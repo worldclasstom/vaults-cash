@@ -1,14 +1,13 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { Position } from "@uniswap/v4-sdk";
-import { robinhoodChain } from "@/lib/chain";
 import { getPoolState, tickToUsdgPrice } from "@/lib/onchain";
 import { fetchPositions, type OwnedPosition } from "@/lib/positions";
 import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
 import { buildPool } from "@/lib/zap";
 import { useActiveAddress } from "./useChainData";
+import { useSendCalls } from "./useSendCalls";
 
 export type PositionView = OwnedPosition & {
   inRange: boolean;
@@ -53,22 +52,13 @@ export function usePositions() {
   });
 }
 
-function useSendCalls() {
-  const { getClientForChain } = useSmartWallets();
-  return async (calls: Awaited<ReturnType<typeof buildCollectPlan>>) => {
-    const client = await getClientForChain({ id: robinhoodChain.id });
-    if (!client) throw new Error("Smart wallet unavailable — please re-login.");
-    return client.sendTransaction({ calls });
-  };
-}
-
 export function useWithdraw() {
   const send = useSendCalls();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (position: OwnedPosition) => {
       const plan = await buildWithdrawPlan({ position, slippageBps: 100 });
-      return send(plan.calls);
+      return send(plan.calls, { description: "Withdraw position to USDG" });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["positions"] });
@@ -84,7 +74,9 @@ export function useCollect() {
   return useMutation({
     mutationFn: async (position: OwnedPosition) => {
       if (!owner) throw new Error("Wallet not ready");
-      return send(await buildCollectPlan(position, owner));
+      return send(await buildCollectPlan(position, owner), {
+        description: "Collect earned fees",
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["positions"] });

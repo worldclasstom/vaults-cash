@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { usePrivy, useFundWallet } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { LogoMark } from "@/components/Logo";
@@ -39,6 +40,8 @@ function Dashboard() {
   const address = useActiveAddress();
   const { fundWallet } = useFundWallet();
   const { data: balance, isLoading } = useUsdgBalance();
+  const [showReceive, setShowReceive] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   return (
     <div className="animate-rise">
@@ -47,12 +50,46 @@ function Dashboard() {
         <p className="py-1 text-5xl font-bold tracking-tight">
           {isLoading || !balance ? "—" : fmtUsd(balance.formatted)}
         </p>
-        <button
-          onClick={() => address && fundWallet({ address })}
-          className="mt-3 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
-        >
-          Add funds
-        </button>
+        <div className="mt-3 flex gap-2">
+          <button
+            onClick={() => address && fundWallet({ address })}
+            className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
+          >
+            Add funds
+          </button>
+          <button
+            onClick={() => setShowReceive(!showReceive)}
+            className="rounded-full bg-surface-raised px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
+          >
+            Receive
+          </button>
+        </div>
+        {showReceive && address && (
+          <div className="mt-3 rounded-2xl bg-surface p-4 text-sm">
+            <p className="pb-2 text-muted">
+              Send <span className="text-foreground">USDG</span> (and a little{" "}
+              <span className="text-foreground">ETH</span> for network fees) on{" "}
+              <span className="text-foreground">Robinhood Chain</span> to:
+            </p>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(address);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
+              }}
+              className="w-full break-all rounded-xl bg-surface-raised p-3 text-left font-mono text-xs transition-colors hover:bg-borderline"
+            >
+              {address}
+              <span className="mt-1 block text-accent">
+                {copied ? "Copied ✓" : "Tap to copy"}
+              </span>
+            </button>
+            <p className="pt-2 text-xs text-muted">
+              You can buy USDG in the Robinhood app and send it here. Only send
+              assets on Robinhood Chain — other networks won&apos;t arrive.
+            </p>
+          </div>
+        )}
       </section>
       <section>
         <h2 className="pb-3 text-lg font-semibold">Markets</h2>

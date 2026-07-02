@@ -1,13 +1,12 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { parseUnits } from "viem";
-import { robinhoodChain } from "@/lib/chain";
 import { USDG, type Market } from "@/lib/markets";
 import { getPoolState } from "@/lib/onchain";
 import { buildZapPlan, type RangePreset, type ZapPlan } from "@/lib/zap";
 import { useActiveAddress } from "./useChainData";
+import { useSendCalls } from "./useSendCalls";
 
 export type DepositInput = {
   market: Market;
@@ -37,24 +36,14 @@ export function usePlanDeposit() {
   });
 }
 
-/** Step 2: send the batch as one sponsored userOp from the smart wallet. */
+/** Step 2: execute the plan — atomic smart-wallet batch when available,
+ *  sequential embedded-EOA transactions otherwise. */
 export function useSendDeposit() {
-  const { getClientForChain } = useSmartWallets();
+  const sendCalls = useSendCalls();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (plan: ZapPlan): Promise<`0x${string}`> => {
-      const client = await getClientForChain({ id: robinhoodChain.id });
-      if (!client) throw new Error("Smart wallet unavailable — please re-login.");
-      return client.sendTransaction(
-        { calls: plan.calls },
-        {
-          uiOptions: {
-            description: "Deposit into your liquidity position",
-            buttonText: "Deposit",
-          },
-        },
-      );
-    },
+    mutationFn: async (plan: ZapPlan) =>
+      sendCalls(plan.calls, { description: "Deposit into your liquidity position" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["usdg-balance"] });
       queryClient.invalidateQueries({ queryKey: ["positions"] });
