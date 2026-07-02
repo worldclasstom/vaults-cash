@@ -42,6 +42,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </header>
       <main className="flex grow flex-col">{children}</main>
+      <footer className="pt-10 text-center text-xs text-muted/70">
+        LP positions carry market &amp; impermanent-loss risk ·{" "}
+        <Link href="/disclosures" className="underline-offset-2 hover:underline">
+          Disclosures &amp; fees
+        </Link>
+      </footer>
     </div>
   );
 }
