@@ -5,6 +5,16 @@
   dashboard smart-wallet config for chain 4663 + fee wallet + test USDG)
 - Vercel deploy + vaults.cash DNS
 
+## Gas UX ladder (as Privy adds chain 4663 support)
+1. **Now**: user pays gas in ETH from the embedded wallet (~$0.01/tx; Receive
+   screen tells them to keep a little ETH).
+2. **When Privy gas management supports 4663**: custom gas payment token =
+   USDG — users pay fees from the same balance they invest, ETH disappears
+   from the UX entirely. (Picker lacks Robinhood Chain today — requested.)
+3. **When smart wallets/native sponsorship support 4663**: atomic one-tap
+   batches + optional app-pays sponsorship (self-funding: ~$0.01 gas vs $0.30
+   fee per $100 deposit), behind NEXT_PUBLIC_SPONSOR_GAS.
+
 ## Next
 - **iOS app (near-term priority)** — Expo/React Native with `@privy-io/expo`
   (Privy smart-wallet client flows are React/React Native only, so Expo is the

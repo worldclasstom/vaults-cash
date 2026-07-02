@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { useMarketQuote, useUsdgBalance } from "@/hooks/useChainData";
+import { useMarketQuote, useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
+import { NATIVE_ETH } from "@/lib/markets";
 import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
 import { fmtUsd, fmtPct } from "@/lib/format";
 import { marketBySymbol } from "@/lib/markets";
@@ -42,10 +43,13 @@ export function MarketDetail({ symbol }: { symbol: string }) {
   const planMutation = usePlanDeposit();
   const sendMutation = useSendDeposit();
 
+  const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
+
   const s = stats?.[market.symbol];
   const amountNum = Number(amount) || 0;
   const insufficient = balance !== undefined && amountNum > (balance?.formatted ?? 0);
   const tooThin = s !== undefined && s.tvlUsd > 0 && amountNum > s.tvlUsd * 0.1;
+  const noGas = ethBalance !== undefined && ethBalance.raw === 0n;
 
   const buildPlan = async () => {
     const p = await planMutation.mutateAsync({
@@ -171,6 +175,13 @@ export function MarketDetail({ symbol }: { symbol: string }) {
             </div>
           )}
 
+          {noGas && amountNum > 0 && (
+            <p className="mt-3 text-xs text-negative">
+              Your wallet has no ETH for network fees. Send a small amount of
+              ETH on Robinhood Chain (about $1 covers many transactions) — see
+              Receive on the home screen.
+            </p>
+          )}
           {tooThin && (
             <p className="mt-3 text-xs text-negative">
               This market is still small — a deposit this size may move the
