@@ -44,3 +44,15 @@ Stock-token markets are geofenced in [src/proxy.ts](src/proxy.ts) (US, CA, GB,
 CH, AE) per the RHJ issuer restrictions, with disclosures at `/disclosures`.
 Get legal review before public launch — a US operator facilitating LP on
 tokenized securities is untested ground.
+
+## Agent API
+
+Agents (MCP hosts, bots, LLM tools) can use the same engine without the UI —
+discovery at [/llms.txt](public/llms.txt):
+
+- `GET /api/agent/markets` · `GET /api/agent/quote` — read-only
+- `POST /api/agent/zap-plan` · `POST /api/agent/withdraw-plan` — executable,
+  fee-inclusive call batches signed by the agent's own wallet
+- `GET /api/agent/positions?owner=0x…`
+
+An MCP server wrapper is planned once the API shape settles.
