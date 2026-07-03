@@ -84,4 +84,7 @@ body {
 
 .animate-bill-escape {
   animation: bill-escape 2.6s ease-out infinite;
+  /* stay at the (invisible) first keyframe during the stagger delay,
+     instead of lingering fully visible before the loop starts */
+  animation-fill-mode: backwards;
 }
