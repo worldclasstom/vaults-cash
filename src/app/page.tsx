@@ -50,18 +50,18 @@ function Dashboard() {
         <p className="py-1 text-5xl font-bold tracking-tight">
           {isLoading || !balance ? "—" : fmtUsd(balance.formatted)}
         </p>
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex items-center gap-3">
           <button
-            onClick={() => address && fundWallet({ address })}
+            onClick={() => setShowReceive(!showReceive)}
             className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
           >
             Add funds
           </button>
           <button
-            onClick={() => setShowReceive(!showReceive)}
-            className="rounded-full bg-surface-raised px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
+            onClick={() => address && fundWallet({ address })}
+            className="text-sm text-muted underline-offset-2 hover:text-foreground hover:underline"
           >
-            Receive
+            Buy with card (beta)
           </button>
         </div>
         {showReceive && address && (
@@ -85,8 +85,9 @@ function Dashboard() {
               </span>
             </button>
             <p className="pt-2 text-xs text-muted">
-              You can buy USDG in the Robinhood app and send it here. Only send
-              assets on Robinhood Chain — other networks won&apos;t arrive.
+              Easiest path: buy USDG in the Robinhood app and send it here.
+              Only send assets on Robinhood Chain — other networks won&apos;t
+              arrive. Card purchases can&apos;t deliver to Robinhood Chain yet.
             </p>
           </div>
         )}
