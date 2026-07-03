@@ -5,7 +5,6 @@ import {
   useSign7702Authorization,
   useWallets,
 } from "@privy-io/react-auth";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { createWalletClient, custom, encodeFunctionData, parseAbi } from "viem";
 import { robinhoodChain } from "@/lib/chain";
 import { publicClient } from "@/lib/onchain";
@@ -43,14 +42,12 @@ function encodeBatch(calls: Call[]): `0x${string}` {
 
 /**
  * Execute a call batch with the best available strategy:
- *  1. Privy smart wallet (ERC-4337) — if the dashboard ever gains 4663 config.
- *  2. EIP-7702 self-executed batch from the embedded EOA — atomic, one
+ *  1. EIP-7702 self-executed batch from the embedded EOA — atomic, one
  *     confirmation, same address; first use includes the delegation.
- *  3. Sequential embedded-EOA transactions — non-atomic fallback (also the
+ *  2. Sequential embedded-EOA transactions — non-atomic fallback (also the
  *     path for external wallets until they support batching).
  */
 export function useSendCalls() {
-  const { getClientForChain } = useSmartWallets();
   const { sendTransaction } = useSendTransaction();
   const { signAuthorization } = useSign7702Authorization();
   const { wallets } = useWallets();
@@ -59,21 +56,7 @@ export function useSendCalls() {
     calls: Call[],
     opts: { description: string },
   ): Promise<{ hash: `0x${string}`; atomic: boolean }> => {
-    // --- 1. dashboard-configured smart wallet ---
-    try {
-      const client = await getClientForChain({ id: robinhoodChain.id });
-      if (client) {
-        const hash = await client.sendTransaction(
-          { calls },
-          { uiOptions: { description: opts.description, buttonText: "Confirm" } },
-        );
-        return { hash, atomic: true };
-      }
-    } catch {
-      /* not configured for this chain */
-    }
-
-    // --- 2. EIP-7702 atomic batch on the embedded EOA ---
+    // --- 1. EIP-7702 atomic batch on the embedded EOA ---
     const embedded = wallets.find((w) => w.walletClientType === "privy");
     if (embedded) {
       try {
@@ -113,7 +96,7 @@ export function useSendCalls() {
       }
     }
 
-    // --- 3. sequential fallback ---
+    // --- 2. sequential fallback ---
     const sponsor = process.env.NEXT_PUBLIC_SPONSOR_GAS === "1";
     let lastHash: `0x${string}` | undefined;
     for (const [i, call] of calls.entries()) {

@@ -2,22 +2,15 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { erc20Abi, formatUnits } from "viem";
 import { getPoolState, publicClient, tickToUsdgPrice } from "@/lib/onchain";
 import { MARKETS, USDG, type Market } from "@/lib/markets";
 
-/** The address funds live at: the user's smart wallet (4337), with the
- *  embedded EOA as fallback while the smart wallet is still deploying. */
+/** The address funds live at: the embedded EOA (which, via EIP-7702
+ *  delegation, is also the smart account — one address forever). */
 export function useActiveAddress(): `0x${string}` | undefined {
   const { user } = usePrivy();
-  const { client } = useSmartWallets();
-  const fromClient = client?.account?.address;
-  const fromLinked = user?.linkedAccounts?.find((a) => a.type === "smart_wallet")?.address as
-    | `0x${string}`
-    | undefined;
-  const embedded = user?.wallet?.address as `0x${string}` | undefined;
-  return (fromClient ?? fromLinked ?? embedded) as `0x${string}` | undefined;
+  return user?.wallet?.address as `0x${string}` | undefined;
 }
 
 export function useUsdgBalance() {

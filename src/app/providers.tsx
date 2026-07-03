@@ -1,7 +1,6 @@
 "use client";
 
 import { PrivyProvider } from "@privy-io/react-auth";
-import { SmartWalletsProvider } from "@privy-io/react-auth/smart-wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { robinhoodChain } from "@/lib/chain";
@@ -40,9 +39,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         supportedChains: [robinhoodChain],
       }}
     >
-      <SmartWalletsProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      </SmartWalletsProvider>
+      {/* SmartWalletsProvider intentionally omitted: Privy has no smart-wallet
+          chain config for 4663 yet and its poller spams console errors.
+          Atomic batching runs via EIP-7702 in useSendCalls instead. */}
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </PrivyProvider>
   );
 }

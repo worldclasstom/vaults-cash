@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { usePrivy, useFundWallet } from "@privy-io/react-auth";
+import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { LogoMark } from "@/components/Logo";
 import { MarketList } from "@/components/MarketList";
@@ -38,7 +38,6 @@ function Landing() {
 
 function Dashboard() {
   const address = useActiveAddress();
-  const { fundWallet } = useFundWallet();
   const { data: balance, isLoading } = useUsdgBalance();
   const [showReceive, setShowReceive] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -50,18 +49,14 @@ function Dashboard() {
         <p className="py-1 text-5xl font-bold tracking-tight">
           {isLoading || !balance ? "—" : fmtUsd(balance.formatted)}
         </p>
+        {/* Card onramp removed until providers can deliver to Robinhood Chain
+            (tested 2026-07-03: Privy funding modal has no route to 4663). */}
         <div className="mt-3 flex items-center gap-3">
           <button
             onClick={() => setShowReceive(!showReceive)}
             className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
           >
             Add funds
-          </button>
-          <button
-            onClick={() => address && fundWallet({ address })}
-            className="text-sm text-muted underline-offset-2 hover:text-foreground hover:underline"
-          >
-            Buy with card (beta)
           </button>
         </div>
         {showReceive && address && (
