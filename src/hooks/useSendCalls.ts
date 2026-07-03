@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useSendTransaction,
-  useSign7702Authorization,
-  useWallets,
-} from "@privy-io/react-auth";
+import { useSendTransaction, useWallets } from "@privy-io/react-auth";
 import { createWalletClient, custom, encodeFunctionData, parseAbi } from "viem";
 import { robinhoodChain } from "@/lib/chain";
 import { publicClient } from "@/lib/onchain";
@@ -49,7 +45,6 @@ function encodeBatch(calls: Call[]): `0x${string}` {
  */
 export function useSendCalls() {
   const { sendTransaction } = useSendTransaction();
-  const { signAuthorization } = useSign7702Authorization();
   const { wallets } = useWallets();
 
   return async (
@@ -71,24 +66,21 @@ export function useSendCalls() {
 
         const code = await publicClient.getCode({ address: eoa });
         const delegated = (code ?? "0x").toLowerCase() === DELEGATION_CODE;
-        const data = encodeBatch(calls);
 
-        const hash = delegated
-          ? await walletClient.sendTransaction({ to: eoa, data, value: 0n })
-          : await walletClient.sendTransaction({
-              to: eoa,
-              data,
-              value: 0n,
-              authorizationList: [
-                await signAuthorization({
-                  contractAddress: DELEGATE,
-                  chainId: robinhoodChain.id,
-                  executor: "self",
-                }),
-              ],
-            });
-        await publicClient.waitForTransactionReceipt({ hash });
-        return { hash, atomic: true };
+        // Privy's embedded signer strips authorizationList from
+        // eth_sendTransaction (verified on-chain 2026-07-03: the "batch"
+        // landed as a type-2 no-op self-call, tx 0x990b52c4…). So we only
+        // batch when the delegation ALREADY exists; installing it requires
+        // the bundler path (EntryPoint v0.8 + eip7702Auth), coming next.
+        if (delegated) {
+          const data = encodeBatch(calls);
+          const hash = await walletClient.sendTransaction({ to: eoa, data, value: 0n });
+          const receipt = await publicClient.waitForTransactionReceipt({ hash });
+          // a real zap always emits events; zero logs = silent no-op
+          if (receipt.logs.length === 0)
+            throw new Error("batch executed as a no-op — falling back");
+          return { hash, atomic: true };
+        }
       } catch (e) {
         // Type-4 not yet supported end-to-end (provider/relay) — fall through
         // to the sequential path rather than dead-ending the user.
