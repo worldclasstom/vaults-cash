@@ -53,3 +53,35 @@ body {
 .animate-rise {
   animation: rise 0.35s ease both;
 }
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-4deg);
+  }
+}
+
+.animate-bob {
+  animation: bob 3s ease-in-out infinite;
+}
+
+@keyframes bill-escape {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) rotate(var(--tilt, -6deg)) scale(0.9);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-90px) rotate(var(--tilt, -6deg)) scale(1.05);
+  }
+}
+
+.animate-bill-escape {
+  animation: bill-escape 2.6s ease-out infinite;
+}

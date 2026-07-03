@@ -27,8 +27,9 @@ export default function DisclosuresPage() {
           <p>
             vaults.cash charges {Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of
             the amount converted when you enter or exit a position. Pool trading
-            fees you earn are yours entirely. Gas is sponsored — you pay no
-            network fees.
+            fees you earn are yours entirely. Network (gas) fees — typically
+            under $0.02 per action — are paid from your wallet directly to the
+            blockchain; vaults.cash does not mark them up or profit from them.
           </p>
         </section>
         <section>

@@ -26,7 +26,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <PrivyProvider
       appId={appId}
       config={{
-        loginMethods: ["email", "sms", "google", "apple", "passkey", "wallet"],
+        // "apple" returns when Apple OAuth is configured in the Privy
+        // dashboard (required for the iOS app anyway — needs an Apple
+        // Developer Service ID first).
+        loginMethods: ["email", "sms", "google", "passkey", "wallet"],
         appearance: {
           theme: "dark",
           accentColor: "#7cd44a",

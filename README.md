@@ -1,5 +1,9 @@
 # vaults.cash
 
+> Docs: [OVERVIEW](docs/OVERVIEW.md) (source of truth) ·
+> [DECISIONS](docs/DECISIONS.md) (why things are the way they are) ·
+> [RUNBOOK](docs/RUNBOOK.md) (ops + gotchas) · [ROADMAP](ROADMAP.md)
+
 Robinhood-simple liquidity positions on **Robinhood Chain** (chain id 4663).
 Log in with email, pick a market (tokenized stocks or blue-chip crypto), and one
 tap converts USDG into a Uniswap v4 LP position. Self-custodial via Privy
