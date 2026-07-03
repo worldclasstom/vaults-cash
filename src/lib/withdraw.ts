@@ -3,25 +3,23 @@
  * platform fee skimmed from the swap output), leaving the user all-USDG.
  * Built as one atomic batch like the deposit zap.
  */
-import { encodeFunctionData, erc20Abi, maxUint256, maxUint160, parseAbi, zeroAddress } from "viem";
-import { Ether, Percent } from "@uniswap/sdk-core";
-import { Actions, Position, V4Planner, V4PositionManager } from "@uniswap/v4-sdk";
-import { UNISWAP } from "./chain";
-import { NATIVE_ETH, USDG, type Market } from "./markets";
+import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
+import { Percent } from "@uniswap/sdk-core";
+import { Position, V4PositionManager } from "@uniswap/v4-sdk";
+import { NATIVE_ETH, USDG } from "./markets";
 import { getPoolState } from "./onchain";
-import { buildPool, quoteAssetToUsdg, type Call } from "./zap";
+import { buildPool } from "./zap";
+import {
+  buildSwapCall,
+  erc20Approve,
+  permit2Approve,
+  quoteAssetToUsdg,
+  PERMIT2,
+  POSM,
+  ROUTER,
+  type Call,
+} from "./uniswap";
 import type { OwnedPosition } from "./positions";
-
-const ROUTER = UNISWAP.v4.universalRouter as `0x${string}`;
-const POSM = UNISWAP.v4.positionManager as `0x${string}`;
-const PERMIT2 = UNISWAP.permit2 as `0x${string}`;
-
-const routerAbi = parseAbi([
-  "function execute(bytes commands, bytes[] inputs, uint256 deadline) payable",
-]);
-const permit2Abi = parseAbi([
-  "function approve(address token, address spender, uint160 amount, uint48 expiration)",
-]);
 
 export type WithdrawPlan = {
   calls: Call[];
@@ -76,52 +74,18 @@ export async function buildWithdrawPlan(params: {
     usdgOutMin = (amountOut * BigInt(10_000 - slippageBps)) / 10_000n;
 
     if (market.token !== NATIVE_ETH) {
-      calls.push({
-        to: market.token,
-        value: 0n,
-        data: encodeFunctionData({ abi: erc20Abi, functionName: "approve", args: [PERMIT2, maxUint256] }),
-      });
-      calls.push({
-        to: PERMIT2,
-        value: 0n,
-        data: encodeFunctionData({
-          abi: permit2Abi,
-          functionName: "approve",
-          args: [market.token, ROUTER, maxUint160, Number(deadline)],
-        }),
-      });
+      calls.push(erc20Approve(market.token, PERMIT2));
+      calls.push(permit2Approve(market.token, ROUTER, deadline));
     }
-
-    const planner = new V4Planner();
-    planner.addAction(Actions.SWAP_EXACT_IN_SINGLE, [
-      {
-        poolKey: {
-          currency0: market.pool.currency0,
-          currency1: market.pool.currency1,
-          fee: market.pool.fee,
-          tickSpacing: market.pool.tickSpacing,
-          hooks: zeroAddress,
-        },
-        zeroForOne: market.assetIsCurrency0, // asset -> USDG
-        amountIn: assetOutMin.toString(),
-        amountOutMinimum: usdgOutMin.toString(),
-        hookData: "0x",
-      },
-    ]);
-    const assetCurrency = market.assetIsCurrency0 ? market.pool.currency0 : market.pool.currency1;
-    const usdgCurrency = market.assetIsCurrency0 ? market.pool.currency1 : market.pool.currency0;
-    planner.addAction(Actions.SETTLE_ALL, [assetCurrency, assetOutMin.toString()]);
-    planner.addAction(Actions.TAKE_ALL, [usdgCurrency, usdgOutMin.toString()]);
-    calls.push({
-      to: ROUTER,
-      // native ETH input is paid as msg.value on the router call
-      value: market.token === NATIVE_ETH ? assetOutMin : 0n,
-      data: encodeFunctionData({
-        abi: routerAbi,
-        functionName: "execute",
-        args: ["0x10", [planner.finalize() as `0x${string}`], deadline],
+    calls.push(
+      buildSwapCall({
+        market,
+        direction: "assetToUsdg",
+        amountIn: assetOutMin,
+        minAmountOut: usdgOutMin,
+        deadline,
       }),
-    });
+    );
 
     // 3. platform fee on the swapped output
     feeAmount = (usdgOutMin * feeBps) / 10_000n;

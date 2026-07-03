@@ -15,21 +15,23 @@
  * pool moves beyond the slippage tolerance. Any dust stays in the user's own
  * wallet — there is no vaults.cash contract holding funds.
  */
-import {
-  encodeFunctionData,
-  erc20Abi,
-  maxUint256,
-  maxUint160,
-  parseAbi,
-  zeroAddress,
-} from "viem";
-import { CurrencyAmount, Ether, Percent, Token, type Currency } from "@uniswap/sdk-core";
-import { Actions, Pool, Position, V4Planner, V4PositionManager } from "@uniswap/v4-sdk";
-import { UNISWAP } from "./chain";
+import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
+import { Ether, Percent, Token, type Currency } from "@uniswap/sdk-core";
+import { Pool, Position, V4PositionManager } from "@uniswap/v4-sdk";
 import { NATIVE_ETH, USDG, type Market } from "./markets";
-import { publicClient } from "./onchain";
+import {
+  buildSwapCall,
+  erc20Approve,
+  permit2Approve,
+  quoteUsdgToAsset,
+  PERMIT2,
+  POSM,
+  ROUTER,
+  type Call,
+} from "./uniswap";
 
-export type Call = { to: `0x${string}`; value: bigint; data: `0x${string}` };
+export type { Call } from "./uniswap";
+export { quoteUsdgToAsset, quoteAssetToUsdg } from "./uniswap";
 
 export type RangePreset = "full" | "balanced" | "aggressive";
 /** half-width of the range as a fraction of price; full = entire curve */
@@ -41,24 +43,6 @@ export const PRESET_WIDTH: Record<Exclude<RangePreset, "full">, number> = {
 const CHAIN_ID = 4663;
 const MIN_TICK = -887272;
 const MAX_TICK = 887272;
-const PERMIT2 = UNISWAP.permit2 as `0x${string}`;
-const ROUTER = UNISWAP.v4.universalRouter as `0x${string}`;
-const POSM = UNISWAP.v4.positionManager as `0x${string}`;
-const QUOTER = UNISWAP.v4.quoter as `0x${string}`;
-const UR_V4_SWAP_COMMAND = "0x10";
-
-const permit2Abi = parseAbi([
-  "function approve(address token, address spender, uint160 amount, uint48 expiration)",
-  "function allowance(address user, address token, address spender) view returns (uint160 amount, uint48 expiration, uint48 nonce)",
-]);
-const routerAbi = parseAbi([
-  "function execute(bytes commands, bytes[] inputs, uint256 deadline) payable",
-]);
-const quoterAbi = parseAbi([
-  "struct PoolKey { address currency0; address currency1; uint24 fee; int24 tickSpacing; address hooks; }",
-  "struct QuoteExactSingleParams { PoolKey poolKey; bool zeroForOne; uint128 exactAmount; bytes hookData; }",
-  "function quoteExactInputSingle(QuoteExactSingleParams params) returns (uint256 amountOut, uint256 gasEstimate)",
-]);
 
 export function marketCurrency(market: Market): Currency {
   return market.token === NATIVE_ETH
@@ -140,37 +124,6 @@ export function swapShare(
   return assetIsCurrency0 ? share0 : 1 - share0;
 }
 
-async function quoteExactIn(market: Market, amountIn: bigint, zeroForOne: boolean) {
-  const { result } = await publicClient.simulateContract({
-    address: QUOTER,
-    abi: quoterAbi,
-    functionName: "quoteExactInputSingle",
-    args: [
-      {
-        poolKey: {
-          currency0: market.pool.currency0,
-          currency1: market.pool.currency1,
-          fee: market.pool.fee,
-          tickSpacing: market.pool.tickSpacing,
-          hooks: zeroAddress,
-        },
-        zeroForOne,
-        exactAmount: amountIn,
-        hookData: "0x",
-      },
-    ],
-  });
-  return { amountOut: result[0], gasEstimate: result[1] };
-}
-
-/** USDG -> asset: direction depends on which side USDG sorted to */
-export const quoteUsdgToAsset = (market: Market, amountIn: bigint) =>
-  quoteExactIn(market, amountIn, !market.assetIsCurrency0);
-
-/** asset -> USDG */
-export const quoteAssetToUsdg = (market: Market, amountIn: bigint) =>
-  quoteExactIn(market, amountIn, market.assetIsCurrency0);
-
 export type ZapPlan = {
   calls: Call[];
   feeAmount: bigint;
@@ -213,46 +166,24 @@ export async function buildZapPlan(params: {
     const { amountOut } = await quoteUsdgToAsset(market, swapIn);
     swapOutMin = (amountOut * slippage) / 10_000n;
 
-    // 2. USDG -> Permit2 -> UniversalRouter
-    calls.push(erc20Approve(USDG.address, PERMIT2, maxUint256));
+    // 2. USDG -> Permit2 -> UniversalRouter, then the swap itself
+    calls.push(erc20Approve(USDG.address, PERMIT2));
     calls.push(permit2Approve(USDG.address, ROUTER, deadline));
-
-    // 3. the swap
-    const planner = new V4Planner();
-    planner.addAction(Actions.SWAP_EXACT_IN_SINGLE, [
-      {
-        poolKey: {
-          currency0: market.pool.currency0,
-          currency1: market.pool.currency1,
-          fee: market.pool.fee,
-          tickSpacing: market.pool.tickSpacing,
-          hooks: zeroAddress,
-        },
-        zeroForOne: !market.assetIsCurrency0, // USDG -> asset
-        amountIn: swapIn.toString(),
-        amountOutMinimum: swapOutMin.toString(),
-        hookData: "0x",
-      },
-    ]);
-    const usdgCurrency = market.assetIsCurrency0 ? market.pool.currency1 : market.pool.currency0;
-    const assetCurrency = market.assetIsCurrency0 ? market.pool.currency0 : market.pool.currency1;
-    planner.addAction(Actions.SETTLE_ALL, [usdgCurrency, swapIn.toString()]);
-    planner.addAction(Actions.TAKE_ALL, [assetCurrency, swapOutMin.toString()]);
-    calls.push({
-      to: ROUTER,
-      value: 0n,
-      data: encodeFunctionData({
-        abi: routerAbi,
-        functionName: "execute",
-        args: [UR_V4_SWAP_COMMAND, [planner.finalize() as `0x${string}`], deadline],
+    calls.push(
+      buildSwapCall({
+        market,
+        direction: "usdgToAsset",
+        amountIn: swapIn,
+        minAmountOut: swapOutMin,
+        deadline,
       }),
-    });
+    );
   }
 
   // 4. approvals for PositionManager
   if (usdgToPosition > 0n) calls.push(permit2Approve(USDG.address, POSM, deadline));
   if (market.token !== NATIVE_ETH && swapOutMin > 0n) {
-    calls.push(erc20Approve(market.token, PERMIT2, maxUint256));
+    calls.push(erc20Approve(market.token, PERMIT2));
     calls.push(permit2Approve(market.token, POSM, deadline));
   }
 
@@ -290,27 +221,6 @@ export async function buildZapPlan(params: {
   }
 
   return { calls, feeAmount, swapIn, swapOutMin, usdgToPosition, tickLower, tickUpper };
-}
-
-function erc20Approve(token: `0x${string}`, spender: `0x${string}`, amount: bigint): Call {
-  return {
-    to: token,
-    value: 0n,
-    data: encodeFunctionData({ abi: erc20Abi, functionName: "approve", args: [spender, amount] }),
-  };
-}
-
-function permit2Approve(token: `0x${string}`, spender: `0x${string}`, deadline: bigint): Call {
-  return {
-    to: PERMIT2,
-    value: 0n,
-    data: encodeFunctionData({
-      abi: permit2Abi,
-      functionName: "approve",
-      // uint48 expiration; deadline fits comfortably
-      args: [token, spender, maxUint160, Number(deadline)],
-    }),
-  };
 }
 
 /** Estimated USDG value of the planned position (for the confirm sheet). */
