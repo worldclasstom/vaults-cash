@@ -5,8 +5,9 @@ import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { LogoMark } from "@/components/Logo";
 import { MarketList } from "@/components/MarketList";
-import { useActiveAddress, useUsdgBalance } from "@/hooks/useChainData";
-import { fmtUsd } from "@/lib/format";
+import { useActiveAddress, useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
+import { fmtAmount, fmtUsd } from "@/lib/format";
+import { NATIVE_ETH } from "@/lib/markets";
 
 function Landing() {
   const { login } = usePrivy();
@@ -39,6 +40,7 @@ function Landing() {
 function Dashboard() {
   const address = useActiveAddress();
   const { data: balance, isLoading } = useUsdgBalance();
+  const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
   const [showReceive, setShowReceive] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -49,6 +51,11 @@ function Dashboard() {
         <p className="py-1 text-5xl font-bold tracking-tight">
           {isLoading || !balance ? "—" : fmtUsd(balance.formatted)}
         </p>
+        {ethBalance && ethBalance.raw > 0n && (
+          <p className="text-sm text-muted">
+            + {fmtAmount(ethBalance.formatted, 5)} ETH for network fees
+          </p>
+        )}
         {/* Card onramp removed until providers can deliver to Robinhood Chain
             (tested 2026-07-03: Privy funding modal has no route to 4663). */}
         <div className="mt-3 flex items-center gap-3">
