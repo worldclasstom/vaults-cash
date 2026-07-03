@@ -1,94 +1,164 @@
 "use client";
 
-import { useSendTransaction, useWallets } from "@privy-io/react-auth";
-import { createWalletClient, custom, encodeFunctionData, parseAbi } from "viem";
+import {
+  useSendTransaction,
+  useSign7702Authorization,
+  useWallets,
+} from "@privy-io/react-auth";
+import { http, type TypedDataDefinition } from "viem";
+import {
+  createBundlerClient,
+  entryPoint08Address,
+  toSimple7702SmartAccount,
+} from "viem/account-abstraction";
+import type { PrivateKeyAccount, SignedAuthorization } from "viem";
 import { robinhoodChain } from "@/lib/chain";
 import { publicClient } from "@/lib/onchain";
 import type { Call } from "@/lib/zap";
 
 /**
- * EF's canonical Simple7702Account delegate (audited, shipped with
- * EntryPoint v0.8) — verified deployed on Robinhood Chain 2026-07-03.
- * The embedded EOA delegates to it once, then executes call batches on
- * itself: atomic, no bundler, same address forever.
+ * Atomic path: the embedded EOA acts as an ERC-4337 sender at its own
+ * address via EIP-7702 (EF's canonical Simple7702Account delegate, verified
+ * deployed on 4663). UserOps go through Alchemy's bundler with the signed
+ * authorization attached — Privy's signer can't send type-4 transactions
+ * directly (it strips authorizationList; verified on-chain), but it CAN sign
+ * the authorization and the EIP-712 userOp hash, which is all this needs.
  */
 const DELEGATE = "0xe6Cae83BdE06E4c305530e199D7217f42808555B" as const;
 const DELEGATION_CODE = ("0xef0100" + DELEGATE.slice(2)).toLowerCase();
 
-const delegateAbi = parseAbi([
-  "struct Call { address target; uint256 value; bytes data; }",
-  "function execute(address target, uint256 value, bytes data)",
-  "function executeBatch(Call[] calls)",
-]);
+const BUNDLER_URL = process.env.NEXT_PUBLIC_RPC_URL || "";
 
-function encodeBatch(calls: Call[]): `0x${string}` {
-  if (calls.length === 1) {
-    return encodeFunctionData({
-      abi: delegateAbi,
-      functionName: "execute",
-      args: [calls[0].to, calls[0].value, calls[0].data],
-    });
-  }
-  return encodeFunctionData({
-    abi: delegateAbi,
-    functionName: "executeBatch",
-    args: [calls.map((c) => ({ target: c.to, value: c.value, data: c.data }))],
+async function bundlerRpc(method: string, params: unknown[] = []) {
+  const res = await fetch(BUNDLER_URL, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
   });
+  const body = await res.json();
+  if (body.error) throw new Error(`${method}: ${body.error.message}`);
+  return body.result;
 }
 
-/**
- * Execute a call batch with the best available strategy:
- *  1. EIP-7702 self-executed batch from the embedded EOA — atomic, one
- *     confirmation, same address; first use includes the delegation.
- *  2. Sequential embedded-EOA transactions — non-atomic fallback (also the
- *     path for external wallets until they support batching).
- */
+let entryPointChecked: boolean | null = null;
+async function bundlerSupportsEp08(): Promise<boolean> {
+  if (entryPointChecked !== null) return entryPointChecked;
+  const eps: string[] = await bundlerRpc("eth_supportedEntryPoints");
+  console.info("[vaults] bundler entrypoints:", eps);
+  entryPointChecked = eps.some(
+    (e) => e.toLowerCase() === entryPoint08Address.toLowerCase(),
+  );
+  return entryPointChecked;
+}
+
 export function useSendCalls() {
   const { sendTransaction } = useSendTransaction();
+  const { signAuthorization } = useSign7702Authorization();
   const { wallets } = useWallets();
 
   return async (
     calls: Call[],
     opts: { description: string },
   ): Promise<{ hash: `0x${string}`; atomic: boolean }> => {
-    // --- 1. EIP-7702 atomic batch on the embedded EOA ---
     const embedded = wallets.find((w) => w.walletClientType === "privy");
-    if (embedded) {
+
+    // --- 1. atomic userOp via Alchemy bundler (EP v0.8 + 7702) ---
+    if (embedded && BUNDLER_URL) {
       try {
+        if (!(await bundlerSupportsEp08()))
+          throw new Error("bundler does not serve EntryPoint v0.8");
+
         const eoa = embedded.address as `0x${string}`;
         await embedded.switchChain(robinhoodChain.id);
         const provider = await embedded.getEthereumProvider();
-        const walletClient = createWalletClient({
-          account: eoa,
-          chain: robinhoodChain,
-          transport: custom(provider),
+
+        // viem only needs signTypedData from the owner (EP v0.8 userOps are
+        // EIP-712); back it with Privy's provider.
+        const owner = {
+          address: eoa,
+          type: "local",
+          source: "custom",
+          signTypedData: async (typedData: TypedDataDefinition) =>
+            (await provider.request({
+              method: "eth_signTypedData_v4",
+              params: [eoa, JSON.stringify(typedData)],
+            })) as `0x${string}`,
+          signMessage: async ({ message }: { message: string }) =>
+            (await provider.request({
+              method: "personal_sign",
+              params: [
+                typeof message === "string" ? message : (message as { raw: string }).raw,
+                eoa,
+              ],
+            })) as `0x${string}`,
+        } as unknown as PrivateKeyAccount;
+
+        const account = await toSimple7702SmartAccount({
+          client: publicClient,
+          owner,
+          implementation: DELEGATE,
         });
 
+        const bundlerClient = createBundlerClient({
+          account,
+          client: publicClient,
+          transport: http(BUNDLER_URL),
+          userOperation: {
+            estimateFeesPerGas: async () => {
+              const block = await publicClient.getBlock();
+              let maxPriorityFeePerGas = 0n;
+              try {
+                maxPriorityFeePerGas = BigInt(
+                  await bundlerRpc("rundler_maxPriorityFeePerGas"),
+                );
+              } catch {
+                /* not rundler — keep 0 */
+              }
+              const base = block.baseFeePerGas ?? 100_000_000n;
+              return {
+                maxFeePerGas: base * 2n + maxPriorityFeePerGas,
+                maxPriorityFeePerGas,
+              };
+            },
+          },
+        });
+
+        // sign the 7702 authorization only if the delegation isn't installed
         const code = await publicClient.getCode({ address: eoa });
         const delegated = (code ?? "0x").toLowerCase() === DELEGATION_CODE;
-
-        // Privy's embedded signer strips authorizationList from
-        // eth_sendTransaction (verified on-chain 2026-07-03: the "batch"
-        // landed as a type-2 no-op self-call, tx 0x990b52c4…). So we only
-        // batch when the delegation ALREADY exists; installing it requires
-        // the bundler path (EntryPoint v0.8 + eip7702Auth), coming next.
-        if (delegated) {
-          const data = encodeBatch(calls);
-          const hash = await walletClient.sendTransaction({ to: eoa, data, value: 0n });
-          const receipt = await publicClient.waitForTransactionReceipt({ hash });
-          // a real zap always emits events; zero logs = silent no-op
-          if (receipt.logs.length === 0)
-            throw new Error("batch executed as a no-op — falling back");
-          return { hash, atomic: true };
+        let authorization: SignedAuthorization | undefined;
+        if (!delegated) {
+          const nonce = await publicClient.getTransactionCount({ address: eoa });
+          const auth = await signAuthorization({
+            contractAddress: DELEGATE,
+            chainId: robinhoodChain.id,
+            nonce,
+          });
+          authorization = {
+            address: DELEGATE,
+            chainId: auth.chainId,
+            nonce: auth.nonce,
+            r: auth.r,
+            s: auth.s,
+            yParity: auth.yParity,
+          } as SignedAuthorization;
         }
+
+        const uoHash = await bundlerClient.sendUserOperation({
+          calls: calls.map((c) => ({ to: c.to, value: c.value, data: c.data })),
+          authorization,
+        });
+        const { receipt, success } =
+          await bundlerClient.waitForUserOperationReceipt({ hash: uoHash });
+        if (!success) throw new Error("userOp reverted on-chain");
+        console.info("[vaults] atomic userOp mined:", receipt.transactionHash);
+        return { hash: receipt.transactionHash, atomic: true };
       } catch (e) {
-        // Type-4 not yet supported end-to-end (provider/relay) — fall through
-        // to the sequential path rather than dead-ending the user.
-        console.warn("7702 batch failed, falling back to sequential:", e);
+        console.warn("[vaults] atomic path failed, using sequential:", e);
       }
     }
 
-    // --- 2. sequential fallback ---
+    // --- 2. sequential fallback (also the external-wallet path) ---
     const sponsor = process.env.NEXT_PUBLIC_SPONSOR_GAS === "1";
     let lastHash: `0x${string}` | undefined;
     for (const [i, call] of calls.entries()) {
