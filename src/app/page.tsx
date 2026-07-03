@@ -6,7 +6,12 @@ import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { LogoMark } from "@/components/Logo";
 import { MarketList } from "@/components/MarketList";
-import { useActiveAddress, useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
+import {
+  useActiveAddress,
+  useAssetBalances,
+  useTokenBalance,
+  useUsdgBalance,
+} from "@/hooks/useChainData";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 
@@ -42,6 +47,7 @@ function Dashboard() {
   const address = useActiveAddress();
   const { data: balance, isLoading } = useUsdgBalance();
   const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
+  const { data: assetBalances } = useAssetBalances();
   const [showReceive, setShowReceive] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -55,6 +61,15 @@ function Dashboard() {
         {ethBalance && ethBalance.raw > 0n && (
           <p className="text-sm text-muted">
             + {fmtAmount(ethBalance.formatted, 5)} ETH for network fees
+          </p>
+        )}
+        {assetBalances && assetBalances.length > 0 && (
+          <p className="text-sm text-muted">
+            +{" "}
+            {assetBalances
+              .map((b) => `${fmtAmount(b.formatted, 5)} ${b.symbol}`)
+              .join(" · ")}{" "}
+            <span className="text-muted/60">(from withdrawals)</span>
           </p>
         )}
         {/* Card onramp removed until providers can deliver to Robinhood Chain

@@ -69,7 +69,9 @@ export function useWithdraw() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (position: OwnedPosition) => {
-      const plan = await buildWithdrawPlan({ position, slippageBps: 100 });
+      // tight tolerance: the slippage buffer is exactly what comes back as
+      // non-USDG dust, and blocks are ~250ms — worst case a revert + retry
+      const plan = await buildWithdrawPlan({ position, slippageBps: 25 });
       return send(plan.calls, { description: "Withdraw position to USDG" });
     },
     onSuccess: () => {

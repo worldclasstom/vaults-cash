@@ -51,6 +51,33 @@ export function useTokenBalance(token: `0x${string}`, decimals: number) {
   });
 }
 
+/** Non-USDG asset balances sitting in the wallet (e.g. withdrawal dust). */
+export function useAssetBalances() {
+  const address = useActiveAddress();
+  return useQuery({
+    queryKey: ["asset-balances", address],
+    enabled: !!address,
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const erc20Markets = MARKETS.filter(
+        (m) => m.token !== "0x0000000000000000000000000000000000000000",
+      );
+      const balances = await Promise.all(
+        erc20Markets.map(async (m) => {
+          const raw = await publicClient.readContract({
+            address: m.token,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [address!],
+          });
+          return { symbol: m.symbol, formatted: Number(formatUnits(raw, m.tokenDecimals)) };
+        }),
+      );
+      return balances.filter((b) => b.formatted > 0);
+    },
+  });
+}
+
 export type MarketQuote = {
   market: Market;
   price: number;
