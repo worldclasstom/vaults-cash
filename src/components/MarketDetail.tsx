@@ -7,8 +7,10 @@ import { AppShell } from "@/components/AppShell";
 import { useMarketQuote, useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
 import { NATIVE_ETH } from "@/lib/markets";
 import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
+import { formatEther } from "viem";
 import { fmtUsd, fmtPct } from "@/lib/format";
-import { marketBySymbol } from "@/lib/markets";
+import { UNISWAP } from "@/lib/chain";
+import { marketBySymbol, USDG } from "@/lib/markets";
 import { planSummary, PRESET_WIDTH, type RangePreset, type ZapPlan } from "@/lib/zap";
 import type { MarketStats } from "@/app/api/stats/route";
 
@@ -228,11 +230,12 @@ export function MarketDetail({ symbol }: { symbol: string }) {
                 v={preset === "full" && !customWidthPct ? "Full range" : `±${customWidthPct || (preset !== "full" ? PRESET_WIDTH[preset] * 100 : "")}%`}
               />
             </dl>
-            <p className="pb-4 text-xs text-muted">
+            <p className="pb-2 text-xs text-muted">
               Network fee ~$0.01, paid in ETH from your wallet. You&apos;ll earn{" "}
               {market.pool.fee / 10_000}% of every trade that crosses your
               range. Withdraw anytime.
             </p>
+            <TxDetails calls={plan.calls} />
             <button
               onClick={confirm}
               disabled={sendMutation.isPending}
@@ -249,6 +252,39 @@ export function MarketDetail({ symbol }: { symbol: string }) {
         </div>
       )}
     </AppShell>
+  );
+}
+
+const CONTRACT_LABELS: Record<string, string> = {
+  [USDG.address.toLowerCase()]: "USDG token",
+  [UNISWAP.permit2.toLowerCase()]: "Permit2 (approvals)",
+  [UNISWAP.v4.universalRouter.toLowerCase()]: "Uniswap Universal Router (swap)",
+  [UNISWAP.v4.positionManager.toLowerCase()]: "Uniswap Position Manager (mint)",
+};
+
+function TxDetails({ calls }: { calls: ZapPlan["calls"] }) {
+  return (
+    <details className="pb-4 text-xs text-muted">
+      <summary className="cursor-pointer underline-offset-2 hover:underline">
+        Transaction details (advanced)
+      </summary>
+      <div className="mt-2 max-h-44 space-y-2 overflow-y-auto rounded-xl bg-background p-3 font-mono">
+        {calls.map((c, i) => (
+          <div key={i}>
+            <p className="text-foreground">
+              {i + 1}. {CONTRACT_LABELS[c.to.toLowerCase()] ?? c.to}
+              {c.value > 0n ? ` · ${formatEther(c.value)} ETH` : ""}
+            </p>
+            <p className="break-all text-muted/60">{c.data}</p>
+          </div>
+        ))}
+        <p className="pt-1 text-muted/60">
+          Executed atomically from your wallet via EIP-7702 + ERC-4337
+          (EntryPoint v0.8). All-or-nothing: if any step fails, everything
+          reverts.
+        </p>
+      </div>
+    </details>
   );
 }
 
