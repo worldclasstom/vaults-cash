@@ -2,11 +2,11 @@ import { createPublicClient, http, parseAbi } from "viem";
 import { robinhoodChain, UNISWAP } from "./chain";
 import type { Market } from "./markets";
 
-/** Browser uses the Alchemy endpoint (protected by its domain allowlist);
- *  server-side code uses the public RPC — Alchemy rejects origin-less
- *  requests once an allowlist is set. */
+/** Browser on the production domain uses the Alchemy endpoint (protected by
+ *  its domain allowlist); server-side code and localhost dev use the public
+ *  RPC — Alchemy rejects origins outside the allowlist. */
 const rpcUrl =
-  typeof window === "undefined"
+  typeof window === "undefined" || window.location.hostname === "localhost"
     ? undefined
     : process.env.NEXT_PUBLIC_RPC_URL || undefined;
 
@@ -43,10 +43,11 @@ export async function getPoolState(market: Market) {
 
 /**
  * Mid-price of the market asset in USDG, derived from the pool tick.
- * Both launch pools have USDG as currency1, so price(c1 per c0) is the
- * asset price directly; the decimal shift is 10^(assetDec - usdgDec).
+ * 1.0001^tick is the raw currency1-per-currency0 price; whether that's the
+ * asset price or its inverse depends on address-sort order.
  */
 export function tickToUsdgPrice(market: Market, tick: number): number {
   const raw = Math.pow(1.0001, tick);
-  return raw * Math.pow(10, market.tokenDecimals - 6);
+  const shift = Math.pow(10, market.tokenDecimals - 6);
+  return market.assetIsCurrency0 ? raw * shift : shift / raw;
 }

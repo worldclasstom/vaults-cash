@@ -116,29 +116,31 @@ export function presetTicks(
 
 /**
  * Which share of the (post-fee) USDG must be swapped into the asset so the
- * two sides match the range's required ratio at the current price.
- * USDG is currency1 in every launch pool (asserted in markets.ts ordering),
- * so the asset is currency0. Float math is fine here: the result only seeds
- * the quote, and the batch is guarded by amountOutMinimum/amountMax.
+ * two sides match the range's required ratio at the current price. Float
+ * math is fine here: the result only seeds the quote, and the batch is
+ * guarded by amountOutMinimum/amountMax.
  */
 export function swapShare(
   currentTick: number,
   tickLower: number,
   tickUpper: number,
+  assetIsCurrency0: boolean,
 ): number {
-  if (currentTick <= tickLower) return 1; // price below range: all asset
-  if (currentTick >= tickUpper) return 0; // price above range: all USDG
+  // out of range: position is single-sided in one currency
+  if (currentTick <= tickLower) return assetIsCurrency0 ? 1 : 0; // all c0
+  if (currentTick >= tickUpper) return assetIsCurrency0 ? 0 : 1; // all c1
   const sp = Math.pow(1.0001, currentTick / 2);
   const sl = Math.pow(1.0001, tickLower / 2);
   const su = Math.pow(1.0001, tickUpper / 2);
   const amount0PerL = 1 / sp - 1 / su;
   const amount1PerL = sp - sl;
   const price = sp * sp; // c1 per c0, raw
-  const value0 = amount0PerL * price;
-  return value0 / (value0 + amount1PerL);
+  const value0 = amount0PerL * price; // both sides valued in c1 units
+  const share0 = value0 / (value0 + amount1PerL);
+  return assetIsCurrency0 ? share0 : 1 - share0;
 }
 
-export async function quoteUsdgToAsset(market: Market, amountIn: bigint) {
+async function quoteExactIn(market: Market, amountIn: bigint, zeroForOne: boolean) {
   const { result } = await publicClient.simulateContract({
     address: QUOTER,
     abi: quoterAbi,
@@ -152,7 +154,7 @@ export async function quoteUsdgToAsset(market: Market, amountIn: bigint) {
           tickSpacing: market.pool.tickSpacing,
           hooks: zeroAddress,
         },
-        zeroForOne: false, // USDG (currency1) -> asset (currency0)
+        zeroForOne,
         exactAmount: amountIn,
         hookData: "0x",
       },
@@ -161,28 +163,13 @@ export async function quoteUsdgToAsset(market: Market, amountIn: bigint) {
   return { amountOut: result[0], gasEstimate: result[1] };
 }
 
-export async function quoteAssetToUsdg(market: Market, amountIn: bigint) {
-  const { result } = await publicClient.simulateContract({
-    address: QUOTER,
-    abi: quoterAbi,
-    functionName: "quoteExactInputSingle",
-    args: [
-      {
-        poolKey: {
-          currency0: market.pool.currency0,
-          currency1: market.pool.currency1,
-          fee: market.pool.fee,
-          tickSpacing: market.pool.tickSpacing,
-          hooks: zeroAddress,
-        },
-        zeroForOne: true, // asset (currency0) -> USDG (currency1)
-        exactAmount: amountIn,
-        hookData: "0x",
-      },
-    ],
-  });
-  return { amountOut: result[0], gasEstimate: result[1] };
-}
+/** USDG -> asset: direction depends on which side USDG sorted to */
+export const quoteUsdgToAsset = (market: Market, amountIn: bigint) =>
+  quoteExactIn(market, amountIn, !market.assetIsCurrency0);
+
+/** asset -> USDG */
+export const quoteAssetToUsdg = (market: Market, amountIn: bigint) =>
+  quoteExactIn(market, amountIn, market.assetIsCurrency0);
 
 export type ZapPlan = {
   calls: Call[];
@@ -213,7 +200,7 @@ export async function buildZapPlan(params: {
   const net = usdgAmount - feeAmount;
 
   const { tickLower, tickUpper } = presetTicks(market, poolState.tick, preset, customWidth);
-  const share = swapShare(poolState.tick, tickLower, tickUpper);
+  const share = swapShare(poolState.tick, tickLower, tickUpper, market.assetIsCurrency0);
   const swapIn = (net * BigInt(Math.round(share * 1_000_000))) / 1_000_000n;
   const usdgToPosition = net - swapIn;
 
@@ -241,14 +228,16 @@ export async function buildZapPlan(params: {
           tickSpacing: market.pool.tickSpacing,
           hooks: zeroAddress,
         },
-        zeroForOne: false,
+        zeroForOne: !market.assetIsCurrency0, // USDG -> asset
         amountIn: swapIn.toString(),
         amountOutMinimum: swapOutMin.toString(),
         hookData: "0x",
       },
     ]);
-    planner.addAction(Actions.SETTLE_ALL, [market.pool.currency1, swapIn.toString()]);
-    planner.addAction(Actions.TAKE_ALL, [market.pool.currency0, swapOutMin.toString()]);
+    const usdgCurrency = market.assetIsCurrency0 ? market.pool.currency1 : market.pool.currency0;
+    const assetCurrency = market.assetIsCurrency0 ? market.pool.currency0 : market.pool.currency1;
+    planner.addAction(Actions.SETTLE_ALL, [usdgCurrency, swapIn.toString()]);
+    planner.addAction(Actions.TAKE_ALL, [assetCurrency, swapOutMin.toString()]);
     calls.push({
       to: ROUTER,
       value: 0n,
@@ -273,8 +262,8 @@ export async function buildZapPlan(params: {
     pool,
     tickLower,
     tickUpper,
-    amount0: swapOutMin.toString(),
-    amount1: usdgToPosition.toString(),
+    amount0: (market.assetIsCurrency0 ? swapOutMin : usdgToPosition).toString(),
+    amount1: (market.assetIsCurrency0 ? usdgToPosition : swapOutMin).toString(),
     useFullPrecision: true,
   });
   const { calldata, value } = V4PositionManager.addCallParameters(position, {

@@ -24,11 +24,12 @@ export async function GET() {
         const attrs = body?.data?.attributes;
         const tvlUsd = Number(attrs?.reserve_in_usd ?? 0);
         const vol24hUsd = Number(attrs?.volume_usd?.h24 ?? 0);
+        if (tvlUsd <= 0) return; // indexer hasn't picked this pool up — show "—"
         const feeFrac = m.pool.fee / 1_000_000;
         out[m.symbol] = {
           tvlUsd,
           vol24hUsd,
-          estAprPct: tvlUsd > 0 ? ((vol24hUsd * feeFrac) / tvlUsd) * 365 * 100 : 0,
+          estAprPct: ((vol24hUsd * feeFrac) / tvlUsd) * 365 * 100,
         };
       } catch {
         /* stats are decorative — never fail the page over them */

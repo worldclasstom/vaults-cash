@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { MARKETS } from "@/lib/markets";
 
 /**
  * Jurisdiction gate for stock-token markets. RHJ stock tokens may not be
@@ -9,8 +10,9 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 const BLOCKED_COUNTRIES = new Set(["US", "CA", "GB", "CH", "AE"]);
 
-// keep in sync with restricted markets in src/lib/markets.ts
-const RESTRICTED_MARKET_PATHS = ["/market/tsla"];
+const RESTRICTED_MARKET_PATHS = MARKETS.filter((m) => m.restricted).map(
+  (m) => `/market/${m.symbol.toLowerCase()}`,
+);
 
 export function proxy(request: NextRequest) {
   const country =

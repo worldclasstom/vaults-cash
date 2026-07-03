@@ -20,6 +20,9 @@ export type Market = {
   /** ERC-8056 scaled-UI tokens report a uiMultiplier (1e18 = 1.0) */
   hasUiMultiplier: boolean;
   pool: PoolRef;
+  /** address-sort order varies per pool: true when the asset is currency0
+   *  (USDG is currency1), false when USDG sorts first */
+  assetIsCurrency0: boolean;
   /** stock tokens may not be offered to US persons */
   restricted: boolean;
   color: string;
@@ -46,18 +49,32 @@ function poolFromRegistry(pair: string, fee: number): PoolRef {
   return { poolId: p.poolId as `0x${string}`, currency0, currency1, fee: p.fee, tickSpacing: p.tickSpacing };
 }
 
-export const MARKETS: Market[] = [
-  {
-    symbol: "TSLA",
-    name: "Tesla",
+function stock(
+  symbol: string,
+  name: string,
+  registryKey: keyof typeof registry.tokens,
+  fee: number,
+  color: string,
+): Market {
+  const token = registry.tokens[registryKey].address as `0x${string}`;
+  const pool = poolFromRegistry(`${registryKey}/USDG`, fee);
+  return {
+    symbol,
+    name,
     kind: "stock",
-    token: registry.tokens.TSLA.address as `0x${string}`,
+    token,
     tokenDecimals: 18,
     hasUiMultiplier: true,
-    pool: poolFromRegistry("TSLA/USDG", 50000),
+    pool,
+    assetIsCurrency0: pool.currency0.toLowerCase() === token.toLowerCase(),
     restricted: true,
-    color: "#e82127",
-  },
+    color,
+  };
+}
+
+const ethPool = poolFromRegistry("ETH/USDG", 500);
+
+export const MARKETS: Market[] = [
   {
     symbol: "ETH",
     name: "Ethereum",
@@ -65,10 +82,18 @@ export const MARKETS: Market[] = [
     token: NATIVE_ETH,
     tokenDecimals: 18,
     hasUiMultiplier: false,
-    pool: poolFromRegistry("ETH/USDG", 500),
+    pool: ethPool,
+    assetIsCurrency0: ethPool.currency0 === NATIVE_ETH,
     restricted: false,
     color: "#8a92b2",
   },
+  stock("TSLA", "Tesla", "TSLA", 50000, "#e82127"),
+  stock("AAPL", "Apple", "AAPL", 50000, "#a2aaad"),
+  stock("NVDA", "NVIDIA", "NVDA", 50000, "#76b900"),
+  stock("AMD", "AMD", "AMD", 10000, "#ed1c24"),
+  stock("QQQ", "Nasdaq-100 ETF", "QQQ", 10000, "#0091da"),
+  stock("SPCX", "SpaceX", "SPCX", 10000, "#005288"),
+  stock("SNDK", "Sandisk", "SNDK", 10000, "#6d2077"),
 ];
 
 export const marketBySymbol = (symbol: string) =>

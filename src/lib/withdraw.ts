@@ -62,9 +62,11 @@ export async function buildWithdrawPlan(params: {
   });
   calls.push({ to: POSM, value: BigInt(value), data: calldata as `0x${string}` });
 
-  // guaranteed minimums out of the burn
-  const { amount0: min0 } = sdkPosition.burnAmountsWithSlippage(slippage);
-  const assetOutMin = BigInt(min0.toString());
+  // guaranteed minimums out of the burn; the asset side depends on sort order
+  const { amount0: min0, amount1: min1 } = sdkPosition.burnAmountsWithSlippage(slippage);
+  const assetOutMin = BigInt(
+    (market.assetIsCurrency0 ? min0 : min1).toString(),
+  );
 
   // 2. swap the asset side back to USDG (skip if out-of-range all-USDG)
   let usdgOutMin = 0n;
@@ -100,14 +102,16 @@ export async function buildWithdrawPlan(params: {
           tickSpacing: market.pool.tickSpacing,
           hooks: zeroAddress,
         },
-        zeroForOne: true, // asset (currency0) -> USDG (currency1)
+        zeroForOne: market.assetIsCurrency0, // asset -> USDG
         amountIn: assetOutMin.toString(),
         amountOutMinimum: usdgOutMin.toString(),
         hookData: "0x",
       },
     ]);
-    planner.addAction(Actions.SETTLE_ALL, [market.pool.currency0, assetOutMin.toString()]);
-    planner.addAction(Actions.TAKE_ALL, [market.pool.currency1, usdgOutMin.toString()]);
+    const assetCurrency = market.assetIsCurrency0 ? market.pool.currency0 : market.pool.currency1;
+    const usdgCurrency = market.assetIsCurrency0 ? market.pool.currency1 : market.pool.currency0;
+    planner.addAction(Actions.SETTLE_ALL, [assetCurrency, assetOutMin.toString()]);
+    planner.addAction(Actions.TAKE_ALL, [usdgCurrency, usdgOutMin.toString()]);
     calls.push({
       to: ROUTER,
       // native ETH input is paid as msg.value on the router call

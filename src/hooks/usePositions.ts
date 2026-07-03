@@ -41,11 +41,14 @@ export function usePositions() {
             liquidity: p.liquidity.toString(),
           });
           const price = tickToUsdgPrice(p.market, state.tick);
-          const assetAmount = Number(sdkPos.amount0.toExact());
-          const usdgAmount = Number(sdkPos.amount1.toExact());
+          const c0 = p.market.assetIsCurrency0;
+          const assetAmount = Number((c0 ? sdkPos.amount0 : sdkPos.amount1).toExact());
+          const usdgAmount = Number((c0 ? sdkPos.amount1 : sdkPos.amount0).toExact());
+          const assetOwed = c0 ? fees.owed0 : fees.owed1;
+          const usdgOwed = c0 ? fees.owed1 : fees.owed0;
           const feesUsd =
-            (Number(fees.owed0) / 10 ** p.market.tokenDecimals) * price +
-            Number(fees.owed1) / 1e6;
+            (Number(assetOwed) / 10 ** p.market.tokenDecimals) * price +
+            Number(usdgOwed) / 1e6;
           return {
             ...p,
             inRange: state.tick >= p.tickLower && state.tick < p.tickUpper,

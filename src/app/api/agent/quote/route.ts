@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     const amount = parseUnits(amountUsd.toFixed(USDG.decimals), USDG.decimals);
     const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
     const net = amount - (amount * feeBps) / 10_000n;
-    const share = swapShare(state.tick, tickLower, tickUpper);
+    const share = swapShare(state.tick, tickLower, tickUpper, market.assetIsCurrency0);
     const swapIn = (net * BigInt(Math.round(share * 1_000_000))) / 1_000_000n;
     const { amountOut } =
       swapIn > 0n ? await quoteUsdgToAsset(market, swapIn) : { amountOut: 0n };
