@@ -2,9 +2,17 @@ import { createPublicClient, http, parseAbi } from "viem";
 import { robinhoodChain, UNISWAP } from "./chain";
 import type { Market } from "./markets";
 
+/** Browser uses the Alchemy endpoint (protected by its domain allowlist);
+ *  server-side code uses the public RPC — Alchemy rejects origin-less
+ *  requests once an allowlist is set. */
+const rpcUrl =
+  typeof window === "undefined"
+    ? undefined
+    : process.env.NEXT_PUBLIC_RPC_URL || undefined;
+
 export const publicClient = createPublicClient({
   chain: robinhoodChain,
-  transport: http(process.env.NEXT_PUBLIC_RPC_URL || undefined),
+  transport: http(rpcUrl),
 });
 
 export const stateViewAbi = parseAbi([
