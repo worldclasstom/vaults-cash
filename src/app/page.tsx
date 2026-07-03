@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
+import { InviteCard, captureRefFromUrl } from "@/components/InviteCard";
 import { LogoMark } from "@/components/Logo";
 import { MarketList } from "@/components/MarketList";
 import { useActiveAddress, useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
@@ -98,12 +99,14 @@ function Dashboard() {
         <h2 className="pb-3 text-lg font-semibold">Markets</h2>
         <MarketList />
       </section>
+      <InviteCard />
     </div>
   );
 }
 
 export default function Home() {
   const { ready, authenticated } = usePrivy();
+  useEffect(() => captureRefFromUrl(), []);
   return (
     <AppShell>
       {!ready ? null : authenticated ? <Dashboard /> : <Landing />}

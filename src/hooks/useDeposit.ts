@@ -47,6 +47,8 @@ export function useSendDeposit() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["usdg-balance"] });
       queryClient.invalidateQueries({ queryKey: ["positions"] });
+      // nudge the fee ledger so referral earnings show up immediately
+      fetch("/api/referral/sync").catch(() => {});
     },
   });
 }
