@@ -229,8 +229,9 @@ export function MarketDetail({ symbol }: { symbol: string }) {
               />
             </dl>
             <p className="pb-4 text-xs text-muted">
-              One transaction, gas free. You&apos;ll earn {market.pool.fee / 10_000}% of
-              every trade that crosses your range. Withdraw anytime.
+              Network fee ~$0.01, paid in ETH from your wallet. You&apos;ll earn{" "}
+              {market.pool.fee / 10_000}% of every trade that crosses your
+              range. Withdraw anytime.
             </p>
             <button
               onClick={confirm}
