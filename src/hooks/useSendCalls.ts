@@ -126,7 +126,14 @@ export function useSendCalls() {
           signTypedData: async (typedData: TypedDataDefinition) =>
             (await provider.request({
               method: "eth_signTypedData_v4",
-              params: [eoa, JSON.stringify(typedData)],
+              params: [
+                eoa,
+                // userOp typed data carries BigInts; encode them as decimal
+                // strings (valid for eth_signTypedData_v4 uint fields)
+                JSON.stringify(typedData, (_, v) =>
+                  typeof v === "bigint" ? v.toString() : v,
+                ),
+              ],
             })) as `0x${string}`,
           signMessage: async ({ message }: { message: string }) =>
             (await provider.request({
