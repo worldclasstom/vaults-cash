@@ -34,6 +34,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
         embeddedWallets: {
           ethereum: { createOnLogin: "users-without-wallets" },
+          // Our Confirm sheet is the single human-readable prompt; Privy's
+          // raw typed-data modal (PackedUserOperation hex) only confuses
+          // embedded-wallet users. External wallets still show their own UI.
+          showWalletUIs: false,
         },
         defaultChain: robinhoodChain,
         supportedChains: [robinhoodChain],
