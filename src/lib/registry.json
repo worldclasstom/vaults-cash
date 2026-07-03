@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-02T22:04:08.182Z",
+  "generatedAt": "2026-07-03T00:33:10.289Z",
   "chainId": 4663,
   "verified": true,
   "uniswap": {
@@ -27,6 +27,14 @@
       "totalSupply": "102144599453706",
       "uiMultiplier": null
     },
+    "WETH": {
+      "address": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "name": "WETH",
+      "symbol": "WETH",
+      "decimals": 18,
+      "totalSupply": "1117827667074551113404",
+      "uiMultiplier": null
+    },
     "TSLA": {
       "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
       "name": "Tesla • Robinhood Token",
@@ -35,24 +43,200 @@
       "totalSupply": "1940294000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
-    "WETH": {
-      "address": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
-      "name": "WETH",
-      "symbol": "WETH",
+    "AAPL": {
+      "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "name": "Apple • Robinhood Token",
+      "symbol": "AAPL",
       "decimals": 18,
-      "totalSupply": "1135464964907925626037",
-      "uiMultiplier": null
+      "totalSupply": "1406977000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "AMD": {
+      "address": "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
+      "name": "AMD • Robinhood Token",
+      "symbol": "AMD",
+      "decimals": 18,
+      "totalSupply": "1431787000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "AMZN": {
+      "address": "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+      "name": "Amazon • Robinhood Token",
+      "symbol": "AMZN",
+      "decimals": 18,
+      "totalSupply": "1704917000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "BABA": {
+      "address": "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4",
+      "name": "Alibaba • Robinhood Token",
+      "symbol": "BABA",
+      "decimals": 18,
+      "totalSupply": "2609418000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "BE": {
+      "address": "0x822CC93fFD030293E9842c30BBD678F530701867",
+      "name": "Bloom Energy • Robinhood Token",
+      "symbol": "BE",
+      "decimals": 18,
+      "totalSupply": "1353715000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "COIN": {
+      "address": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b",
+      "name": "Coinbase • Robinhood Token",
+      "symbol": "COIN",
+      "decimals": 18,
+      "totalSupply": "2725917000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "CRCL": {
+      "address": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5",
+      "name": "Circle Internet Group • Robinhood Token",
+      "symbol": "CRCL",
+      "decimals": 18,
+      "totalSupply": "6546952000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "CRWV": {
+      "address": "0x5f10A1C971B69e47e059e1dC91901B59b3fB49C3",
+      "name": "CoreWeave • Robinhood Token",
+      "symbol": "CRWV",
+      "decimals": 18,
+      "totalSupply": "4645841000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "GOOGL": {
+      "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "name": "Alphabet Class A • Robinhood Token",
+      "symbol": "GOOGL",
+      "decimals": 18,
+      "totalSupply": "1143807000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "INTC": {
+      "address": "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681",
+      "name": "Intel • Robinhood Token",
+      "symbol": "INTC",
+      "decimals": 18,
+      "totalSupply": "2979366000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "META": {
+      "address": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+      "name": "Meta Platforms • Robinhood Token",
+      "symbol": "META",
+      "decimals": 18,
+      "totalSupply": "715749000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "MSFT": {
+      "address": "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+      "name": "Microsoft • Robinhood Token",
+      "symbol": "MSFT",
+      "decimals": 18,
+      "totalSupply": "1092175000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "MU": {
+      "address": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
+      "name": "Micron Technology • Robinhood Token",
+      "symbol": "MU",
+      "decimals": 18,
+      "totalSupply": "796326000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "NVDA": {
+      "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "name": "NVIDIA • Robinhood Token",
+      "symbol": "NVDA",
+      "decimals": 18,
+      "totalSupply": "4530275000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "ORCL": {
+      "address": "0xb0992820E760d836549ba69BC7598b4af75dEE03",
+      "name": "Oracle • Robinhood Token",
+      "symbol": "ORCL",
+      "decimals": 18,
+      "totalSupply": "2808713000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "PLTR": {
+      "address": "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
+      "name": "Palantir Technologies • Robinhood Token",
+      "symbol": "PLTR",
+      "decimals": 18,
+      "totalSupply": "3402727000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "SNDK": {
+      "address": "0xB90A19fF0Af67f7779afF50A882A9CfF42446400",
+      "name": "Sandisk Corporation • Robinhood Token",
+      "symbol": "SNDK",
+      "decimals": 18,
+      "totalSupply": "391178000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "SPCX": {
+      "address": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+      "name": "SpaceX • Robinhood Token",
+      "symbol": "SPCX",
+      "decimals": 18,
+      "totalSupply": "2758213000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "USAR": {
+      "address": "0xd917B029C761D264c6A312BBbcDA868658eF86a6",
+      "name": "USA Rare Earth • Robinhood Token",
+      "symbol": "USAR",
+      "decimals": 18,
+      "totalSupply": "19445260000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "QQQ": {
+      "address": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+      "name": "Invesco QQQ • Robinhood Token",
+      "symbol": "QQQ",
+      "decimals": 18,
+      "totalSupply": "558087000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "SGOV": {
+      "address": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "name": "iShares 0-3 Month Treasury Bond • Robinhood Token",
+      "symbol": "SGOV",
+      "decimals": 18,
+      "totalSupply": "4058370000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "SLV": {
+      "address": "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
+      "name": "iShares Silver Trust • Robinhood Token",
+      "symbol": "SLV",
+      "decimals": 18,
+      "totalSupply": "7541742000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "SPY": {
+      "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "name": "SPDR S&P 500 ETF Trust • Robinhood Token",
+      "symbol": "SPY",
+      "decimals": 18,
+      "totalSupply": "547396000000000000000",
+      "uiMultiplier": "1000000000000000000"
+    },
+    "CUSO": {
+      "address": "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344",
+      "name": "United States Oil Fund • Robinhood Token",
+      "symbol": "USO",
+      "decimals": 18,
+      "totalSupply": "3919707000000000000000",
+      "uiMultiplier": "1000000000000000000"
     }
   },
   "v4Pools": [
-    {
-      "poolId": "0xdd5458c88d3de32b83514b9448bbfaa7f8df1d5f0a00939c95df4a5ceee53bf6",
-      "pair": "TSLA/USDG",
-      "fee": 50000,
-      "tickSpacing": 1000,
-      "tick": -217087,
-      "liquidity": "4768202762072838"
-    },
     {
       "poolId": "0x24107d152f14a76d292123265ae3f3c71f863fc2f4ef7ba49d64e78d28ea379e",
       "pair": "ETH/USDG",
@@ -66,7 +250,7 @@
       "pair": "ETH/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -201931,
+      "tick": -201959,
       "liquidity": "38594162326941557"
     },
     {
@@ -83,15 +267,119 @@
       "fee": 10000,
       "tickSpacing": 200,
       "tick": -201909,
-      "liquidity": "2561694630820036"
+      "liquidity": "2614997422462174"
+    },
+    {
+      "poolId": "0xdd5458c88d3de32b83514b9448bbfaa7f8df1d5f0a00939c95df4a5ceee53bf6",
+      "pair": "TSLA/USDG",
+      "fee": 50000,
+      "tickSpacing": 1000,
+      "tick": -217062,
+      "liquidity": "4768202762072838"
     },
     {
       "poolId": "0xb2a6d67bf3fc511d11cac788a531655f5a7b60cd31c8ff386f0476121741e751",
       "pair": "ETH/TSLA",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": 15027,
+      "tick": 15125,
       "liquidity": "99940649251976691335"
+    },
+    {
+      "poolId": "0x36b9a6280ac5ac147255a45b33f5bcdc61b073ad829403e681a78cd81476354e",
+      "pair": "AAPL/USDG",
+      "fee": 50000,
+      "tickSpacing": 1000,
+      "tick": 218998,
+      "liquidity": "2098292065623756"
+    },
+    {
+      "poolId": "0xf4dda6b92ccfaa5db9d241651557195e3ef3959f1bbedb2acc38c57919a18052",
+      "pair": "ETH/AAPL",
+      "fee": 50000,
+      "tickSpacing": 1000,
+      "tick": 17037,
+      "liquidity": "37348203025032945830"
+    },
+    {
+      "poolId": "0xde9f85fdd9e05a943a52f2c69ffafe3064a3287df03d02c9b431bc92d4781274",
+      "pair": "AMD/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 213897,
+      "liquidity": "49648634851256"
+    },
+    {
+      "poolId": "0x7299841b076c2e7021cc1cad26b0f96046a32bd5212851b68ee3cf1958f57e3d",
+      "pair": "ETH/AMD",
+      "fee": 50000,
+      "tickSpacing": 1000,
+      "tick": 11848,
+      "liquidity": "82835441877747763814"
+    },
+    {
+      "poolId": "0x3bb34a44f1b2b5f32c034c38a53065a521a47b199700fa9bd19d60985ff24bf1",
+      "pair": "NVDA/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 223575,
+      "liquidity": "77150551216869"
+    },
+    {
+      "poolId": "0x98be496c51741e7a41b565aa52ba2731e8bb17e45246e220729cfbf835d84fd8",
+      "pair": "NVDA/USDG",
+      "fee": 50000,
+      "tickSpacing": 1000,
+      "tick": 223599,
+      "liquidity": "4681465489345010"
+    },
+    {
+      "poolId": "0xaa8039d8e39d2bbcae23762e71f5a12162875a61848f0d96914c827f61877ef6",
+      "pair": "ETH/NVDA",
+      "fee": 50000,
+      "tickSpacing": 1000,
+      "tick": 21622,
+      "liquidity": "53249367877732353236"
+    },
+    {
+      "poolId": "0x2707cb88a6a40fa0f948f58958051ba097d6f6a3cf7f87929bd68ccc5becea24",
+      "pair": "SNDK/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 201462,
+      "liquidity": "2289156259073"
+    },
+    {
+      "poolId": "0xcb6ffbcc84359535c2cc0a5688c0a76520ea6e0a4820fddd3ac8d7880e576370",
+      "pair": "SPCX/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -225292,
+      "liquidity": "12467577928565"
+    },
+    {
+      "poolId": "0x39910df82a4009ea98d01e9df0b9f1b5b01583cc62ea5889c6c8a8e41fbef470",
+      "pair": "ETH/SPCX",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 22725,
+      "liquidity": "947908476486554"
+    },
+    {
+      "poolId": "0x7cf7a805185bce4766278dc4e4047fbc5d8e2bc8a33b3268270d43b86e10236b",
+      "pair": "ETH/SPCX",
+      "fee": 50000,
+      "tickSpacing": 1000,
+      "tick": 23563,
+      "liquidity": "196041886459089724232"
+    },
+    {
+      "poolId": "0xd3d49eaab15eb8f4d1d480a8518fc3ce4e60ca81d69904b3e7dc53b4fc0ce2d9",
+      "pair": "QQQ/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 210301,
+      "liquidity": "5072977456249"
     }
   ],
   "geckoTopPools": [
@@ -99,8 +387,8 @@
       "geckoAddress": "0xbe4a5b9dde1756098005dfcc4a5d29d0e5b379d3",
       "name": "HOODRAT / WETH",
       "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 134557.1634,
-      "volume24hUsd": 6537590.91722105,
+      "reserveUsd": 0.05841133972,
+      "volume24hUsd": 9365053.43779892,
       "baseToken": "0x59fc5da68be136907a3a58d145a3370db365c160",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
@@ -108,7 +396,7 @@
       "geckoAddress": "0x1749159a277d8a923826c805a36e2c1b0a43751a",
       "name": "ROBINHODL / WETH",
       "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 43.4342,
+      "reserveUsd": 43.5126,
       "volume24hUsd": 2679921.58517907,
       "baseToken": "0x871f0b5e40f4328bba5cdf63ba3aa182c5fc6ae8",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
@@ -123,47 +411,38 @@
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0x387bf619da4d3fb62bb276482693dba1b9b3520f573cabdfe033384a24125982",
-      "name": "WETH / USDG 0.05%",
-      "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 201915.027,
-      "volume24hUsd": 1289120.79134573,
-      "baseToken": "0x0000000000000000000000000000000000000000",
-      "quoteToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168"
+      "geckoAddress": "0x69bfaf19c9f377bb306a89aed9f6b07e2c1a8d9a",
+      "name": "USDG / WETH 0.05%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 66190.4877,
+      "volume24hUsd": 1312087.79728974,
+      "baseToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
       "geckoAddress": "0x794a7feeb8a3c3d5a1c42b71a3afc5b60ff76e03",
       "name": "ROBIN / WETH",
       "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 51.5782,
+      "reserveUsd": 51.6712,
       "volume24hUsd": 1299748.87829523,
       "baseToken": "0x3325917130af1a35b532245ff96f34827e88634a",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0x69bfaf19c9f377bb306a89aed9f6b07e2c1a8d9a",
-      "name": "USDG / WETH 0.05%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 65882.8239,
-      "volume24hUsd": 1220290.31444972,
-      "baseToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x015b7dc4dfa6d804e052b34ae5d6a242586bdc15",
-      "name": "CAPTAIN / WETH",
-      "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 0.06457753137,
-      "volume24hUsd": 1491457.80118211,
-      "baseToken": "0xca4b22143dbc93562474f2420fba9da5848a1831",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+      "geckoAddress": "0x387bf619da4d3fb62bb276482693dba1b9b3520f573cabdfe033384a24125982",
+      "name": "WETH / USDG 0.05%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 202144.027,
+      "volume24hUsd": 1209480.4364306,
+      "baseToken": "0x0000000000000000000000000000000000000000",
+      "quoteToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168"
     },
     {
       "geckoAddress": "0xd95e8e2cd04c207625c6f23c974d365a5f3a91d3",
       "name": "VIRTUAL / WETH",
       "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 530999.8794,
-      "volume24hUsd": 1166905.73122443,
+      "reserveUsd": 532860.0511,
+      "volume24hUsd": 1192129.29231758,
       "baseToken": "0xc6911796042b15d7fa4f6cde69e245ddcd3d9c31",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
@@ -171,8 +450,8 @@
       "geckoAddress": "0x84fbd96a51085502b4d4ee716ff68e35c7f8f5d3",
       "name": "RIALTO / WETH 0.05%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 56005.2706,
-      "volume24hUsd": 1391941.88490974,
+      "reserveUsd": 43389.4865,
+      "volume24hUsd": 1441557.80719483,
       "baseToken": "0xefd3db0271aa579b8f9f1e4ab91a9d17fea1faa9",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
@@ -180,8 +459,8 @@
       "geckoAddress": "0x40566606a37ffafb5cd1516e8feaa91a0f6c9220",
       "name": "MAXI / WETH 0.01%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 37205.2544,
-      "volume24hUsd": 1216438.80156028,
+      "reserveUsd": 37948.4053,
+      "volume24hUsd": 1216820.08067169,
       "baseToken": "0x8d540f61f569e2165bd7919dae29c78d86679648",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
@@ -195,6 +474,15 @@
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
+      "geckoAddress": "0x451c0da3b774045a822a129eedcc5c667dcbfdd8",
+      "name": "HOODRAT / WETH",
+      "dex": "uniswap-v2-robinhood",
+      "reserveUsd": 46839.6601,
+      "volume24hUsd": 563462.268599339,
+      "baseToken": "0x8e62f281f282686fca6dcb39288069a93fc23f1c",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
       "geckoAddress": "0xd8d71f28eff305361845e94094b11f1e9965b3b9",
       "name": "RobinHood / WETH",
       "dex": "uniswap-v2-robinhood",
@@ -204,12 +492,12 @@
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0x21c37681013d088789c6aed0c0a665cc7b7c1bfb",
-      "name": "DIH / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 66640.0119,
-      "volume24hUsd": 1212192.31200502,
-      "baseToken": "0x17bb0c898254406b1ea2e8e99b0c263e26c9e4a4",
+      "geckoAddress": "0x015b7dc4dfa6d804e052b34ae5d6a242586bdc15",
+      "name": "CAPTAIN / WETH",
+      "dex": "uniswap-v2-robinhood",
+      "reserveUsd": 0.06457753137,
+      "volume24hUsd": 1164791.60650516,
+      "baseToken": "0xca4b22143dbc93562474f2420fba9da5848a1831",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
@@ -222,19 +510,10 @@
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0xa70fc67c9f69da90b63a0e4c05d229954574e313",
-      "name": "CASHCAT / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 242389.8482,
-      "volume24hUsd": 2378121.0384446,
-      "baseToken": "0x020bfc650a365f8bb26819deaabf3e21291018b4",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
       "geckoAddress": "0x87ed62d1ab4a0ae5e825796b229e70e4250686eb",
       "name": "JOHN / WETH",
       "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 0.1697,
+      "reserveUsd": 0.17,
       "volume24hUsd": 3372186.64605173,
       "baseToken": "0x7b62695547b463ac2bc00b31fbdc90dfc22acd8d",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
@@ -252,9 +531,27 @@
       "geckoAddress": "0xc3698e57baedff8fcf8d0464a3ea9fdf4fbe08bf",
       "name": "ROBIN / WETH 1%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 2431.6388,
+      "reserveUsd": 2374.8348,
       "volume24hUsd": 1602.5555587869,
       "baseToken": "0x4c92177dc03430058929f1e115e0d51a3d1d62ba",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0xa70fc67c9f69da90b63a0e4c05d229954574e313",
+      "name": "CASHCAT / WETH 1%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 235910.179,
+      "volume24hUsd": 2080168.56558762,
+      "baseToken": "0x020bfc650a365f8bb26819deaabf3e21291018b4",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0x21c37681013d088789c6aed0c0a665cc7b7c1bfb",
+      "name": "DIH / WETH 1%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 65963.6485,
+      "volume24hUsd": 1070343.90644508,
+      "baseToken": "0x17bb0c898254406b1ea2e8e99b0c263e26c9e4a4",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
@@ -264,15 +561,6 @@
       "reserveUsd": 0.04595726962,
       "volume24hUsd": 624683.225823857,
       "baseToken": "0xfb7f928411a38390d19176788b1b25832a146a88",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x451c0da3b774045a822a129eedcc5c667dcbfdd8",
-      "name": "HOODRAT / WETH",
-      "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 50459.7423,
-      "volume24hUsd": 425956.44102414,
-      "baseToken": "0x8e62f281f282686fca6dcb39288069a93fc23f1c",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
@@ -297,8 +585,8 @@
       "geckoAddress": "0xda7ffce090f637891a01287d834ba1aee01653d7",
       "name": "VLADHOOD / WETH",
       "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 76449.5167,
-      "volume24hUsd": 472194.463098834,
+      "reserveUsd": 0.004005602847,
+      "volume24hUsd": 512373.467974347,
       "baseToken": "0x8797a07dc4306ce6c87dfed6ac20b90b9ae360c7",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
