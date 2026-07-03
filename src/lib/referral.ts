@@ -129,5 +129,13 @@ export async function syncFeeEvents() {
     from = to + 1n;
     chunks++;
   }
-  return { scanned: chunks, inserted, upToBlock: (from - 1n).toString() };
+  const [totals] = await q`
+    SELECT count(*)::int AS events, COALESCE(sum(amount_usdg), 0)::float8 AS fees
+    FROM fee_events`;
+  return {
+    scanned: chunks,
+    inserted,
+    upToBlock: (from - 1n).toString(),
+    ledger: { events: totals.events as number, feesUsd: (totals.fees as number) / 1e6 },
+  };
 }
