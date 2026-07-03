@@ -134,13 +134,16 @@ export function useSendCalls() {
             chainId: robinhoodChain.id,
             nonce,
           });
+          // Privy returns yParity/chainId/nonce in loosely-typed encodings
+          // (yParity arrived as a 32-byte padded hex once — Alchemy rejected
+          // it). Normalize every numeric field explicitly.
           authorization = {
             address: DELEGATE,
-            chainId: auth.chainId,
-            nonce: auth.nonce,
+            chainId: Number(BigInt(auth.chainId)),
+            nonce: Number(BigInt(auth.nonce)),
             r: auth.r,
             s: auth.s,
-            yParity: auth.yParity,
+            yParity: Number(BigInt(auth.yParity ?? auth.v)) % 2,
           } as SignedAuthorization;
         }
 

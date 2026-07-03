@@ -7,9 +7,13 @@ import { useCollect, usePositions, useWithdraw, type PositionView } from "@/hook
 import { useUsdgBalance } from "@/hooks/useChainData";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 
+/** don't offer collection below this — it wouldn't meaningfully beat gas */
+const MIN_COLLECT_USD = 0.05;
+
 function PositionCard({ p }: { p: PositionView }) {
   const withdraw = useWithdraw();
   const collect = useCollect();
+  const collectible = p.feesUsd >= MIN_COLLECT_USD;
 
   return (
     <li className="rounded-3xl bg-surface p-5">
@@ -28,6 +32,12 @@ function PositionCard({ p }: { p: PositionView }) {
           <p className="text-sm text-muted">
             {fmtAmount(p.assetAmount, 5)} {p.market.symbol} + {fmtUsd(p.usdgAmount)}
           </p>
+          <p className="text-sm">
+            <span className="text-muted">Fees earned: </span>
+            <span className={p.feesUsd > 0 ? "text-accent" : "text-muted"}>
+              {p.feesUsd >= 0.01 ? fmtUsd(p.feesUsd) : p.feesUsd > 0 ? "<$0.01" : "$0.00"}
+            </span>
+          </p>
         </div>
         <p className="text-xl font-bold">{fmtUsd(p.valueUsd)}</p>
       </div>
@@ -41,8 +51,9 @@ function PositionCard({ p }: { p: PositionView }) {
         </button>
         <button
           onClick={() => collect.mutate(p)}
-          disabled={collect.isPending}
-          className="rounded-full bg-surface-raised px-4 py-2 text-sm text-muted transition-colors hover:bg-borderline hover:text-foreground disabled:opacity-40"
+          disabled={collect.isPending || !collectible}
+          title={collectible ? undefined : `Collect unlocks at ${fmtUsd(MIN_COLLECT_USD)} earned`}
+          className="rounded-full bg-surface-raised px-4 py-2 text-sm text-muted transition-colors hover:bg-borderline hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
         >
           {collect.isPending ? "Collecting…" : "Collect fees"}
         </button>

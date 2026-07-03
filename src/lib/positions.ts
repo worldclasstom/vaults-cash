@@ -39,6 +39,41 @@ function marketForTruncatedPoolId(truncated: string): Market | undefined {
   return MARKETS.find((m) => m.pool.poolId.slice(2, 52).toLowerCase() === truncated.toLowerCase());
 }
 
+const feeViewAbi = parseAbi([
+  "function getFeeGrowthInside(bytes32 poolId, int24 tickLower, int24 tickUpper) view returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128)",
+  "function getPositionInfo(bytes32 poolId, address owner, int24 tickLower, int24 tickUpper, bytes32 salt) view returns (uint128 liquidity, uint256 feeGrowthInside0LastX128, uint256 feeGrowthInside1LastX128)",
+]);
+
+const Q128 = 1n << 128n;
+const U256 = (1n << 256n) - 1n;
+/** fee growth counters wrap; subtraction is defined mod 2^256 */
+const wrapSub = (a: bigint, b: bigint) => (a - b) & U256;
+
+/** Uncollected trading fees for a position, in raw token units. */
+export async function getUncollectedFees(position: OwnedPosition) {
+  const { market, tokenId, tickLower, tickUpper } = position;
+  const stateView = UNISWAP.v4.stateView as `0x${string}`;
+  const salt = `0x${tokenId.toString(16).padStart(64, "0")}` as `0x${string}`;
+  const [[fg0, fg1], [liquidity, fg0Last, fg1Last]] = await Promise.all([
+    publicClient.readContract({
+      address: stateView,
+      abi: feeViewAbi,
+      functionName: "getFeeGrowthInside",
+      args: [market.pool.poolId, tickLower, tickUpper],
+    }),
+    publicClient.readContract({
+      address: stateView,
+      abi: feeViewAbi,
+      functionName: "getPositionInfo",
+      args: [market.pool.poolId, POSM, tickLower, tickUpper, salt],
+    }),
+  ]);
+  return {
+    owed0: (liquidity * wrapSub(fg0, fg0Last)) / Q128,
+    owed1: (liquidity * wrapSub(fg1, fg1Last)) / Q128,
+  };
+}
+
 /** Enumerate the user's v4 position NFTs via Blockscout, then read live state. */
 export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPosition[]> {
   const api = robinhoodChain.blockExplorers.default.apiUrl;
