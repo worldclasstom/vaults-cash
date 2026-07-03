@@ -5,14 +5,20 @@
   dashboard smart-wallet config for chain 4663 + fee wallet + test USDG)
 - Vercel deploy + vaults.cash DNS
 
-## Gas UX ladder (as Privy adds chain 4663 support)
-1. **Now**: user pays gas in ETH from the embedded wallet (~$0.01/tx; Receive
-   screen tells them to keep a little ETH).
-2. **When Privy gas management supports 4663**: custom gas payment token =
-   USDG — users pay fees from the same balance they invest, ETH disappears
-   from the UX entirely. (Picker lacks Robinhood Chain today — requested.)
-3. **When smart wallets/native sponsorship support 4663**: atomic one-tap
-   batches + optional app-pays sponsorship (self-funding: ~$0.01 gas vs $0.30
+## Gas + batching ladder
+1. **Now (shipped)**: sequential EOA transactions, user pays gas in ETH
+   (~$0.01/tx; Receive screen tells them to keep a little ETH).
+2. **Next (no external dependency — build it): EIP-7702 atomic batching.**
+   VERIFIED 2026-07-02: chain runs ArbOS 61 (ArbSys.arbOSVersion() = 116,
+   nitro v3.11.2) — type-4 txs supported (7702 landed in ArbOS 40 "Callisto").
+   Privy supports signing 7702 authorizations. Embedded EOA delegates to a
+   batch executor (Kernel v3 7702 / Simple7702Account) and self-executes
+   `execute(calls)` — the whole zap in ONE user-paid tx, no bundler, and the
+   fee/swap/mint batch is atomic again. This obsoletes the sequential path.
+3. **When Privy gas management supports 4663**: custom gas payment token =
+   USDG — fees come from the invested balance, ETH leaves the UX (requested
+   via Privy support 2026-07-02).
+4. **Optional later**: app-pays sponsorship (self-funding: ~$0.01 gas vs $0.30
    fee per $100 deposit), behind NEXT_PUBLIC_SPONSOR_GAS.
 
 ## Next
@@ -37,9 +43,15 @@ Thesis: the DLMM crowd (Meteora on Solana, LFJ on Avalanche/Monad) migrates to
 Robinhood Chain as retail flow arrives; nobody serves them there yet. We want
 to be positioned as their venue.
 
-Approach: **Uniswap v4 hooks, not an AMM fork.** Deploy our own hooked pools on
-the canonical PoolManager (dynamic fees, limit-order behavior, bin-like
-liquidity shaping) so we stay inside the routing/aggregator/liquidity gravity
-well instead of bootstrapping TVL from zero against Uniswap + Rialto.
-Prereqs: real volume data from MVP, Solidity + audit budget, and a license
-check on lfj-gg/joe-v2 if we ever borrow Liquidity Book mechanics directly.
+Approach: **Uniswap v4 hooks, not an AMM fork.** VERIFIED (developers.uniswap.org
+custom-accounting guide): "Return deltas enable hooks to implement custom curves
+that can completely bypass Uniswap's native pricing mechanism" — so true
+DLMM mechanics (constant-price bins, zero slippage within bin) CAN live in a
+v4 hook via BeforeSwapDelta, while inheriting PoolManager settlement + router/
+aggregator integration. Honest scoping: that is a full AMM implemented inside
+a hook — LB-fork-scale Solidity + audit work, hook-issued LP shares (not
+standard v4 position NFTs), custom quoter. Cheap partial alternative that
+works today with zero contracts: single-spacing-wide standard positions ≈
+range orders (bin-like limit-order LPing, but price still moves within the
+range — not zero-slippage). Prereqs unchanged: MVP volume data, Solidity +
+audit budget, joe-v2 license check if borrowing LB mechanics.
