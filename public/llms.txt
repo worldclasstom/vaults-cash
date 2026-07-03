@@ -5,7 +5,14 @@
 > 0.30% of converted amounts, embedded in the returned calls. Self-custodial:
 > the executing wallet owns the position NFT; vaults.cash never holds funds.
 
-## API (no auth, JSON)
+## MCP server (recommended for agents)
+
+Streamable HTTP endpoint: https://vaults.cash/api/mcp/mcp
+Tools: list_markets, get_balances, get_deposit_quote, build_deposit_calls,
+list_positions, build_withdraw_calls, build_collect_calls.
+Build tools return {to, value, data} call batches you sign with your own wallet.
+
+## REST API (no auth, JSON)
 
 - GET  /api/agent/markets — listed markets, live prices, pool ids, docs
 - GET  /api/agent/quote?market=ETH&amountUsd=100&preset=balanced — read-only deposit split

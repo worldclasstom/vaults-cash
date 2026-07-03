@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
+import { captureRefFromUrl } from "./InviteCard";
 import { Wordmark } from "./Logo";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { authenticated, logout } = usePrivy();
   const pathname = usePathname();
+  // referral links work on ANY page (vaults.cash/market/eth?ref=… included)
+  useEffect(() => captureRefFromUrl(), []);
 
   const tab = (href: string, label: string) => (
     <Link
