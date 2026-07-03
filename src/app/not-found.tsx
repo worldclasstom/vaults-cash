@@ -25,10 +25,6 @@ export default function NotFound() {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-4 text-center">
       <div className="relative">
-        <span
-          aria-hidden
-          className="animate-glow-pulse absolute left-1/2 top-1/2 -z-10 size-44 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/30 blur-3xl"
-        />
         <EscapingBill delay="0s" left="-10%" tilt="-14deg" />
         <EscapingBill delay="0.9s" left="45%" tilt="8deg" />
         <EscapingBill delay="1.7s" left="95%" tilt="-5deg" />
