@@ -219,19 +219,6 @@ export async function buildZapPlan(params: {
 
   const calls: Call[] = [];
 
-  // 1. platform fee
-  if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
-    calls.push({
-      to: USDG.address,
-      value: 0n,
-      data: encodeFunctionData({
-        abi: erc20Abi,
-        functionName: "transfer",
-        args: [feeRecipient, feeAmount],
-      }),
-    });
-  }
-
   let swapOutMin = 0n;
   const slippage = BigInt(10_000 - slippageBps);
 
@@ -297,6 +284,21 @@ export async function buildZapPlan(params: {
     useNative: market.token === NATIVE_ETH ? Ether.onChain(CHAIN_ID) : undefined,
   });
   calls.push({ to: POSM, value: BigInt(value), data: calldata as `0x${string}` });
+
+  // platform fee LAST: in the atomic path order is irrelevant, and in the
+  // sequential fallback the fee is only charged once the position exists
+  // (an abandoned attempt costs the user nothing).
+  if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
+    calls.push({
+      to: USDG.address,
+      value: 0n,
+      data: encodeFunctionData({
+        abi: erc20Abi,
+        functionName: "transfer",
+        args: [feeRecipient, feeAmount],
+      }),
+    });
+  }
 
   return { calls, feeAmount, swapIn, swapOutMin, usdgToPosition, tickLower, tickUpper };
 }

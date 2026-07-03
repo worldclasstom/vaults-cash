@@ -5,7 +5,7 @@ import {
   useSign7702Authorization,
   useWallets,
 } from "@privy-io/react-auth";
-import { http, type TypedDataDefinition } from "viem";
+import { custom, type TypedDataDefinition } from "viem";
 import {
   createBundlerClient,
   entryPoint08Address,
@@ -49,6 +49,51 @@ async function bundlerSupportsEp08(): Promise<boolean> {
     (e) => e.toLowerCase() === entryPoint08Address.toLowerCase(),
   );
   return entryPointChecked;
+}
+
+/**
+ * viem encodes the ERC-7702 userOp factory marker as compact "0x7702";
+ * Alchemy's rundler rejects that as "wrong address length" (verified on the
+ * second live deposit attempt). Rewrite to the padded 20-byte marker, with
+ * field-omission as the fallback encoding; remember whichever works.
+ */
+const FACTORY_MARKER = "0x7702";
+const FACTORY_PADDED = "0x7702000000000000000000000000000000000000";
+let factoryMode: "padded" | "omit" | null = null;
+
+type WireUserOp = Record<string, unknown> & { factory?: string; factoryData?: string };
+
+function rewriteOp(op: WireUserOp, mode: "padded" | "omit"): WireUserOp {
+  const out = { ...op };
+  if (mode === "padded") out.factory = FACTORY_PADDED;
+  else {
+    delete out.factory;
+    delete out.factoryData;
+  }
+  return out;
+}
+
+async function bundlerRequest({ method, params }: { method: string; params?: unknown }) {
+  const p = (params ?? []) as unknown[];
+  const isUserOpCall =
+    method === "eth_estimateUserOperationGas" || method === "eth_sendUserOperation";
+  const op = isUserOpCall ? (p[0] as WireUserOp | undefined) : undefined;
+
+  if (op && op.factory === FACTORY_MARKER) {
+    const modes: Array<"padded" | "omit"> = factoryMode ? [factoryMode] : ["padded", "omit"];
+    let lastError: unknown;
+    for (const mode of modes) {
+      try {
+        const result = await bundlerRpc(method, [rewriteOp(op, mode), ...p.slice(1)]);
+        factoryMode = mode;
+        return result;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    throw lastError;
+  }
+  return bundlerRpc(method, p);
 }
 
 export function useSendCalls() {
@@ -102,7 +147,7 @@ export function useSendCalls() {
         const bundlerClient = createBundlerClient({
           account,
           client: publicClient,
-          transport: http(BUNDLER_URL),
+          transport: custom({ request: bundlerRequest }),
           userOperation: {
             estimateFeesPerGas: async () => {
               const block = await publicClient.getBlock();
