@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getAccessToken, usePrivy } from "@privy-io/react-auth";
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { LogoMark } from "@/components/Logo";
@@ -46,39 +45,11 @@ function Landing() {
 
 function Dashboard() {
   const address = useActiveAddress();
-  const queryClient = useQueryClient();
   const { data: balance, isLoading } = useUsdgBalance();
   const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
   const { data: assetBalances } = useAssetBalances();
   const [showReceive, setShowReceive] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [dripped, setDripped] = useState(false);
-
-  // one-time gas starter: new wallets get their first network fees covered
-  useEffect(() => {
-    if (!address || !ethBalance || ethBalance.raw > 0n) return;
-    const guard = `vaults.drip.${address}`;
-    if (localStorage.getItem(guard)) return;
-    localStorage.setItem(guard, "1");
-    (async () => {
-      try {
-        const token = await getAccessToken();
-        if (!token) return;
-        const res = await fetch("/api/gas-drip", {
-          method: "POST",
-          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-          body: JSON.stringify({ wallet: address }),
-        });
-        const body = await res.json();
-        if (body.dripped) {
-          setDripped(true);
-          queryClient.invalidateQueries({ queryKey: ["token-balance"] });
-        }
-      } catch {
-        /* non-fatal; deposit screen still explains gas */
-      }
-    })();
-  }, [address, ethBalance, queryClient]);
 
   return (
     <div className="animate-rise">
@@ -90,7 +61,6 @@ function Dashboard() {
         {ethBalance && ethBalance.raw > 0n && (
           <p className="text-sm text-muted">
             + {fmtAmount(ethBalance.formatted, 5)} ETH for network fees
-            {dripped && <span className="text-accent"> · first fees on us ✓</span>}
           </p>
         )}
         {assetBalances && assetBalances.length > 0 && (
@@ -115,7 +85,8 @@ function Dashboard() {
         {showReceive && address && (
           <div className="mt-3 rounded-2xl bg-surface p-4 text-sm">
             <p className="pb-2 text-muted">
-              Send <span className="text-foreground">USDG</span> on{" "}
+              Send <span className="text-foreground">USDG</span> (and a little{" "}
+              <span className="text-foreground">ETH</span> for network fees) on{" "}
               <span className="text-foreground">Robinhood Chain</span> to:
             </p>
             <button
@@ -134,8 +105,7 @@ function Dashboard() {
             <p className="pt-2 text-xs text-muted">
               Easiest path: buy USDG in the Robinhood app and send it here.
               Only send assets on Robinhood Chain — other networks won&apos;t
-              arrive. Your first network fees are on us, so no ETH needed to
-              start.
+              arrive. Card purchases can&apos;t deliver to Robinhood Chain yet.
             </p>
           </div>
         )}

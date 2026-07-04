@@ -38,12 +38,6 @@ export function ensureSchema(): Promise<void> {
         k text PRIMARY KEY,
         v text NOT NULL
       )`;
-      await q`CREATE TABLE IF NOT EXISTS gas_drips (
-        privy_did text PRIMARY KEY,
-        wallet text NOT NULL,
-        tx_hash text NOT NULL,
-        created_at timestamptz NOT NULL DEFAULT now()
-      )`;
     })();
   }
   return schemaReady;
