@@ -8,6 +8,7 @@ import {
 import { custom, type TypedDataDefinition } from "viem";
 import {
   createBundlerClient,
+  createPaymasterClient,
   entryPoint08Address,
   toSimple7702SmartAccount,
 } from "viem/account-abstraction";
@@ -151,10 +152,22 @@ export function useSendCalls() {
           implementation: DELEGATE,
         });
 
+        // Alchemy Gas Manager sponsorship (ERC-7677) — active when a policy
+        // id is configured; swaps to a USDG paymaster policy later without
+        // code changes.
+        const policyId = process.env.NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID;
         const bundlerClient = createBundlerClient({
           account,
           client: publicClient,
           transport: custom({ request: bundlerRequest }),
+          ...(policyId
+            ? {
+                paymaster: createPaymasterClient({
+                  transport: custom({ request: bundlerRequest }),
+                }),
+                paymasterContext: { policyId },
+              }
+            : {}),
           userOperation: {
             estimateFeesPerGas: async () => {
               const block = await publicClient.getBlock();

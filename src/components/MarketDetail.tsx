@@ -8,6 +8,7 @@ import { useMarketQuote, useTokenBalance, useUsdgBalance } from "@/hooks/useChai
 import { NATIVE_ETH } from "@/lib/markets";
 import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
 import { formatEther } from "viem";
+import { GAS_SPONSORED } from "@/lib/config";
 import { fmtUsd, fmtPct } from "@/lib/format";
 import { UNISWAP } from "@/lib/chain";
 import { marketBySymbol, USDG } from "@/lib/markets";
@@ -177,7 +178,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
             </div>
           )}
 
-          {noGas && amountNum > 0 && (
+          {!GAS_SPONSORED && noGas && amountNum > 0 && (
             <p className="mt-3 text-xs text-negative">
               Your wallet has no ETH for network fees. Send a small amount of
               ETH on Robinhood Chain (about $1 covers many transactions) — see
@@ -231,9 +232,11 @@ export function MarketDetail({ symbol }: { symbol: string }) {
               />
             </dl>
             <p className="pb-2 text-xs text-muted">
-              Network fee ~$0.01, paid in ETH from your wallet. You&apos;ll earn{" "}
-              {market.pool.fee / 10_000}% of every trade that crosses your
-              range. Withdraw anytime.
+              {GAS_SPONSORED
+                ? "Network fees are covered by vaults.cash."
+                : "Network fee ~$0.01, paid in ETH from your wallet."}{" "}
+              You&apos;ll earn {market.pool.fee / 10_000}% of every trade that
+              crosses your range. Withdraw anytime.
             </p>
             <TxDetails calls={plan.calls} />
             <button

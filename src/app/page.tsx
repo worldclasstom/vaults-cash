@@ -12,6 +12,7 @@ import {
   useTokenBalance,
   useUsdgBalance,
 } from "@/hooks/useChainData";
+import { GAS_SPONSORED } from "@/lib/config";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 
@@ -85,9 +86,15 @@ function Dashboard() {
         {showReceive && address && (
           <div className="mt-3 rounded-2xl bg-surface p-4 text-sm">
             <p className="pb-2 text-muted">
-              Send <span className="text-foreground">USDG</span> (and a little{" "}
-              <span className="text-foreground">ETH</span> for network fees) on{" "}
-              <span className="text-foreground">Robinhood Chain</span> to:
+              Send <span className="text-foreground">USDG</span>
+              {!GAS_SPONSORED && (
+                <>
+                  {" "}
+                  (and a little <span className="text-foreground">ETH</span> for
+                  network fees)
+                </>
+              )}{" "}
+              on <span className="text-foreground">Robinhood Chain</span> to:
             </p>
             <button
               onClick={() => {
