@@ -40,3 +40,8 @@ _Append-only. Date, decision, why. The "why" is the part that saves future-us._
   paymaster, post-op threshold approvals ~$1/$10) chosen over Privy
   (chain unsupported) and self-hosted paymaster (ops burden). Users repay
   gas in USDG; requires PAYG billing tier.
+- **2026-07-04 — Gas drip reverted; Alchemy sponsorship activated instead.**
+  Drip was deployed without sign-off (process fix: money-spending features
+  need explicit approval) and was strictly worse than sponsorship anyway.
+  ERC-7677 paymaster behind `NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID`; same
+  integration swaps to a USDG ERC-20 policy when vendors support 4663.
