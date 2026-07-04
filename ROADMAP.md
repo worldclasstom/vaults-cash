@@ -39,19 +39,28 @@
   open LP positions conversationally (Robinhood's own agentic trading is MCP).
 
 ## Later — the Vault (Rialto propAMM; supersedes the hooks/DLMM plan)
-Thesis: the DLMM crowd (Meteora on Solana, LFJ on Avalanche/Monad) migrates to
-Robinhood Chain as retail flow arrives; nobody serves them there yet. We want
-to be positioned as their venue.
 
-Approach: **Uniswap v4 hooks, not an AMM fork.** VERIFIED (developers.uniswap.org
-custom-accounting guide): "Return deltas enable hooks to implement custom curves
-that can completely bypass Uniswap's native pricing mechanism" — so true
-DLMM mechanics (constant-price bins, zero slippage within bin) CAN live in a
-v4 hook via BeforeSwapDelta, while inheriting PoolManager settlement + router/
-aggregator integration. Honest scoping: that is a full AMM implemented inside
-a hook — LB-fork-scale Solidity + audit work, hook-issued LP shares (not
-standard v4 position NFTs), custom quoter. Cheap partial alternative that
-works today with zero contracts: single-spacing-wide standard positions ≈
-range orders (bin-like limit-order LPing, but price still moves within the
-range — not zero-slippage). Prereqs unchanged: MVP volume data, Solidity +
-audit budget, joe-v2 license check if borrowing LB mechanics.
+Thesis: users want asset exposure + income visibly ticking up daily, without
+operating anything. The venue is Rialto's propAMM (two-function interface:
+`getAmountOut` quote + `swapExactIn` settle; our contract holds inventory and
+competes for Robinhood-router flow net of gas). The model is HLP: ONE vault,
+one daily-ticking share price, radical transparency, withdrawal cooldown,
+zero APY promises.
+
+Design (autonomous-vault): quote = Chainlink read AT CALL TIME + immutable
+spread/inventory-skew params — no off-chain quoting server, no operator
+discretion; inventory-aware skew subsumes grid/accumulate/distribute as
+special cases. ERC-4626 shares over the same inventory; permissionless exit;
+flat protocol fee. Stock tokens: market-hours-aware spread widening is the
+chain-specific edge (24/7 tokens vs closed underlying — where curve LPs bleed).
+
+Sequence: (1) treasury pilot on ETH/USDG with LLC capital — the pilot
+contract IS the vault prototype; public live-P&L page as track record;
+(2) audit + counsel gate; (3) open ERC-4626 deposits. Prereqs: pilot P&L,
+Solidity + audit budget, Rialto onboarding confirmed for chain 4663 (their
+registration doc currently says Arbitrum One — verify), securities counsel
+before any stock-token pair or pooled deposits.
+
+(v4 hooks: demoted 2026-07-04 — propAMM is strictly more flexible and plugs
+into Robinhood's own router flow; revisit only if Uniswap-side flow capture
+someday matters.)
