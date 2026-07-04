@@ -228,25 +228,44 @@ export function useSendCalls() {
 
     // --- 2. sequential fallback (also the external-wallet path) ---
     const sponsor = process.env.NEXT_PUBLIC_SPONSOR_GAS === "1";
+    const eoa = embedded?.address as `0x${string}` | undefined;
     let lastHash: `0x${string}` | undefined;
     for (const [i, call] of calls.entries()) {
-      const { hash } = await sendTransaction(
-        {
-          to: call.to,
-          value: call.value,
-          data: call.data,
-          chainId: robinhoodChain.id,
-        },
-        {
-          sponsor,
-          uiOptions: {
-            description: `${opts.description} — step ${i + 1} of ${calls.length}`,
-            buttonText: i === calls.length - 1 ? "Finish" : "Continue",
-          },
-        },
-      );
+      const tx = {
+        to: call.to,
+        value: call.value,
+        data: call.data,
+        chainId: robinhoodChain.id,
+      };
+      const uiOptions = {
+        description: `${opts.description} — step ${i + 1} of ${calls.length}`,
+        buttonText: i === calls.length - 1 ? "Finish" : "Continue",
+      };
+      const preNonce = eoa
+        ? await publicClient.getTransactionCount({ address: eoa })
+        : undefined;
+      let hash: string;
+      try {
+        ({ hash } = await sendTransaction(tx, { sponsor, uiOptions }));
+      } catch (e) {
+        // Privy's signer occasionally races its own nonce cache between
+        // rapid sequential sends (seen live: "nonce too low" killed a
+        // withdrawal's swap step). Give state a beat and retry once.
+        if (!/nonce too low/i.test((e as Error).message)) throw e;
+        await new Promise((r) => setTimeout(r, 2000));
+        ({ hash } = await sendTransaction(tx, { sponsor, uiOptions }));
+      }
       lastHash = hash as `0x${string}`;
       await publicClient.waitForTransactionReceipt({ hash: lastHash });
+      // don't start the next step until the chain's confirmed nonce reflects
+      // this one — keeps Privy's nonce source in sync
+      if (eoa && preNonce !== undefined) {
+        for (let tries = 0; tries < 20; tries++) {
+          const n = await publicClient.getTransactionCount({ address: eoa });
+          if (n > preNonce) break;
+          await new Promise((r) => setTimeout(r, 300));
+        }
+      }
     }
     if (!lastHash) throw new Error("No transactions were sent");
     return { hash: lastHash, atomic: false };
