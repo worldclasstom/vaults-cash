@@ -92,3 +92,21 @@ State: a stack of **lots** `{ amountEth, entryPriceX18 }`.
 - Win share of Rialto routes (observed fills) — competitiveness check
 - No oracle-staleness incidents / no reverts from our side
 - Honest comparison vs (a) HODL 50/50, (b) Uniswap v4 LP same capital
+
+## Appendix: vs HLP (decision record, 2026-07-04)
+
+HLP = three engines: order-book MM (off-chain, closed-source algos) +
+liquidation backstop + fee/funding accrual; USDC-denominated absolute-return
+posture; realizes losses continuously to stay ~delta-neutral; ~15–30% APR
+windows with 5–12% drawdown episodes; 4-day lock; no perf fee.
+
+Only engine #1 (spread capture) exists on Robinhood Chain via Rialto
+propAMM — no liquidation pipeline or funding to harvest. So the real choice
+was philosophy A (this spec: exposure + income, never realize losses, NAV
+rides ETH, income stalls underwater) vs B (HLP-style delta-managed MM:
+steadier income, flat NAV, realizes losses by design — a stablecoin-yield
+product for a different customer). CHOSEN: A — matches the user thesis
+(exposure, held; income, visible), keeps the fully-deterministic on-chain
+compliance posture. ADOPTED FROM HLP: the wrapper — one vault, shares,
+deposit cooldown, no performance fee, radical transparency, no APY promises.
+Revisit B only as a possible second internal strategy after pilot data.
