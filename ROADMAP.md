@@ -38,7 +38,7 @@
 - **MCP server** wrapping /api/agent/* so Claude/ChatGPT/Cursor agents can
   open LP positions conversationally (Robinhood's own agentic trading is MCP).
 
-## Later — the Meteora/LFJ play
+## Later — the Vault (Rialto propAMM; supersedes the hooks/DLMM plan)
 Thesis: the DLMM crowd (Meteora on Solana, LFJ on Avalanche/Monad) migrates to
 Robinhood Chain as retail flow arrives; nobody serves them there yet. We want
 to be positioned as their venue.

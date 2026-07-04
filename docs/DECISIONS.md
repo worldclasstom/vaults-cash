@@ -45,3 +45,18 @@ _Append-only. Date, decision, why. The "why" is the part that saves future-us._
   need explicit approval) and was strictly worse than sponsorship anyway.
   ERC-7677 paymaster behind `NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID`; same
   integration swaps to a USDG ERC-20 policy when vendors support 4663.
+- **2026-07-04 — v4-hooks DLMM plan demoted; Rialto propAMM is the active-liquidity path.**
+  A propAMM quote function is a strictly more flexible strategy canvas than
+  hook-constrained curves, and it plugs into Robinhood's own router flow.
+  Hooks revisit only if evidence demands Uniswap-side flow capture.
+- **2026-07-04 — ONE vault product, not a strategy menu.** Single strategy:
+  oracle-mid bid/ask with inventory-aware skew (subsumes grid/accumulate/
+  distribute as special cases). HLP model: one vault, one daily-ticking
+  share price, radical transparency, withdrawal cooldown, no APY promises.
+- **2026-07-04 — Autonomous-vault design for compliance posture.** Quote
+  function reads Chainlink ON-CHAIN at call time + immutable params — no
+  off-chain quoting server, no operator discretion, no custody; ERC-4626
+  shares, permissionless exit, flat protocol fee (not fund-style fees).
+  Stronger-than-HLP trustlessness as both differentiator and legal story.
+  NOT legal immunity: counsel gate before any pooled user deposits; crypto
+  pair (ETH/USDG) first; stock-token vaults inherit geofencing if ever.
