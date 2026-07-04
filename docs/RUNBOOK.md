@@ -66,3 +66,15 @@ fee wallet, per `fee_events` grouped by `referrer_wallet` × 50%.
 - Fee wallet / LLC login: `0x970481E181189411aD0A4A4f22C08f111C6E1384`
 - Test depositor (personal login): `0xFD03B83711B089D0Bc087B3381AAdDd92c204035`
   (7702-delegated; holds test USDG/ETH + live position)
+
+## Incident log
+
+- **2026-07-04 — "lost $6" withdrawal scare (no loss).** Invalid Gas Manager
+  policy (testnet-scoped) made pm_getPaymasterData fail → atomic path broke
+  on EVERY op → sequential fallback → Privy nonce race ("nonce too low")
+  killed the ETH→USDG swap step after burns completed. Funds arrived as raw
+  ETH+USDG; nothing lost; no fee charged (fee rides the swap). Lessons:
+  (1) a configured-but-invalid paymaster is worse than none — validate a
+  policy with a test op before trusting env; (2) sequential sends must sync
+  confirmed nonce between steps (fixed in useSendCalls); (3) ETH landing
+  unswapped needs a UI conversion path (TODO).
