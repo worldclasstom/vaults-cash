@@ -2,7 +2,7 @@
 
 _Status: parameters SIGNED OFF by Tom 2026-07-04. This document is the
 source of truth for what the pilot contract may and may not do with capital.
-Remaining gate before deploy: Rialto onboarding confirmation for chain 4663._
+Rialto confirmed supporting chain 4663. Remaining before deploy: Chainlink ETH/USD feed address + Rialto router/registration address._
 
 ## One-sentence strategy
 
@@ -24,8 +24,14 @@ Rialto propAMM (Robinhood's router). Canonical two-function interface:
 The contract holds its own inventory; Rialto never custodies. Quotes compete
 against other liquidity sources net of gas.
 
-**OPEN ITEM: confirm Rialto propAMM registration is open for Robinhood
-Chain (4663) — their doc currently lists Arbitrum One.**
+Rialto PRODUCT supports Robinhood Chain 4663 (docs.rialto.xyz/overview/
+supported-markets lists it as the sole supported chain; Rialto is a RH-Chain
+launch partner). BUT their propAMM PARTNER-ONBOARDING doc still says "Chain
+(today: Arbitrum One, 42161)" and onboarding is a manual email handshake
+("send us your deployed IPropPair contract + chain + gas estimate; we add the
+config and allowlist it"). ACTION: email Rialto to confirm we can list an
+ETH/USDG propAMM pair on 4663 and get router/registration details. Almost
+certainly yes (launch partner) but it's a human step, not self-serve.
 
 ## Strategy mechanics
 
