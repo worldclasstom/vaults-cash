@@ -34,17 +34,20 @@ contract VaultSim is Test {
     uint256 wethStart; // set per scenario at p0
     uint256 constant CLIP_WETH = 0.02 ether; // ~$36 per fill (< maxTrade)
 
-    function _fresh() internal {
+    uint256 startPrice; // path[0]: all three strategies start 50/50 here
+
+    function _fresh(uint256 p0) internal {
+        startPrice = p0;
         weth = new MockERC20("WETH", 18);
         usdg = new MockERC20("USDG", 6);
         oracle = new MockOracle();
         vm.warp(1_000_000);
-        oracle.set(int256(P0 * E8));
+        oracle.set(int256(p0 * E8));
         vault = new VaultPair(
             address(weth), address(usdg), address(oracle),
             30, 25, 90, 150e6, 8000
         );
-        wethStart = (START_USDG * PRICE_SCALE) / (P0 * E8); // equal $ in ETH
+        wethStart = (START_USDG * PRICE_SCALE) / (p0 * E8); // equal $ in ETH at p0
         weth.mint(address(this), 1000 ether);
         usdg.mint(address(this), 10_000_000e6);
         weth.approve(address(vault), type(uint256).max);
@@ -80,14 +83,9 @@ contract VaultSim is Test {
 
     /// returns (vaultNAV, vaultIncome, hodlValue, lpValue) in USDG (1e6), at endP
     function _run(uint256[] memory path) internal returns (uint256, uint256, uint256, uint256) {
-        _fresh();
-        // LP state: full-range x*y=k with same starting $ ; plus accumulated fees
-        uint256 lpX = wethStart; // ETH (1e18)
-        uint256 lpY = START_USDG; // USDG (1e6)
-        // normalize k in a common unit: value both sides in 1e6 USDG at p
+        _fresh(path[0]);
         uint256 lpFees;
-
-        uint256 prev = P0;
+        uint256 prev = path[0];
         for (uint256 i = 0; i < path.length; i++) {
             uint256 p = path[i];
             oracle.set(int256(p * E8));
@@ -116,12 +114,10 @@ contract VaultSim is Test {
         // HODL 50/50 terminal
         uint256 hodl = (wethStart * endP * E8) / PRICE_SCALE + START_USDG;
 
-        // LP full-range terminal: value = 2*sqrt(k*p) with k in matched units.
-        // Work in USDG(1e6): x_usd0 = wethStart*p0, symmetric. Value(p) =
-        // 2*sqrt(V0/2 * V0/2 * p/p0) simplification → V0 * sqrt(p/p0) is the
-        // 50/50 rebalanced-constant-product value relative to start.
+        // LP full-range x*y=k: 50/50 value tracks V0 * sqrt(p/p0) (classic IL
+        // payoff) plus accumulated fees.
         uint256 v0 = START_USDG * 2; // total start USDG
-        uint256 lpVal = (v0 * _sqrt((endP * 1e12) / P0)) / 1e6 + lpFees;
+        uint256 lpVal = (v0 * _sqrt((endP * 1e12) / startPrice)) / 1e6 + lpFees;
 
         return (vNav, vIncome, hodl, lpVal);
     }

@@ -129,3 +129,25 @@ product for a different customer). CHOSEN: A — matches the user thesis
 compliance posture. ADOPTED FROM HLP: the wrapper — one vault, shares,
 deposit cooldown, no performance fee, radical transparency, no APY promises.
 Revisit B only as a possible second internal strategy after pilot data.
+
+## Appendix: backtest findings (2026-07-05, real data + drives real contract)
+
+Same $550, 50/50 start, identical price paths & fill model. Fill model is
+OPTIMISTIC (one clip captured per move; no adverse selection, no route
+competition) — treat as directional, real income lands below these.
+
+| Scenario | Vault | HODL 50/50 | UniV4 LP | Vault income |
+|---|---|---|---|---|
+| Chop, ends flat | **$558** | $550 | $550 | $7 |
+| Crash then recover | **$557** | $550 | $550 | $6 |
+| Straight rally +40% | $598 | **$660** | $651 | $39 |
+| Crash −39% | $393 | **$444** | $430 | $0 |
+| **REAL ETH H1-26 (−41%)** | $383 | **$439** | $428 | $34 |
+
+Verdict: mean-reversion / range harvester. WINS in chop and round-trips
+(the majority regime); LAGS in a straight rally (sells into strength);
+LOSES to HODL in a sustained downtrend (accumulates into the fall → ends
+over-exposed; realized income doesn't cover the extra market loss). This is
+the strategy doing exactly what's specced (buy dips, never realize a loss),
+not a bug. Bet = "ETH round-trips more than it trends." Reproduce:
+`forge test --match-contract 'VaultBacktest|VaultSim' -vv`.
