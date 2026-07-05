@@ -157,3 +157,28 @@ over-exposed; realized income doesn't cover the extra market loss). This is
 the strategy doing exactly what's specced (buy dips, never realize a loss),
 not a bug. Bet = "ETH round-trips more than it trends." Reproduce:
 `forge test --match-contract 'VaultBacktest|VaultSim' -vv`.
+
+## Appendix: oracle reality check (2026-07-05, measured on-chain)
+
+Chainlink ETH/USD on Robinhood Chain: proxy
+`0x78F3556b67E17Df817D51Ef5a990cDaF09E8d3A9` (8 decimals, verified live,
+answer $1,782.11 at check time). It is a DEVIATION feed: updates on **0.5%
+price move or 24h heartbeat**, not on a clock. Measured last 30 rounds:
+update intervals 3.5 min – 8.3 h, median ~71 min.
+
+Consequences for the signed-off params:
+1. **maxOracleAge 90s is unusable** — the vault would quote 0 nearly always.
+   Correct staleness check for a deviation feed = heartbeat + buffer:
+   **90,000s (25h)**. Between updates the price is guaranteed within 0.5% of
+   true (else deviation would have triggered); staleness beyond heartbeat
+   means the feed is dead — that's what the check is for.
+2. **spreadBps 30 < deviation threshold 50 → systematic pick-off.** Routers
+   see real-time price; quoting ±30bps around a mid that can be 50bps stale
+   sells below / buys above true price. Spread must exceed worst-case
+   staleness: **60bps proposed** (10bps worst-case edge, ~35bps typical).
+   minProfitBps 25 unchanged.
+
+PENDING TOM SIGN-OFF: maxOracleAge 90s→90,000s; spreadBps 30→60.
+
+Gas (forge --gas-report, for Rialto onboarding): `getAmountOut` ~28–36k
+(view), `swapExactIn` median ~109k / max ~128k.
