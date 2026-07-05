@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {Test} from "forge-std/Test.sol";
 import {VaultPair} from "../src/VaultPair.sol";
 
-contract MockERC20 {
+contract MockERC20 { // shared
     string public name;
     uint8 public immutable decimals;
     mapping(address => uint256) public balanceOf;
