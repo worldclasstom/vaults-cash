@@ -1,7 +1,8 @@
 # The Vault — strategy & contract spec (v0, pilot)
 
-_Status: DRAFT for Tom's review before any Solidity. This document is the
-source of truth for what the pilot contract may and may not do with capital._
+_Status: parameters SIGNED OFF by Tom 2026-07-04. This document is the
+source of truth for what the pilot contract may and may not do with capital.
+Remaining gate before deploy: Rialto onboarding confirmation for chain 4663._
 
 ## One-sentence strategy
 
@@ -67,6 +68,24 @@ State: a stack of **lots** `{ amountEth, entryPriceX18 }`.
   silent until price recovers into the lot stack; **income counter stalls;
   USD NAV marks down (unrealized).** Accepted-by-thesis: exposure we want
   to hold anyway. Never sold at a loss.
+
+## Deposits, redemptions & the cap (ERC-4626 phase)
+
+- **The 80% cap is a ratio, not a quantity.** New USDG deposits grow NAV,
+  ETH weight falls below the cap, and bidding resumes automatically — fresh
+  capital is fresh dip-buying capacity at current prices. New (cheap) lots
+  stack on top; LIFO means they harvest first on recovery.
+- **Deposits: USDG only** (v1). Shares minted at NAV marked at oracle mid —
+  entrants never buy hidden losses; drawdown is already in the share price.
+- **Redemptions: pro-rata IN KIND (ETH + USDG), never USDG-only.** A
+  USDG-only exit path would force selling underwater lots during full-ETH
+  drawdowns, killing the core invariant exactly when it matters. In-kind
+  keeps "never sells below basis" unconditional; the exiting user chooses
+  whether to convert their ETH.
+- **Disclosure requirement:** the no-realized-loss guarantee is a property
+  of the VAULT'S TRADING, not of each depositor's round trip — a depositor
+  entering at high NAV and exiting at low NAV realizes their own loss via
+  share price. Say this verbatim wherever deposits happen.
 
 ## Accounting & display (two counters, never conflated)
 
