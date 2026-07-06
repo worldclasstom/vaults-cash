@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { LogoMark } from "@/components/Logo";
 import { MarketList } from "@/components/MarketList";
+import { SendPanel } from "@/components/SendPanel";
 import {
   useActiveAddress,
   useAssetBalances,
@@ -50,6 +51,7 @@ function Dashboard() {
   const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
   const { data: assetBalances } = useAssetBalances();
   const [showReceive, setShowReceive] = useState(false);
+  const [showSend, setShowSend] = useState(false);
   const [copied, setCopied] = useState(false);
 
   return (
@@ -77,12 +79,25 @@ function Dashboard() {
             (tested 2026-07-03: Privy funding modal has no route to 4663). */}
         <div className="mt-3 flex items-center gap-3">
           <button
-            onClick={() => setShowReceive(!showReceive)}
+            onClick={() => {
+              setShowReceive(!showReceive);
+              setShowSend(false);
+            }}
             className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
           >
             Add funds
           </button>
+          <button
+            onClick={() => {
+              setShowSend(!showSend);
+              setShowReceive(false);
+            }}
+            className="rounded-full bg-surface-raised px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
+          >
+            Send
+          </button>
         </div>
+        {showSend && <SendPanel onClose={() => setShowSend(false)} />}
         {showReceive && address && (
           <div className="mt-3 rounded-2xl bg-surface p-4 text-sm">
             <p className="pb-2 text-muted">
