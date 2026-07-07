@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
 import {VaultPair} from "../src/VaultPair.sol";
-import {MockERC20, MockOracle} from "./VaultPair.t.sol";
+import {MockERC20, MockOracle, MockStateView, PriceMath} from "./VaultPair.t.sol";
 
 /// @notice Head-to-head simulation of the pilot strategy vs (a) HODL 50/50 and
 ///         (b) a full-range x*y=k Uniswap LP, over identical price paths and an
@@ -26,6 +26,7 @@ contract VaultSim is Test {
     MockERC20 weth;
     MockERC20 usdg;
     MockOracle oracle;
+    MockStateView pool;
     VaultPair vault;
 
     // starting capital: $275 ETH + $275 USDG at p0=$1800  => 0.152778 ETH
@@ -36,16 +37,23 @@ contract VaultSim is Test {
 
     uint256 startPrice; // path[0]: all three strategies start 50/50 here
 
+    function _setMid(uint256 usd) internal {
+        oracle.set(int256(usd * E8));
+        pool.set(PriceMath.sqrtP(usd));
+    }
+
     function _fresh(uint256 p0) internal {
         startPrice = p0;
         weth = new MockERC20("WETH", 18);
         usdg = new MockERC20("USDG", 6);
         oracle = new MockOracle();
+        pool = new MockStateView();
         vm.warp(1_000_000);
-        oracle.set(int256(p0 * E8));
+        _setMid(p0);
         vault = new VaultPair(
             address(weth), address(usdg), address(oracle),
-            30, 25, 90, 150e6, 8000
+            address(pool), bytes32(uint256(1)),
+            30, 25, 90_000, 150e6, 8000, 100
         );
         wethStart = (START_USDG * PRICE_SCALE) / (p0 * E8); // equal $ in ETH at p0
         weth.mint(address(this), 1000 ether);
@@ -69,7 +77,7 @@ contract VaultSim is Test {
 
     function _sellUsdgForWeth(uint256 wethTarget, uint256 price) internal returns (bool) {
         // find a USDG-in that yields ~wethTarget at current ask
-        uint256 exec = (price * E8 * (10_000 + 30)) / 10_000;
+        uint256 exec = (PriceMath.mid(price) * (10_000 + 30)) / 10_000;
         uint256 usdgIn = (wethTarget * exec) / PRICE_SCALE;
         if (usdgIn == 0 || usdgIn > 150e6) return false;
         uint256 q = vault.getAmountOut(false, usdgIn);
@@ -88,7 +96,7 @@ contract VaultSim is Test {
         uint256 prev = path[0];
         for (uint256 i = 0; i < path.length; i++) {
             uint256 p = path[i];
-            oracle.set(int256(p * E8));
+            _setMid(p);
 
             // vault fills
             if (p < prev) {
@@ -107,7 +115,7 @@ contract VaultSim is Test {
         uint256 endP = path[path.length - 1];
 
         // vault terminal
-        oracle.set(int256(endP * E8));
+        _setMid(endP);
         uint256 vNav = vault.nav();
         uint256 vIncome = vault.cumulativeIncomeUsdg();
 

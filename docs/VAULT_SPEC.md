@@ -37,8 +37,14 @@ certainly yes (launch partner) but it's a human step, not self-serve.
 
 State: a stack of **lots** `{ amountEth, entryPriceX18 }`.
 
-- **Pricing source:** Chainlink ETH/USD read inside `getAmountOut` at call
-  time. Reject (quote 0) if `updatedAt` older than `maxOracleAge`.
+- **Pricing source (v0.2):** mid = the live Uniswap v4 ETH/USDG pool price
+  (StateView.getSlot0 read inside `getAmountOut` at call time) — real-time,
+  arb-corrected, never stale. Chainlink ETH/USD is the GUARDRAIL, not the
+  price: quote 0 if the feed is dead (older than `maxOracleAge`) or if pool
+  and Chainlink diverge more than `maxDivergenceBps`. Manipulation economics:
+  skewing the pool costs fees + impact, capped by the divergence bound, and
+  extracts at most maxTradeUsdg x divergence per fill — unprofitable at
+  pilot params.
 - **Bid (router sells ETH to us / we buy):** price `mid × (1 − spreadBps)`.
   Size limited by USDG balance and `maxTradeSize`. Every fill pushes a lot.
 - **Ask (router buys ETH from us / we sell):** walk the lot stack
@@ -58,9 +64,10 @@ State: a stack of **lots** `{ amountEth, entryPriceX18 }`.
 
 | Param | Pilot value (proposed) | Note |
 |---|---|---|
-| spreadBps | 30 | each side vs mid |
+| spreadBps | 30 | each side vs live pool mid |
 | minProfitBps | 25 | per-lot realized profit floor |
-| maxOracleAge | 90s | else quote 0 |
+| maxOracleAge | 90,000s (25h) | Chainlink GUARDRAIL liveness: heartbeat 24h + buffer |
+| maxDivergenceBps | 100 (1%) | pool mid vs Chainlink; else quote 0 |
 | maxTradeSize | $150 notional | per fill |
 | maxEthWeightBps | 8000 (80%) | stop bidding beyond |
 | pair | ETH / USDG | crypto-only for pilot (compliance) |
@@ -178,7 +185,12 @@ Consequences for the signed-off params:
    staleness: **60bps proposed** (10bps worst-case edge, ~35bps typical).
    minProfitBps 25 unchanged.
 
-PENDING TOM SIGN-OFF: maxOracleAge 90s→90,000s; spreadBps 30→60.
+RESOLVED 2026-07-07 (v0.2): rather than widening the spread to 60bps (fill
+death) or keeping 30bps on a stale mid (pick-off), the mid source moved to
+the live v4 pool price with Chainlink demoted to guardrail. Spread stays
+30bps and is safe: the mid can't be stale. maxOracleAge 90,000s signed off.
+Validated against live chain state 2026-07-07: pool-derived mid $1,778.99 vs
+Chainlink $1,774.29 (26bps divergence — CL lagging, as designed for).
 
 Gas (forge --gas-report, for Rialto onboarding): `getAmountOut` ~28–36k
 (view), `swapExactIn` median ~109k / max ~128k.

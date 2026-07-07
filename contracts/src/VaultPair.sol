@@ -1,12 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title VaultPair — vaults.cash LIFO no-loss grid propAMM (pilot v0)
+/// @title VaultPair — vaults.cash LIFO no-loss grid propAMM (pilot v0.2)
 /// @notice Rialto propAMM liquidity source for WETH/USDG implementing the
-///         strategy in docs/VAULT_SPEC.md: quote two-sided around Chainlink
-///         mid, but only ever sell inventory lots above their own entry
+///         strategy in docs/VAULT_SPEC.md: quote two-sided around a live mid,
+///         but only ever sell inventory lots above their own entry
 ///         (most-recent first). Every realized trade is a profit by
 ///         construction; drawdowns are held as inventory.
+///
+///         PRICING (v0.2): mid = the live Uniswap v4 ETH/USDG pool price —
+///         real-time, arb-corrected, never stale — bounded by Chainlink as a
+///         sanity guardrail (quote 0 if the two diverge > maxDivergenceBps or
+///         the feed is dead). v0.1 quoted from Chainlink directly, but the
+///         feed on this chain is a 0.5%-deviation/24h-heartbeat feed: quoting
+///         a stale mid tighter than the deviation band is systematic pick-off.
+///         Pool-mid pricing lets the spread stay tight and competitive.
+///         Manipulation economics: skewing the pool price costs pool fees +
+///         impact, is capped by the divergence bound, and can extract at most
+///         maxTradeUsdg * divergence per fill — unprofitable at pilot params.
 ///
 ///         token0 = WETH (18 dec), token1 = USDG (6 dec).
 ///         zeroForOne = true  : router sells WETH to us  (our BID / we buy)
@@ -29,6 +40,13 @@ interface IAggregatorV3 {
     function decimals() external view returns (uint8);
 }
 
+interface IStateView {
+    function getSlot0(bytes32 poolId)
+        external
+        view
+        returns (uint160 sqrtPriceX96, int24 tick, uint24 protocolFee, uint24 lpFee);
+}
+
 contract VaultPair {
     // ---------------------------------------------------------------- types
 
@@ -46,14 +64,17 @@ contract VaultPair {
 
     IERC20 public immutable weth;
     IERC20 public immutable usdg;
-    IAggregatorV3 public immutable oracle; // ETH/USD, 8 decimals
+    IAggregatorV3 public immutable oracle; // ETH/USD guardrail, 8 decimals
+    IStateView public immutable stateView; // Uniswap v4 StateView
+    bytes32 public immutable poolId; // v4 ETH/USDG pool (the mid source)
     address public immutable owner; // LLC treasury
 
     uint256 public immutable spreadBps; // 30
     uint256 public immutable minProfitBps; // 25
-    uint256 public immutable maxOracleAge; // 90s
+    uint256 public immutable maxOracleAge; // guardrail: feed heartbeat + buffer
     uint256 public immutable maxTradeUsdg; // 150e6
     uint256 public immutable maxEthWeightBps; // 8000
+    uint256 public immutable maxDivergenceBps; // pool mid vs Chainlink, 100
 
     // ---------------------------------------------------------------- state
 
@@ -89,23 +110,30 @@ contract VaultPair {
         address weth_,
         address usdg_,
         address oracle_,
+        address stateView_,
+        bytes32 poolId_,
         uint256 spreadBps_,
         uint256 minProfitBps_,
         uint256 maxOracleAge_,
         uint256 maxTradeUsdg_,
-        uint256 maxEthWeightBps_
+        uint256 maxEthWeightBps_,
+        uint256 maxDivergenceBps_
     ) {
         require(spreadBps_ < BPS && minProfitBps_ < BPS && maxEthWeightBps_ <= BPS, "params");
+        require(maxDivergenceBps_ > 0 && maxDivergenceBps_ < BPS, "divergence");
         require(IAggregatorV3(oracle_).decimals() == 8, "oracle decimals");
         weth = IERC20(weth_);
         usdg = IERC20(usdg_);
         oracle = IAggregatorV3(oracle_);
+        stateView = IStateView(stateView_);
+        poolId = poolId_;
         owner = msg.sender;
         spreadBps = spreadBps_;
         minProfitBps = minProfitBps_;
         maxOracleAge = maxOracleAge_;
         maxTradeUsdg = maxTradeUsdg_;
         maxEthWeightBps = maxEthWeightBps_;
+        maxDivergenceBps = maxDivergenceBps_;
     }
 
     // ------------------------------------------------------- Rialto interface
@@ -113,8 +141,8 @@ contract VaultPair {
     /// @notice Rialto quote hook. Returns 0 for any size/state we can't fill.
     function getAmountOut(bool zeroForOne, uint256 amountIn) public view returns (uint256) {
         if (paused || amountIn == 0) return 0;
-        (uint256 mid, bool fresh) = _price();
-        if (!fresh) return 0;
+        (uint256 mid, bool ok) = _price();
+        if (!ok) return 0;
 
         if (zeroForOne) {
             // BID: router sells WETH, we pay USDG at mid - spread
@@ -169,11 +197,25 @@ contract VaultPair {
 
     // ------------------------------------------------------------ strategy
 
-    function _price() internal view returns (uint256 mid, bool fresh) {
+    /// mid = live v4 pool price in USD 1e8; ok only when Chainlink is alive
+    /// and agrees within maxDivergenceBps. The pool is the price (real-time,
+    /// arb-corrected); Chainlink is the tripwire against pool manipulation.
+    function _price() internal view returns (uint256 mid, bool ok) {
+        (uint160 sqrtP,,,) = stateView.getSlot0(poolId);
+        // 2^104 bound keeps the squaring overflow-free; ETH would need to be
+        // ~$1e16 to hit it on an 18/6-decimals pair
+        if (sqrtP == 0 || uint256(sqrtP) >= 1 << 104) return (0, false);
+        // (sqrtP/2^96)^2 = USDG-raw per WETH-raw; * 1e20 -> USD 1e8
+        mid = (((uint256(sqrtP) * uint256(sqrtP)) >> 96) * PRICE_SCALE) >> 96;
+        if (mid == 0) return (0, false);
+
         (, int256 answer,, uint256 updatedAt,) = oracle.latestRoundData();
-        if (answer <= 0) return (0, false);
-        if (block.timestamp > updatedAt + maxOracleAge) return (uint256(answer), false);
-        return (uint256(answer), true);
+        if (answer <= 0) return (mid, false);
+        if (block.timestamp > updatedAt + maxOracleAge) return (mid, false);
+        uint256 cl = uint256(answer);
+        uint256 diff = mid > cl ? mid - cl : cl - mid;
+        if (diff * BPS > cl * maxDivergenceBps) return (mid, false);
+        return (mid, true);
     }
 
     /// Post-trade ETH weight must stay <= maxEthWeightBps of NAV (USDG terms).
@@ -235,9 +277,9 @@ contract VaultPair {
 
     /// Fund inventory. WETH funded here is lotted at the current mid.
     function fund(uint256 wethAmount, uint256 usdgAmount) external onlyOwner {
-        (uint256 mid, bool fresh) = _price();
+        (uint256 mid, bool ok) = _price();
         if (wethAmount > 0) {
-            require(fresh, "stale oracle");
+            require(ok, "no price");
             require(weth.transferFrom(msg.sender, address(this), wethAmount), "pull weth");
             require(lots.length < MAX_LOTS, "lots full");
             lots.push(Lot(uint128(wethAmount), uint128(mid)));
@@ -270,10 +312,10 @@ contract VaultPair {
         return lots.length;
     }
 
-    /// NAV in USDG terms at current oracle mid (0 if oracle stale).
+    /// NAV in USDG terms at the current mid (0 if pricing is unavailable).
     function nav() external view returns (uint256) {
-        (uint256 mid, bool fresh) = _price();
-        if (!fresh) return 0;
+        (uint256 mid, bool ok) = _price();
+        if (!ok) return 0;
         return (weth.balanceOf(address(this)) * mid) / PRICE_SCALE + usdg.balanceOf(address(this));
     }
 }

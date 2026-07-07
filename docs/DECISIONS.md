@@ -60,3 +60,15 @@ _Append-only. Date, decision, why. The "why" is the part that saves future-us._
   Stronger-than-HLP trustlessness as both differentiator and legal story.
   NOT legal immunity: counsel gate before any pooled user deposits; crypto
   pair (ETH/USDG) first; stock-token vaults inherit geofencing if ever.
+
+## 2026-07-07 — Vault v0.2: pool-mid pricing, Chainlink demoted to guardrail
+
+Chainlink on 4663 is a 0.5%-deviation/24h-heartbeat feed (measured median
+~71min between updates). Quoting FROM it forces a bad choice: spread < 50bps
+gets picked off by real-time routers; spread > 50bps loses every calm-market
+route to the 5bps Uniswap pool. Resolution: mid = live v4 ETH/USDG pool
+price (StateView, view-safe), Chainlink only bounds it (maxDivergenceBps
+100, maxOracleAge 90,000s liveness). Spread stays 30bps. Manipulation is
+uneconomic: pool-skew costs fees+impact, divergence bound caps mispricing at
+1%, maxTrade caps extraction at ~$1.50/fill. Tom's fill-rate concern drove
+this; 24 tests pass; math validated against live chain (26bps divergence).
