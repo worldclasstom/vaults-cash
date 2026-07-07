@@ -36,8 +36,8 @@ export { quoteUsdgToAsset, quoteAssetToUsdg } from "./uniswap";
 export type RangePreset = "full" | "balanced" | "aggressive";
 /** half-width of the range as a fraction of price; full = entire curve */
 export const PRESET_WIDTH: Record<Exclude<RangePreset, "full">, number> = {
-  balanced: 0.15,
-  aggressive: 0.05,
+  balanced: 0.3,
+  aggressive: 0.15,
 };
 
 const CHAIN_ID = 4663;

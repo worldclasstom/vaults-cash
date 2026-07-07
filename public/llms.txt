@@ -20,7 +20,7 @@ Build tools return {to, value, data} call batches you sign with your own wallet.
 - GET  /api/agent/positions?owner=0x… — live positions for a wallet
 - POST /api/agent/withdraw-plan {owner, tokenId, slippageBps?} — executable calls: position -> USDG
 
-Presets: full (never rebalance) | balanced (±15%) | aggressive (±5%).
+Presets: full (never rebalance) | balanced (±30%) | aggressive (±15%).
 Execute calls IN ORDER from `owner`; batch atomically if the wallet supports it
 (ERC-4337/EIP-7702). Plans embed slippage bounds and expire — rebuild after ~60s.
 

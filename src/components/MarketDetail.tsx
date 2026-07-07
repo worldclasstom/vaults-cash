@@ -17,8 +17,8 @@ import type { MarketStats } from "@/app/api/stats/route";
 
 const PRESETS: Array<{ id: RangePreset; label: string; blurb: string }> = [
   { id: "full", label: "Set & forget", blurb: "Earns at any price. Never needs attention." },
-  { id: "balanced", label: "Balanced", blurb: "Earns while price stays within ±15%." },
-  { id: "aggressive", label: "Aggressive", blurb: "Highest rate, narrow ±5% band." },
+  { id: "balanced", label: "Balanced", blurb: "Earns while price stays within ±30%." },
+  { id: "aggressive", label: "Aggressive", blurb: "Highest rate, narrow ±15% band." },
 ];
 
 function useStats() {
