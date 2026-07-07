@@ -37,6 +37,20 @@ function Landing() {
       >
         Get started
       </button>
+      <ul className="space-y-2 pt-2 text-left text-sm text-muted">
+        {[
+          "Self-custodial — funds stay in your own wallet",
+          "Official Uniswap v4 pools, verifiable on-chain",
+          "One flat 0.6% conversion fee. Nothing hidden",
+        ].map((line) => (
+          <li key={line} className="flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-accent" aria-hidden>
+              <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {line}
+          </li>
+        ))}
+      </ul>
       <p className="text-xs text-muted">
         Liquidity positions carry market &amp; impermanent-loss risk. Not
         available in all regions.

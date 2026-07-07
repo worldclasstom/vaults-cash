@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -12,6 +12,11 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  themeColor: "#0b0d0b",
+  viewportFit: "cover", // bottom tab bar respects the iPhone home indicator
+};
 
 export const metadata: Metadata = {
   title: "vaults.cash — earn on Robinhood Chain",
