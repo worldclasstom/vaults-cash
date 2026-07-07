@@ -78,3 +78,23 @@ fee wallet, per `fee_events` grouped by `referrer_wallet` × 50%.
   policy with a test op before trusting env; (2) sequential sends must sync
   confirmed nonce between steps (fixed in useSendCalls); (3) ETH landing
   unswapped needs a UI conversion path (TODO).
+
+## Gas sponsorship policy (2026-07-07) — NOT YET ACTIVE
+
+Policy "VAULTS.cash Gas Sponsorship" id `8d512c49-f1e5-4a61-b1b5-2235df108afa`
+(Alchemy Gas Manager, review screen confirmed Robinhood Chain Mainnet).
+Rules: $1/op, $1 + 20 ops per address, $25 + 2000 ops policy-wide, 10-min
+sponsorship expiry, no end date, no custom rules.
+
+DO NOT set NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID until ALL of:
+1. Gas credits purchased in Alchemy (banner: sponsorship needs prepaid
+   credits — with env set but no credits, every atomic op fails its
+   paymaster step and degrades to sequential: the 200caf87 incident shape).
+2. Network verified programmatically (policies list tooltip ambiguity:
+   old testnet policy sits in the same list).
+3. One live test deposit validated end-to-end with sponsorship applied
+   (userOp receipt shows paymaster, user paid $0).
+
+Rialto onboarding: issue #3 filed by Tom on rialto-plds/rialto-api-docs
+(2026-07-07) + X DM channel. Monitor for reply; send contract address
+once deployed.
