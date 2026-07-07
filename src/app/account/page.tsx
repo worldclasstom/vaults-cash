@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
+import { InviteCard } from "@/components/InviteCard";
 import { useActiveAddress, useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
@@ -115,6 +116,8 @@ export default function AccountPage() {
               vaults.cash can never move your funds.
             </p>
           </section>
+
+          <InviteCard />
 
           <section className="rounded-3xl bg-surface p-5">
             <Link
