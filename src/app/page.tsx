@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
@@ -51,6 +52,12 @@ function Landing() {
           </li>
         ))}
       </ul>
+      <Link
+        href="/how-it-works"
+        className="text-sm font-semibold text-accent underline-offset-2 hover:underline"
+      >
+        See exactly how it works →
+      </Link>
       <p className="text-xs text-muted">
         Liquidity positions carry market &amp; impermanent-loss risk. Not
         available in all regions.

@@ -132,6 +132,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           conversion fee — no other charges.
         </p>
         <p className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
+          <Link href="/how-it-works" className="text-muted underline-offset-2 hover:text-foreground hover:underline">
+            How it works
+          </Link>
           <Link href="/disclosures" className="text-muted underline-offset-2 hover:text-foreground hover:underline">
             Disclosures &amp; fees
           </Link>

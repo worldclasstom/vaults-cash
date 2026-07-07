@@ -118,6 +118,12 @@ export default function AccountPage() {
 
           <section className="rounded-3xl bg-surface p-5">
             <Link
+              href="/how-it-works"
+              className="block py-1 text-sm text-muted transition-colors hover:text-foreground"
+            >
+              How it works →
+            </Link>
+            <Link
               href="/disclosures"
               className="block py-1 text-sm text-muted transition-colors hover:text-foreground"
             >
