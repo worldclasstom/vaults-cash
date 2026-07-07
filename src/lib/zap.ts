@@ -142,8 +142,11 @@ export async function buildZapPlan(params: {
   customWidth?: number;
   slippageBps: number;
   poolState: { sqrtPriceX96: bigint; tick: number; liquidity: bigint };
+  /** add to this position (its range) instead of minting a new one */
+  addTo?: { tokenId: bigint; tickLower: number; tickUpper: number };
 }): Promise<ZapPlan> {
-  const { market, owner, usdgAmount, preset, customWidth, slippageBps, poolState } = params;
+  const { market, owner, usdgAmount, preset, customWidth, slippageBps, poolState, addTo } =
+    params;
 
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
@@ -152,7 +155,8 @@ export async function buildZapPlan(params: {
   const feeAmount = (usdgAmount * feeBps) / 10_000n;
   const net = usdgAmount - feeAmount;
 
-  const { tickLower, tickUpper } = presetTicks(market, poolState.tick, preset, customWidth);
+  const { tickLower, tickUpper } =
+    addTo ?? presetTicks(market, poolState.tick, preset, customWidth);
   const share = swapShare(poolState.tick, tickLower, tickUpper, market.assetIsCurrency0);
   const swapIn = (net * BigInt(Math.round(share * 1_000_000))) / 1_000_000n;
   const usdgToPosition = net - swapIn;
@@ -197,12 +201,17 @@ export async function buildZapPlan(params: {
     amount1: (market.assetIsCurrency0 ? usdgToPosition : swapOutMin).toString(),
     useFullPrecision: true,
   });
-  const { calldata, value } = V4PositionManager.addCallParameters(position, {
-    recipient: owner,
+  const common = {
     slippageTolerance: new Percent(slippageBps, 10_000),
     deadline: deadline.toString(),
     useNative: market.token === NATIVE_ETH ? Ether.onChain(CHAIN_ID) : undefined,
-  });
+  };
+  // with a tokenId the SDK encodes INCREASE_LIQUIDITY on that position
+  // instead of minting a new NFT
+  const { calldata, value } = V4PositionManager.addCallParameters(
+    position,
+    addTo ? { ...common, tokenId: addTo.tokenId.toString() } : { ...common, recipient: owner },
+  );
   calls.push({ to: POSM, value: BigInt(value), data: calldata as `0x${string}` });
 
   // platform fee LAST: in the atomic path order is irrelevant, and in the

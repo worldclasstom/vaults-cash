@@ -36,6 +36,32 @@ export function usePlanDeposit() {
   });
 }
 
+/** Build a plan that adds USDG to an EXISTING position (same range, no new
+ *  NFT). The swap share is computed from the position's range at the current
+ *  price, so out-of-center — even fully out-of-range — adds split correctly. */
+export function usePlanAdd() {
+  const owner = useActiveAddress();
+  return useMutation({
+    mutationFn: async (input: {
+      position: { tokenId: bigint; tickLower: number; tickUpper: number; market: Market };
+      amountUsd: number;
+      slippageBps: number;
+    }): Promise<ZapPlan> => {
+      if (!owner) throw new Error("Wallet not ready yet — try again in a second.");
+      const poolState = await getPoolState(input.position.market);
+      return buildZapPlan({
+        market: input.position.market,
+        owner,
+        usdgAmount: parseUnits(input.amountUsd.toFixed(USDG.decimals), USDG.decimals),
+        preset: "full", // ignored — addTo's ticks win
+        slippageBps: input.slippageBps,
+        poolState,
+        addTo: input.position,
+      });
+    },
+  });
+}
+
 /** Step 2: execute the plan — atomic smart-wallet batch when available,
  *  sequential embedded-EOA transactions otherwise. */
 export function useSendDeposit() {

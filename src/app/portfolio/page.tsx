@@ -1,18 +1,133 @@
 "use client";
 
+import { useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { usePlanAdd, useSendDeposit } from "@/hooks/useDeposit";
 import { useCollect, usePositions, useWithdraw, type PositionView } from "@/hooks/usePositions";
 import { useUsdgBalance } from "@/hooks/useChainData";
 import { fmtAmount, fmtUsd } from "@/lib/format";
+import { planSummary } from "@/lib/zap";
 
 /** don't offer collection below this — it wouldn't meaningfully beat gas */
 const MIN_COLLECT_USD = 0.05;
 
+function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
+  const { data: balance } = useUsdgBalance();
+  const [amount, setAmount] = useState("");
+  const plan = usePlanAdd();
+  const send = useSendDeposit();
+
+  const amountNum = Number(amount) || 0;
+  const insufficient = balance !== undefined && amountNum > balance.formatted;
+
+  if (send.isSuccess) {
+    return (
+      <div className="mt-3 rounded-2xl bg-surface-raised p-4 text-sm">
+        <p className="font-semibold text-accent">Added ✓</p>
+        <p className="pt-1 text-muted">
+          Your position will reflect it in a few seconds.
+        </p>
+        <button
+          onClick={onClose}
+          className="mt-3 rounded-full bg-surface px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
+        >
+          Done
+        </button>
+      </div>
+    );
+  }
+
+  if (plan.isSuccess) {
+    const s = planSummary(plan.data, p.price, p.market.tokenDecimals);
+    return (
+      <div className="mt-3 rounded-2xl bg-surface-raised p-4 text-sm">
+        <p className="font-semibold">Confirm add</p>
+        <p className="pt-1 text-muted">
+          {fmtUsd(amountNum)} → ~{fmtUsd(s.assetUsd)} {p.market.symbol} + ~
+          {fmtUsd(s.usdgUsd)} USDG into this position&apos;s existing range.
+          Fee {fmtUsd(s.feeUsd)}.
+        </p>
+        {!p.inRange && (
+          <p className="pt-1 text-xs text-muted">
+            This position is out of range, so the whole amount converts to one
+            side and won&apos;t earn until price returns to the range.
+          </p>
+        )}
+        <div className="mt-3 flex gap-2">
+          <button
+            onClick={() => plan.reset()}
+            disabled={send.isPending}
+            className="rounded-full bg-surface px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
+          >
+            Back
+          </button>
+          <button
+            onClick={() => send.mutate(plan.data)}
+            disabled={send.isPending}
+            className="grow rounded-full bg-accent py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-40"
+          >
+            {send.isPending ? "Adding…" : "Add"}
+          </button>
+        </div>
+        {send.isError && (
+          <p className="pt-2 text-xs text-negative">{(send.error as Error).message}</p>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 rounded-2xl bg-surface-raised p-4 text-sm">
+      <div className="flex items-center gap-2">
+        <span className="text-muted">$</span>
+        <input
+          inputMode="decimal"
+          placeholder="0.00"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
+          className="w-full rounded-xl bg-surface p-3 font-mono outline-none placeholder:text-muted/50"
+        />
+        <button
+          onClick={() => balance && setAmount(String(balance.formatted))}
+          className="rounded-full bg-surface px-4 py-2 text-xs font-semibold text-muted transition-colors hover:bg-borderline hover:text-foreground"
+        >
+          Max
+        </button>
+      </div>
+      <p className="pt-1 text-xs text-muted">
+        Available: {balance ? fmtUsd(balance.formatted) : "—"} USDG
+        {insufficient && <span className="text-negative"> — not enough</span>}
+      </p>
+      <div className="mt-3 flex gap-2">
+        <button
+          onClick={onClose}
+          className="rounded-full bg-surface px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() =>
+            plan.mutate({ position: p, amountUsd: amountNum, slippageBps: 50 })
+          }
+          disabled={amountNum <= 0 || insufficient || plan.isPending}
+          className="grow rounded-full bg-accent py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-40"
+        >
+          {plan.isPending ? "Quoting…" : "Review add"}
+        </button>
+      </div>
+      {plan.isError && (
+        <p className="pt-2 text-xs text-negative">{(plan.error as Error).message}</p>
+      )}
+    </div>
+  );
+}
+
 function PositionCard({ p }: { p: PositionView }) {
   const withdraw = useWithdraw();
   const collect = useCollect();
+  const [adding, setAdding] = useState(false);
   const collectible = p.feesUsd >= MIN_COLLECT_USD;
 
   return (
@@ -43,6 +158,12 @@ function PositionCard({ p }: { p: PositionView }) {
       </div>
       <div className="mt-4 flex gap-2">
         <button
+          onClick={() => setAdding(!adding)}
+          className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
+        >
+          Add
+        </button>
+        <button
           onClick={() => withdraw.mutate(p)}
           disabled={withdraw.isPending}
           className="grow rounded-full bg-surface-raised py-2 text-sm font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
@@ -58,6 +179,7 @@ function PositionCard({ p }: { p: PositionView }) {
           {collect.isPending ? "Collecting…" : "Collect fees"}
         </button>
       </div>
+      {adding && <AddPanel p={p} onClose={() => setAdding(false)} />}
       {(withdraw.isError || collect.isError) && (
         <p className="mt-2 text-xs text-negative">
           {((withdraw.error ?? collect.error) as Error).message}
