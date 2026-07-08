@@ -64,7 +64,7 @@ State: a stack of **lots** `{ amountEth, entryPriceX18 }`.
 
 | Param | Pilot value (proposed) | Note |
 |---|---|---|
-| spreadBps | 30 | each side vs live pool mid |
+| spreadBps | 15 | each side vs live pool mid; ladder-first, Tom 2026-07-07 |
 | minProfitBps | 25 | per-lot realized profit floor |
 | maxOracleAge | 90,000s (25h) | Chainlink GUARDRAIL liveness: heartbeat 24h + buffer |
 | maxDivergenceBps | 100 (1%) | pool mid vs Chainlink; else quote 0 |
