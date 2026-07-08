@@ -115,9 +115,11 @@ function Dashboard() {
 
 export default function Home() {
   const { ready, authenticated } = usePrivy();
+  if (!ready) return null;
+  if (!authenticated) return <Landing />;
   return (
     <AppShell>
-      {!ready ? null : authenticated ? <Dashboard /> : <Landing />}
+      <Dashboard />
     </AppShell>
   );
 }

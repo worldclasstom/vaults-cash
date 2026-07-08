@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { captureRefFromUrl } from "./InviteCard";
+import { FooterContent } from "./Footer";
 import { Wordmark } from "./Logo";
 
 function MarketsIcon({ active }: { active: boolean }) {
@@ -119,35 +120,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </header>
       <main className="flex grow flex-col">{children}</main>
-      <footer className="mt-12 space-y-3 border-t border-borderline pt-6 pb-4 text-xs text-muted/80">
-        <p>
-          <span className="text-muted">Self-custodial:</span> your funds stay in
-          your own wallet and in positions you own — vaults.cash never takes
-          custody. Positions sit in official Uniswap v4 pools on Robinhood
-          Chain.
-        </p>
-        <p>
-          LP positions carry market &amp; impermanent-loss risk and are not
-          insured. Flat {Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}%
-          conversion fee — no other charges.
-        </p>
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
-          <Link href="/how-it-works" className="text-muted underline-offset-2 hover:text-foreground hover:underline">
-            How it works
-          </Link>
-          <Link href="/disclosures" className="text-muted underline-offset-2 hover:text-foreground hover:underline">
-            Disclosures &amp; fees
-          </Link>
-          <a
-            href="https://robinhoodchain.blockscout.com"
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted underline-offset-2 hover:text-foreground hover:underline"
-          >
-            Explorer
-          </a>
-          <span className="text-muted/60">© 2026 vaults.cash</span>
-        </p>
+      <footer className="mt-12 border-t border-borderline pt-6 pb-4">
+        <FooterContent />
       </footer>
       {authenticated && <BottomNav pathname={pathname} />}
     </div>
