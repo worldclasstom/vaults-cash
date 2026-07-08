@@ -72,3 +72,15 @@ price (StateView, view-safe), Chainlink only bounds it (maxDivergenceBps
 uneconomic: pool-skew costs fees+impact, divergence bound caps mispricing at
 1%, maxTrade caps extraction at ~$1.50/fill. Tom's fill-rate concern drove
 this; 24 tests pass; math validated against live chain (26bps divergence).
+
+## 2026-07-07 — v0.2 pricing + spread 15bps (ladder-first)
+Mid = live Uniswap v4 pool price (StateView.getSlot0), Chainlink demoted to
+guardrail (alive + within maxDivergenceBps=100, age<=25h). Kills the
+stale-oracle pick-off that forced wide spreads in v0.1. With live pricing,
+Tom's grid logic holds: fills ARE the product (ladder entries/exits), not
+spread capture vs informed flow — so quote TIGHT: spreadBps 30->15.
+Remaining tight-spread cost is faster inventory build in downtrends
+(bounded by 80% weight cap, accepted by thesis). Manipulation bounded:
+divergence cap + $150 maxTrade makes pool-skew attacks unprofitable.
+Router pays fill gas, not us. Spread is a constructor param — redeploy to
+retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
