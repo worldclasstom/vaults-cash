@@ -1,11 +1,11 @@
-import { AppShell } from "@/components/AppShell";
+import { MarketingShell } from "@/components/MarketingShell";
 
 export const metadata = { title: "Disclosures — vaults.cash" };
 
 export default function DisclosuresPage() {
   return (
-    <AppShell>
-      <div className="animate-rise py-4">
+    <MarketingShell>
+      <div className="mx-auto max-w-2xl animate-rise px-6 py-14">
         <h1 className="pb-6 text-3xl font-bold">Disclosures</h1>
         <div className="space-y-6 text-sm leading-relaxed text-muted">
           <section>
@@ -61,6 +61,6 @@ export default function DisclosuresPage() {
           </section>
         </div>
       </div>
-    </AppShell>
+    </MarketingShell>
   );
 }

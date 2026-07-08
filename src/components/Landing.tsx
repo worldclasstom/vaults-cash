@@ -4,8 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
-import { Wordmark } from "@/components/Logo";
-import { FooterContent } from "@/components/Footer";
+import { MarketingShell } from "@/components/MarketingShell";
 import {
   MarketChart,
   TRADER_YS,
@@ -75,34 +74,7 @@ export function Landing() {
   const { login } = usePrivy();
 
   return (
-    <div className="w-full">
-      {/* nav */}
-      <header className="sticky top-0 z-40 border-b border-borderline/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Wordmark />
-          <nav className="flex items-center gap-2 sm:gap-4">
-            <Link
-              href="/how-it-works"
-              className="hidden text-sm font-medium text-muted transition-colors hover:text-foreground sm:block"
-            >
-              How it works
-            </Link>
-            <button
-              onClick={login}
-              className="rounded-full border border-borderline px-5 py-2 text-sm font-semibold transition-colors hover:border-muted"
-            >
-              Log in
-            </button>
-            <button
-              onClick={login}
-              className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
-            >
-              Get started
-            </button>
-          </nav>
-        </div>
-      </header>
-
+    <MarketingShell>
       {/* hero */}
       <section className="relative overflow-hidden">
         <div
@@ -223,6 +195,12 @@ export function Landing() {
             pool. This is the live rate from real trading over the last 24
             hours — not a projection we made up.
           </p>
+          <button
+            onClick={login}
+            className="mt-7 rounded-full bg-accent px-8 py-3 font-semibold text-black transition-colors hover:bg-accent-strong"
+          >
+            Start earning
+          </button>
         </div>
         <EarningsCalculator />
       </section>
@@ -331,12 +309,6 @@ export function Landing() {
           </p>
         </div>
       </section>
-
-      <footer className="border-t border-borderline/60">
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <FooterContent />
-        </div>
-      </footer>
-    </div>
+    </MarketingShell>
   );
 }

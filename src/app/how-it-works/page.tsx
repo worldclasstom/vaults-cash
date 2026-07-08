@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AppShell } from "@/components/AppShell";
+import { MarketingShell } from "@/components/MarketingShell";
 
 export const metadata = { title: "How it works — vaults.cash" };
 
@@ -21,8 +21,8 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 
 export default function HowItWorksPage() {
   return (
-    <AppShell>
-      <div className="animate-rise space-y-8 py-4">
+    <MarketingShell>
+      <div className="mx-auto max-w-2xl animate-rise space-y-8 px-6 py-14">
         <header>
           <h1 className="text-3xl font-bold">How it works</h1>
           <p className="pt-2 text-muted">
@@ -145,6 +145,6 @@ export default function HowItWorksPage() {
           </Link>
         </div>
       </div>
-    </AppShell>
+    </MarketingShell>
   );
 }
