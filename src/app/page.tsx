@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
-import { LogoMark } from "@/components/Logo";
+import { Landing } from "@/components/Landing";
 import { MarketList } from "@/components/MarketList";
 import { SendPanel } from "@/components/SendPanel";
 import {
@@ -17,54 +16,6 @@ import {
 import { GAS_SPONSORED } from "@/lib/config";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
-
-function Landing() {
-  const { login } = usePrivy();
-  return (
-    <div className="flex grow flex-col items-center justify-center gap-6 py-24 text-center animate-rise">
-      <LogoMark size={72} />
-      <h1 className="text-4xl font-bold tracking-tight">
-        Put your cash
-        <br />
-        to work<span className="text-accent">.</span>
-      </h1>
-      <p className="max-w-sm text-balance text-muted">
-        Provide liquidity to tokenized stocks and blue-chip crypto on Robinhood
-        Chain, and earn a share of every trade. No seed phrases. No gas.
-      </p>
-      <button
-        onClick={login}
-        className="rounded-full bg-accent px-8 py-3 font-semibold text-black transition-colors hover:bg-accent-strong"
-      >
-        Get started
-      </button>
-      <ul className="space-y-2 pt-2 text-left text-sm text-muted">
-        {[
-          "Self-custodial — funds stay in your own wallet",
-          "Official Uniswap v4 pools, verifiable on-chain",
-          "One flat 0.6% conversion fee. Nothing hidden",
-        ].map((line) => (
-          <li key={line} className="flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-accent" aria-hidden>
-              <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {line}
-          </li>
-        ))}
-      </ul>
-      <Link
-        href="/how-it-works"
-        className="text-sm font-semibold text-accent underline-offset-2 hover:underline"
-      >
-        See exactly how it works →
-      </Link>
-      <p className="text-xs text-muted">
-        Liquidity positions carry market &amp; impermanent-loss risk. Not
-        available in all regions.
-      </p>
-    </div>
-  );
-}
 
 function Dashboard() {
   const address = useActiveAddress();
