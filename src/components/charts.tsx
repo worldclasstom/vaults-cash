@@ -1,6 +1,8 @@
 /**
  * Dependency-free market-style charts: smooth Catmull-Rom→bezier curves,
- * gradient area fills, grid lines. Data is constant (hydration-safe).
+ * gradient area fills, grid lines, "+$" fee badges. Data is constant
+ * (hydration-safe). Fixed viewBox aspect — no preserveAspectRatio
+ * stretching, so text and badges never distort.
  */
 "use client";
 
@@ -12,13 +14,13 @@ type Series = {
   width?: number;
   fill?: boolean;
   dashed?: boolean;
-  /** indices that get a small "fee tick" dot */
+  /** indices that get a "+$" fee badge above the line */
   ticks?: number[];
 };
 
 const W = 320;
 const H = 132;
-const PAD = 10;
+const PAD = 12;
 
 function toPoints(ys: number[], min: number, max: number): [number, number][] {
   const span = max - min || 1;
@@ -31,7 +33,7 @@ function toPoints(ys: number[], min: number, max: number): [number, number][] {
 /** Catmull-Rom spline → cubic bezier path (the standard smoothing trick). */
 function smoothPath(pts: [number, number][]): string {
   if (pts.length < 2) return "";
-  let d = `M ${pts[0][0]},${pts[0][1]}`;
+  let d = `M ${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[Math.max(0, i - 1)];
     const p1 = pts[i];
@@ -48,13 +50,11 @@ function smoothPath(pts: [number, number][]): string {
 
 export function MarketChart({
   series,
-  className,
-  height = H,
+  className = "w-full h-auto",
   domain,
 }: {
   series: Series[];
   className?: string;
-  height?: number;
   /** fixed y-range — stops near-flat data being auto-stretched into noise */
   domain?: [number, number];
 }) {
@@ -64,19 +64,13 @@ export function MarketChart({
   const uid = useId();
 
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      className={className}
-      style={{ height, width: "100%" }}
-      preserveAspectRatio="none"
-      aria-hidden
-    >
+    <svg viewBox={`0 0 ${W} ${H}`} className={className} aria-hidden>
       <defs>
         {series.map(
           (s, i) =>
             s.fill && (
               <linearGradient key={i} id={`${uid}-${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={s.color} stopOpacity="0.28" />
+                <stop offset="0%" stopColor={s.color} stopOpacity="0.25" />
                 <stop offset="100%" stopColor={s.color} stopOpacity="0" />
               </linearGradient>
             ),
@@ -91,41 +85,51 @@ export function MarketChart({
           y1={PAD + f * (H - PAD * 2)}
           y2={PAD + f * (H - PAD * 2)}
           stroke="var(--border)"
-          strokeWidth="1"
-          strokeDasharray="2 6"
+          strokeWidth="0.75"
         />
       ))}
       {series.map((s, i) => {
         const pts = toPoints(s.ys, min, max);
         const d = smoothPath(pts);
+        const last = pts[pts.length - 1];
         return (
           <g key={i}>
             {s.fill && (
-              <path
-                d={`${d} L ${W},${H} L 0,${H} Z`}
-                fill={`url(#${uid}-${i})`}
-                stroke="none"
-              />
+              <path d={`${d} L ${W},${H} L 0,${H} Z`} fill={`url(#${uid}-${i})`} stroke="none" />
             )}
             <path
               d={d}
               fill="none"
               stroke={s.color}
-              strokeWidth={s.width ?? 2.25}
-              strokeLinecap="round"
-              strokeDasharray={s.dashed ? "1 7" : undefined}
-              vectorEffect="non-scaling-stroke"
+              strokeWidth={s.width ?? 1.75}
+              strokeLinejoin="round"
+              strokeDasharray={s.dashed ? "3 4" : undefined}
             />
-            {s.ticks?.map((idx, j) => (
-              <g
-                key={idx}
-                className="tick-pop"
-                style={{ animationDelay: `${0.7 + j * 0.3}s` }}
-              >
-                <circle cx={pts[idx][0]} cy={pts[idx][1]} r="4.5" fill="var(--background)" stroke={s.color} strokeWidth="2" />
-                <circle cx={pts[idx][0]} cy={pts[idx][1]} r="1.8" fill={s.color} />
-              </g>
-            ))}
+            {/* live endpoint */}
+            {!s.dashed && <circle cx={last[0]} cy={last[1]} r="2.5" fill={s.color} />}
+            {/* "+$" fee badges */}
+            {s.ticks?.map((idx, j) => {
+              const [x, y] = pts[idx];
+              return (
+                <g
+                  key={idx}
+                  className="tick-pop"
+                  style={{ animationDelay: `${0.6 + j * 0.3}s` }}
+                >
+                  <circle cx={x} cy={y - 14} r="8.5" fill={s.color} opacity="0.16" />
+                  <text
+                    x={x}
+                    y={y - 11}
+                    textAnchor="middle"
+                    fontSize="8"
+                    fontWeight="700"
+                    fill={s.color}
+                  >
+                    +$
+                  </text>
+                </g>
+              );
+            })}
           </g>
         );
       })}
@@ -134,30 +138,37 @@ export function MarketChart({
 }
 
 /* ---------------------------------------------------------------- data
-   Constant, realistic-feeling series (no Math.random → SSR-safe). */
+   Constant seeded-random-walk series (no Math.random → SSR-safe). */
 
 export const TRADER_YS = [
-  100, 103, 98, 104, 109, 102, 95, 99, 91, 96, 88, 92, 83, 87, 90, 81, 76, 82,
-  77, 71, 75, 68, 73, 65, 69, 62, 66, 59, 63, 57, 60, 55,
+  100, 100.4, 101.4, 101.1, 100.7, 99.8, 101.7, 100.3, 98.2, 96.6, 95.0, 93.8,
+  92.3, 90.0, 88.7, 87.4, 87.3, 85.4, 83.0, 81.1, 80.9, 79.9, 80.6, 81.7, 80.8,
+  78.5, 79.2, 80.0, 79.1, 79.4, 78.0, 79.6, 80.8, 81.8, 83.5, 81.8, 81.6, 82.3,
+  83.3, 82.4, 80.2, 80.4, 78.1, 78.7, 75.9, 75.2, 74.7, 72.5, 72.0, 71.5, 70.5,
+  72.0, 73.3, 74.8, 73.1, 70.4,
 ];
 
 export const HOLDER_YS = [
-  100, 100.8, 99.6, 100.4, 101.2, 100.2, 99.2, 100, 100.9, 99.8, 99, 99.9,
-  100.7, 99.7, 98.9, 99.8, 100.6, 101.3, 100.3, 99.4, 100.1, 101, 100, 99.1,
-  99.9, 100.8, 100, 99.2, 100, 100.9, 100.1, 100.5,
+  100, 99.6, 99.7, 99.5, 99.7, 99.9, 99.3, 98.6, 99.1, 98.8, 98.4, 99.2, 99.1,
+  99.7, 99.6, 99.9, 99.4, 99.6, 100.2, 100.2, 100.6, 100.9, 100.2, 100.6,
+  100.8, 100.5, 99.8, 100.4, 100.4, 100.7, 101.3, 101.7, 102.3, 102.2, 102.6,
+  102.6, 103.3, 103.8, 103.3, 102.7, 102.3, 103.0, 103.0, 103.2, 102.9, 102.9,
+  102.8, 102.6, 102.7, 102.9, 103.5, 103.8, 104.5, 105.0, 105.8, 106.0,
 ];
 
 /** same market as HOLDER, plus steadily-compounding collected fees */
-export const EARNER_YS = HOLDER_YS.map((v, i) => v + i * 0.62);
+export const EARNER_YS = HOLDER_YS.map((v, i) => +(v + i * 0.34).toFixed(1));
 
-/** hero: longer, gently-up market with visible fee compounding on top */
+/** hero: longer, gently-up market with fee compounding on top */
 export const HERO_HOLD_YS = [
-  100, 101.5, 99.8, 102.2, 104, 102.5, 100.9, 103.1, 105.4, 103.8, 102.4, 104.6,
-  106.8, 105.1, 103.6, 105.7, 107.9, 109.6, 107.8, 106.1, 107.9, 110.2, 108.4,
-  106.7, 108.3, 110.6, 109, 107.4, 109.1, 111.4, 110, 111.8, 113.5, 111.9,
-  110.4, 112.3, 114.5, 112.9, 111.5, 113.4,
+  100, 100.1, 100.6, 102.5, 102.6, 103.0, 103.6, 102.7, 103.0, 103.8, 105.1,
+  103.9, 103.4, 102.1, 103.6, 104.6, 103.1, 105.3, 107.3, 108.2, 108.9, 107.9,
+  106.3, 106.7, 105.3, 104.4, 103.7, 102.2, 102.3, 102.4, 104.0, 104.3, 105.1,
+  105.4, 106.3, 106.4, 105.9, 108.0, 110.2, 111.8, 112.9, 112.4, 111.7, 111.2,
+  109.8, 111.1, 111.0, 112.6, 112.4, 114.5, 116.1, 114.4, 113.6, 115.5, 115.6,
+  117.7, 117.6, 116.3, 117.1, 118.4, 117.8, 116.5, 116.2, 118.2,
 ];
 
-export const HERO_EARN_YS = HERO_HOLD_YS.map((v, i) => v + i * 0.42);
+export const HERO_EARN_YS = HERO_HOLD_YS.map((v, i) => +(v + i * 0.3).toFixed(1));
 
-export const HERO_TICKS = [6, 13, 20, 27, 34, 39];
+export const HERO_TICKS = [10, 21, 32, 43, 54, 62];

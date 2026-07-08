@@ -150,10 +150,9 @@ export function Landing() {
               </span>
             </div>
             <MarketChart
-              height={230}
               series={[
-                { ys: HERO_HOLD_YS, color: "var(--muted)", width: 2, dashed: true },
-                { ys: HERO_EARN_YS, color: "var(--accent)", width: 2.5, fill: true, ticks: HERO_TICKS },
+                { ys: HERO_HOLD_YS, color: "var(--muted)", width: 1.5, dashed: true },
+                { ys: HERO_EARN_YS, color: "var(--accent)", width: 2, fill: true, ticks: HERO_TICKS },
               ]}
             />
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1 pt-4 text-xs text-muted">
@@ -175,11 +174,12 @@ export function Landing() {
       <section className="border-y border-borderline/60 bg-surface/30">
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
           <h2 className="max-w-2xl text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-            The middle ground the market forgot
+            Between trading and holding, there&apos;s{" "}
+            <span className="text-accent">earning</span>.
           </h2>
           <div className="grid gap-5 pt-10 md:grid-cols-3">
             <div className="rounded-3xl border border-borderline bg-surface p-7">
-              <MarketChart height={120} series={[{ ys: TRADER_YS, color: "var(--negative)", fill: true }]} />
+              <MarketChart series={[{ ys: TRADER_YS, color: "var(--negative)", fill: true }]} />
               <p className="pt-5 text-lg font-semibold">Trading is hard</p>
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Timing the market is a full-time job, and most people who try
@@ -187,7 +187,7 @@ export function Landing() {
               </p>
             </div>
             <div className="rounded-3xl border border-borderline bg-surface p-7">
-              <MarketChart height={120} domain={[88, 112]} series={[{ ys: HOLDER_YS, color: "var(--muted)" }]} />
+              <MarketChart domain={[88, 112]} series={[{ ys: HOLDER_YS, color: "var(--muted)" }]} />
               <p className="pt-5 text-lg font-semibold">Holding earns nothing</p>
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Holding is easier — but your assets just sit there. No income,
@@ -196,10 +196,9 @@ export function Landing() {
             </div>
             <div className="rounded-3xl border border-accent/40 bg-surface p-7">
               <MarketChart
-                height={120}
                 series={[
-                  { ys: HOLDER_YS, color: "var(--muted)", width: 1.5, dashed: true },
-                  { ys: EARNER_YS, color: "var(--accent)", fill: true, ticks: [8, 16, 24, 30] },
+                  { ys: HOLDER_YS, color: "var(--muted)", width: 1.25, dashed: true },
+                  { ys: EARNER_YS, color: "var(--accent)", fill: true, ticks: [12, 26, 40, 52] },
                 ]}
               />
               <p className="pt-5 text-lg font-semibold text-accent">Hold — and collect</p>
@@ -285,7 +284,7 @@ export function Landing() {
         <ul className="grid gap-5 pt-10 md:grid-cols-3">
           {[
             ["24/7 markets", "Tokenized stocks and crypto trade around the clock — your position earns while you sleep."],
-            ["Fees in pennies", "Transactions confirm in under a second and cost less than a cent."],
+            ["Wall Street, tokenized", "Real equities — TSLA, NVDA, SPY — live here as tokens. Earn on stocks, not just crypto."],
             ["Fully public", "Every position, fee, and trade is verifiable on the public explorer. Nothing happens behind a curtain."],
           ].map(([t, d]) => (
             <li key={t} className="rounded-3xl border border-borderline bg-surface p-7">
