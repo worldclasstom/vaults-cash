@@ -21,10 +21,14 @@ export function InviteCard() {
   const address = useActiveAddress();
   const [copied, setCopied] = useState(false);
 
-  // one-time first-touch bind after login
+  // one-time first-touch bind after login. The "done" flag is per-wallet:
+  // a second account logging in from the same browser must still bind
+  // (server side is idempotent and first-touch-immutable regardless).
   useEffect(() => {
+    if (!authenticated || !address) return;
     const pending = localStorage.getItem(REF_KEY);
-    if (!authenticated || !address || !pending || localStorage.getItem(BOUND_KEY)) return;
+    const boundKey = `${BOUND_KEY}:${address.toLowerCase()}`;
+    if (!pending || localStorage.getItem(boundKey)) return;
     (async () => {
       try {
         const token = await getAccessToken();
@@ -34,7 +38,7 @@ export function InviteCard() {
           headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
           body: JSON.stringify({ wallet: address, refCode: pending }),
         });
-        localStorage.setItem(BOUND_KEY, "1");
+        localStorage.setItem(boundKey, "1");
       } catch {
         /* retried on next visit */
       }

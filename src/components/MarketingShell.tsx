@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { FooterContent } from "./Footer";
+import { captureRefFromUrl } from "./InviteCard";
 import { Wordmark } from "./Logo";
 
 /** Shared shell for the public/marketing pages (landing, how-it-works,
@@ -10,6 +12,8 @@ import { Wordmark } from "./Logo";
  *  visitors get an "Open app" button instead of login CTAs. */
 export function MarketingShell({ children }: { children: React.ReactNode }) {
   const { ready, authenticated, login } = usePrivy();
+  // referral links land on the marketing pages — capture ?ref= here too
+  useEffect(() => captureRefFromUrl(), []);
 
   return (
     <div className="w-full">
