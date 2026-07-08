@@ -1,15 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveAddress } from "@/hooks/useChainData";
 import { fmtUsd } from "@/lib/format";
 
 const REF_KEY = "vaults.ref";
-const BOUND_KEY = "vaults.ref.bound";
 
-/** Capture ?ref=CODE on any load so it survives until after login. */
+/**
+ * localStorage fallback capture for cookie-blocking browsers. The PRIMARY
+ * attribution path is server-side: the edge proxy sets an httpOnly cookie
+ * on any ?ref= entry, and /api/referral/me binds it on the first
+ * authenticated call — no client coordination involved.
+ */
 export function captureRefFromUrl() {
   if (typeof window === "undefined") return;
   const ref = new URLSearchParams(window.location.search).get("ref");
@@ -21,37 +25,19 @@ export function InviteCard() {
   const address = useActiveAddress();
   const [copied, setCopied] = useState(false);
 
-  // one-time first-touch bind after login. The "done" flag is per-wallet:
-  // a second account logging in from the same browser must still bind
-  // (server side is idempotent and first-touch-immutable regardless).
-  useEffect(() => {
-    if (!authenticated || !address) return;
-    const pending = localStorage.getItem(REF_KEY);
-    const boundKey = `${BOUND_KEY}:${address.toLowerCase()}`;
-    if (!pending || localStorage.getItem(boundKey)) return;
-    (async () => {
-      try {
-        const token = await getAccessToken();
-        if (!token) return;
-        await fetch("/api/referral/bind", {
-          method: "POST",
-          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-          body: JSON.stringify({ wallet: address, refCode: pending }),
-        });
-        localStorage.setItem(boundKey, "1");
-      } catch {
-        /* retried on next visit */
-      }
-    })();
-  }, [authenticated, address]);
-
   const { data } = useQuery({
     queryKey: ["referral-me", address],
     enabled: authenticated && !!address,
     staleTime: 60_000,
     queryFn: async () => {
       const token = await getAccessToken();
-      const res = await fetch(`/api/referral/me?wallet=${address}`, {
+      // cookie rides along automatically (same-origin); localStorage code
+      // goes as an explicit fallback param
+      const pending = localStorage.getItem(REF_KEY);
+      const url = `/api/referral/me?wallet=${address}${
+        pending ? `&pendingRef=${encodeURIComponent(pending)}` : ""
+      }`;
+      const res = await fetch(url, {
         headers: { authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("referral fetch failed");
