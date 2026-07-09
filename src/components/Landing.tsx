@@ -23,46 +23,69 @@ import { fmtPct, fmtUsd } from "@/lib/format";
  * feather's #00c805) so "our vault" reads distinct from "their chain". */
 function VaultDoor({ className }: { className?: string }) {
   const C = 200;
-  const bolts = Array.from({ length: 16 }, (_, i) => {
-    const a = (i / 16) * Math.PI * 2;
-    return { cx: C + 171 * Math.cos(a), cy: C + 171 * Math.sin(a) };
+  const P = (r: number, a: number) => [C + r * Math.cos(a), C + r * Math.sin(a)] as const;
+  // fine graduation ticks around the dial (safe-combination look); every 6th longer
+  const ticks = Array.from({ length: 72 }, (_, i) => {
+    const a = (i / 72) * Math.PI * 2;
+    const long = i % 6 === 0;
+    const [x1, y1] = P(long ? 150 : 156, a);
+    const [x2, y2] = P(165, a);
+    return { x1, y1, x2, y2, long };
   });
-  const lockBolts = Array.from({ length: 8 }, (_, i) => {
+  // radial locking bolts between the dial and the hub
+  const bolts = Array.from({ length: 8 }, (_, i) => {
     const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
-    return {
-      x1: C + 58 * Math.cos(a),
-      y1: C + 58 * Math.sin(a),
-      x2: C + 138 * Math.cos(a),
-      y2: C + 138 * Math.sin(a),
-    };
+    const [x1, y1] = P(92, a);
+    const [x2, y2] = P(120, a);
+    return { x1, y1, x2, y2 };
   });
-  const wheel = Array.from({ length: 6 }, (_, i) => {
+  // handle-wheel spokes, each capped with a small knob
+  const spokes = Array.from({ length: 6 }, (_, i) => {
     const a = (i / 6) * Math.PI * 2;
-    return { x2: C + 44 * Math.cos(a), y2: C + 44 * Math.sin(a) };
+    const [x, y] = P(72, a);
+    return { x, y };
   });
   return (
     <svg
       viewBox="0 0 400 400"
       fill="none"
       stroke="currentColor"
-      strokeWidth={5}
       strokeLinecap="round"
+      strokeLinejoin="round"
       className={className}
       aria-hidden
     >
-      <circle cx={C} cy={C} r={192} />
-      <circle cx={C} cy={C} r={150} />
+      {/* frame: bold outer, hairline inner (depth), door edge */}
+      <circle cx={C} cy={C} r={196} strokeWidth={2.5} />
+      <circle cx={C} cy={C} r={187} strokeWidth={0.75} opacity={0.55} />
+      <circle cx={C} cy={C} r={171} strokeWidth={1.75} />
+      {/* combination dial */}
+      {ticks.map((t, i) => (
+        <line
+          key={`t${i}`}
+          x1={t.x1}
+          y1={t.y1}
+          x2={t.x2}
+          y2={t.y2}
+          strokeWidth={t.long ? 1.75 : 0.9}
+          opacity={t.long ? 1 : 0.65}
+        />
+      ))}
+      <circle cx={C} cy={C} r={131} strokeWidth={1.25} />
+      {/* locking bolts */}
       {bolts.map((b, i) => (
-        <circle key={`b${i}`} cx={b.cx} cy={b.cy} r={5} fill="currentColor" stroke="none" />
+        <line key={`b${i}`} x1={b.x1} y1={b.y1} x2={b.x2} y2={b.y2} strokeWidth={2.75} />
       ))}
-      {lockBolts.map((s, i) => (
-        <line key={`l${i}`} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} />
+      {/* hub + knobbed handle wheel */}
+      <circle cx={C} cy={C} r={62} strokeWidth={1.75} />
+      <circle cx={C} cy={C} r={20} strokeWidth={1.75} />
+      {spokes.map((s, i) => (
+        <g key={`s${i}`}>
+          <line x1={C} y1={C} x2={s.x} y2={s.y} strokeWidth={2.25} />
+          <circle cx={s.x} cy={s.y} r={7} strokeWidth={1.75} />
+        </g>
       ))}
-      <circle cx={C} cy={C} r={52} />
-      {wheel.map((w, i) => (
-        <line key={`w${i}`} x1={C} y1={C} x2={w.x2} y2={w.y2} />
-      ))}
-      <circle cx={C} cy={C} r={12} fill="currentColor" stroke="none" />
+      <circle cx={C} cy={C} r={4.5} fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -254,7 +277,7 @@ export function Landing() {
 
       {/* calculator */}
       <section className="relative isolate overflow-hidden">
-        <VaultDoor className="pointer-events-none absolute -left-40 top-1/2 hidden h-[640px] w-[640px] -translate-y-1/2 -z-10 text-accent opacity-20 lg:block" />
+        <VaultDoor className="pointer-events-none absolute -left-28 top-6 -z-10 h-[380px] w-[380px] text-accent opacity-[0.18] sm:opacity-20 lg:-left-40 lg:top-1/2 lg:h-[640px] lg:w-[640px] lg:-translate-y-1/2" />
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:py-24 lg:grid-cols-2 lg:gap-16">
           <div>
             <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
