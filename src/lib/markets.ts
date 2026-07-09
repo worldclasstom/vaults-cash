@@ -36,28 +36,39 @@ export const USDG = {
   decimals: 6,
 } as const;
 
-function poolFromRegistry(pair: string, fee: number): PoolRef {
-  const p = registry.v4Pools.find((p) => p.pair === pair && p.fee === fee);
-  if (!p) throw new Error(`pool ${pair}@${fee} missing from registry — rerun scripts/verify-chain.ts`);
-  const [a, b] = pair.split("/").map((s) => {
-    if (s === "ETH") return NATIVE_ETH;
-    const t = registry.tokens[s as keyof typeof registry.tokens];
-    if (!t) throw new Error(`token ${s} missing from registry`);
-    return t.address as `0x${string}`;
-  });
+function toAddress(sym: string): `0x${string}` {
+  if (sym === "ETH") return NATIVE_ETH;
+  const t = registry.tokens[sym as keyof typeof registry.tokens];
+  if (!t) throw new Error(`token ${sym} missing from registry`);
+  return t.address as `0x${string}`;
+}
+
+function poolRef(pair: string, p: { poolId: string; fee: number; tickSpacing: number }): PoolRef {
+  const [a, b] = pair.split("/").map(toAddress);
   const [currency0, currency1] = a.toLowerCase() < b.toLowerCase() ? [a, b] : [b, a];
   return { poolId: p.poolId as `0x${string}`, currency0, currency1, fee: p.fee, tickSpacing: p.tickSpacing };
+}
+
+/** The deepest (most-liquidity) USDG pool for a token, or null if every tier
+ *  is empty. Fee tiers migrate on this young chain — a hardcoded tier silently
+ *  breaks when liquidity moves (e.g. NVDA's 5% pool drained to zero), so we
+ *  always resolve the live deepest pool from the registry instead. */
+function deepestUsdgPool(symbol: string): PoolRef | null {
+  const best = registry.v4Pools
+    .filter((p) => p.pair === `${symbol}/USDG` && BigInt(p.liquidity) > 0n)
+    .sort((a, b) => (BigInt(b.liquidity) > BigInt(a.liquidity) ? 1 : -1))[0];
+  return best ? poolRef(`${symbol}/USDG`, best) : null;
 }
 
 function stock(
   symbol: string,
   name: string,
   registryKey: keyof typeof registry.tokens,
-  fee: number,
   color: string,
-): Market {
+): Market | null {
+  const pool = deepestUsdgPool(registryKey);
+  if (!pool) return null; // no live liquidity in any tier — don't list it
   const token = registry.tokens[registryKey].address as `0x${string}`;
-  const pool = poolFromRegistry(`${registryKey}/USDG`, fee);
   return {
     symbol,
     name,
@@ -72,7 +83,7 @@ function stock(
   };
 }
 
-const ethPool = poolFromRegistry("ETH/USDG", 500);
+const ethPool = deepestUsdgPool("ETH")!; // flagship market; always has liquidity
 
 export const MARKETS: Market[] = [
   {
@@ -87,14 +98,16 @@ export const MARKETS: Market[] = [
     restricted: false,
     color: "#8a92b2",
   },
-  stock("TSLA", "Tesla", "TSLA", 50000, "#e82127"),
-  stock("AAPL", "Apple", "AAPL", 50000, "#a2aaad"),
-  stock("NVDA", "NVIDIA", "NVDA", 50000, "#76b900"),
-  stock("AMD", "AMD", "AMD", 10000, "#ed1c24"),
-  stock("QQQ", "Nasdaq-100 ETF", "QQQ", 10000, "#0091da"),
-  stock("SPCX", "SpaceX", "SPCX", 10000, "#005288"),
-  stock("SNDK", "Sandisk", "SNDK", 10000, "#6d2077"),
-];
+  stock("TSLA", "Tesla", "TSLA", "#e82127"),
+  stock("AAPL", "Apple", "AAPL", "#a2aaad"),
+  stock("NVDA", "NVIDIA", "NVDA", "#76b900"),
+  stock("AMD", "AMD", "AMD", "#ed1c24"),
+  stock("MU", "Micron", "MU", "#0071ce"),
+  stock("QQQ", "Nasdaq-100 ETF", "QQQ", "#0091da"),
+  stock("SPY", "S&P 500 ETF", "SPY", "#c99a3f"),
+  stock("SPCX", "SpaceX", "SPCX", "#005288"),
+  stock("SNDK", "Sandisk", "SNDK", "#6d2077"),
+].filter((m): m is Market => m !== null);
 
 export const marketBySymbol = (symbol: string) =>
   MARKETS.find((m) => m.symbol.toLowerCase() === symbol.toLowerCase());
