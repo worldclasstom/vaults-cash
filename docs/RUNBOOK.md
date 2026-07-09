@@ -98,3 +98,23 @@ DO NOT set NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID until ALL of:
 Rialto onboarding: issue #3 filed by Tom on rialto-plds/rialto-api-docs
 (2026-07-07) + X DM channel. Monitor for reply; send contract address
 once deployed.
+
+## Gas sponsorship ACTIVATED (2026-07-08)
+
+NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID=8d512c49-... set in Vercel Production +
+.env.local. Validated non-destructively BEFORE enabling via paymaster probe:
+`pm_getPaymasterData` on the app RPC (Origin: https://vaults.cash header —
+Alchemy blocks origin-less calls) with a chain-4663 (0x1237) userOp returned
+signed paymaster data stamped {"sponsor":{"name":"VAULTS.cash Gas
+Sponsorship"}} — proving the policy exists, is mainnet-scoped, active, and
+funded, without moving funds. This is the definitive check for the
+"Policy ID(s) not found" failure that broke the atomic path last time.
+Deployment confirmed current via /market/mu = 307 (restricted, exists) vs
+/market/zzz = 404. GAS_SPONSORED messaging flips automatically off the env.
+
+Reusable probe: node script POST pm_getPaymasterData to $NEXT_PUBLIC_RPC_URL
+with Origin header; error "Policy ID(s) not found" = wrong network/app.
+
+REMAINING: the first real embedded-wallet deposit (USDG-funded, zero-ETH
+wallet) is the end-to-end smoke test — user pays $0, op shows paymaster.
+Do this before inviting friends & family en masse.
