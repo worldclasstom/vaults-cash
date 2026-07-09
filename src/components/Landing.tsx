@@ -17,6 +17,38 @@ import {
 import type { MarketStats } from "@/app/api/stats/route";
 import { fmtPct, fmtUsd } from "@/lib/format";
 
+/* Robinhood-green feather mark used as the "Built on Robinhood Chain" section
+ * backdrop. Stylized line-art stand-in — swap public/brand/robinhood-mark for
+ * the official brandmark when available. */
+function ChainFeather({ className }: { className?: string }) {
+  const N = 30;
+  const barbs = Array.from({ length: N }, (_, i) => {
+    const t = i / (N - 1); // 0 = tip, 1 = quill
+    const y = 30 + t * 244;
+    const len = 90 * Math.sin(Math.PI * Math.pow(t, 0.9)); // widen mid, taper ends
+    return { y, len };
+  });
+  return (
+    <svg
+      viewBox="0 0 340 300"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={5}
+      strokeLinecap="round"
+      className={className}
+      aria-hidden
+    >
+      <path d="M170 22 C179 90 179 210 170 288" />
+      {barbs.map(({ y, len }, i) => (
+        <g key={i}>
+          <path d={`M170 ${y} L ${170 - len} ${y - len * 0.6}`} />
+          <path d={`M170 ${y} L ${170 + len} ${y - len * 0.6}`} />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 /* ------------------------------------------------------------ calculator */
 
 function EarningsCalculator() {
@@ -250,7 +282,11 @@ export function Landing() {
       </section>
 
       {/* chain */}
-      <section className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
+      <section className="relative isolate overflow-hidden">
+        <ChainFeather
+          className="pointer-events-none absolute -right-16 -top-12 -z-10 h-[360px] w-[360px] rotate-[18deg] text-[#00C805] opacity-[0.22] sm:h-[520px] sm:w-[520px] sm:opacity-25"
+        />
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
         <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
           Built on Robinhood Chain
         </h2>
@@ -275,6 +311,7 @@ export function Landing() {
           vaults.cash is an independent app built on Robinhood Chain. It is not
           affiliated with, endorsed by, or sponsored by Robinhood Markets.
         </p>
+        </div>
       </section>
 
       {/* final CTA */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
@@ -16,6 +17,57 @@ import {
 import { GAS_SPONSORED } from "@/lib/config";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
+
+function AddFundsPanel({
+  address,
+  copied,
+  onCopy,
+}: {
+  address: `0x${string}`;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  const steps = [
+    <>Buy <span className="text-foreground">USDG</span> in the Robinhood app (or on any exchange that supports it).</>,
+    <>Send it on <span className="text-foreground">Robinhood Chain</span> to the address below — scan the code or paste it.</>,
+    <>It lands in your account here within seconds{GAS_SPONSORED ? "" : ", along with a little ETH for network fees"}.</>,
+  ];
+  return (
+    <div className="mt-3 rounded-2xl bg-surface p-5 text-sm">
+      <ol className="space-y-3">
+        {steps.map((s, i) => (
+          <li key={i} className="flex gap-3">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-black">
+              {i + 1}
+            </span>
+            <span className="text-muted">{s}</span>
+          </li>
+        ))}
+      </ol>
+
+      <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl bg-surface-raised p-4">
+        <div className="rounded-xl bg-white p-3">
+          <QRCodeSVG value={address} size={148} bgColor="#ffffff" fgColor="#0d0f0d" level="M" />
+        </div>
+        <button
+          onClick={onCopy}
+          className="w-full break-all rounded-xl bg-surface p-3 text-center font-mono text-xs transition-colors hover:bg-borderline"
+        >
+          {address}
+          <span className="mt-1 block font-sans text-accent">
+            {copied ? "Copied ✓" : "Tap to copy address"}
+          </span>
+        </button>
+      </div>
+
+      <p className="pt-3 text-xs text-muted">
+        <span className="text-foreground">Robinhood Chain only.</span> Funds sent
+        on any other network won&apos;t arrive. Buying with a card can&apos;t
+        deliver to Robinhood Chain yet — the Robinhood app is the simplest way in.
+      </p>
+    </div>
+  );
+}
 
 function Dashboard() {
   const address = useActiveAddress();
@@ -71,37 +123,15 @@ function Dashboard() {
         </div>
         {showSend && <SendPanel onClose={() => setShowSend(false)} />}
         {showReceive && address && (
-          <div className="mt-3 rounded-2xl bg-surface p-4 text-sm">
-            <p className="pb-2 text-muted">
-              Send <span className="text-foreground">USDG</span>
-              {!GAS_SPONSORED && (
-                <>
-                  {" "}
-                  (and a little <span className="text-foreground">ETH</span> for
-                  network fees)
-                </>
-              )}{" "}
-              on <span className="text-foreground">Robinhood Chain</span> to:
-            </p>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(address);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1500);
-              }}
-              className="w-full break-all rounded-xl bg-surface-raised p-3 text-left font-mono text-xs transition-colors hover:bg-borderline"
-            >
-              {address}
-              <span className="mt-1 block text-accent">
-                {copied ? "Copied ✓" : "Tap to copy"}
-              </span>
-            </button>
-            <p className="pt-2 text-xs text-muted">
-              Easiest path: buy USDG in the Robinhood app and send it here.
-              Only send assets on Robinhood Chain — other networks won&apos;t
-              arrive. Card purchases can&apos;t deliver to Robinhood Chain yet.
-            </p>
-          </div>
+          <AddFundsPanel
+            address={address}
+            copied={copied}
+            onCopy={() => {
+              navigator.clipboard.writeText(address);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 1500);
+            }}
+          />
         )}
       </section>
       <section>
