@@ -23,7 +23,7 @@ import { fmtPct, fmtUsd } from "@/lib/format";
 function RobinhoodMark({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="-558.32321571 -776.08216153 1777.65741484 1821.20469754"
+      viewBox="0 0 598 800"
       fill="currentColor"
       className={className}
       aria-hidden
@@ -270,7 +270,7 @@ export function Landing() {
       {/* chain */}
       <section className="relative isolate overflow-hidden">
         <RobinhoodMark
-          className="pointer-events-none absolute -right-20 -top-16 -z-10 h-[380px] w-[380px] text-[#00C805] opacity-[0.18] sm:h-[560px] sm:w-[560px] sm:opacity-[0.22]"
+          className="pointer-events-none absolute -right-12 -top-20 -z-10 h-[440px] w-[329px] text-[#00C805] opacity-[0.18] sm:-right-8 sm:h-[760px] sm:w-[568px] sm:opacity-[0.22]"
         />
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
         <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
