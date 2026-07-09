@@ -17,6 +17,56 @@ import {
 import type { MarketStats } from "@/app/api/stats/route";
 import { fmtPct, fmtUsd } from "@/lib/format";
 
+/* Bank-vault door — line-art backdrop for the "What could that earn?" section.
+ * Evokes the brand name + stored/growing wealth; mirrors the feather's
+ * treatment on the opposite edge. Drawn in our accent green (vs the Robinhood
+ * feather's #00c805) so "our vault" reads distinct from "their chain". */
+function VaultDoor({ className }: { className?: string }) {
+  const C = 200;
+  const bolts = Array.from({ length: 16 }, (_, i) => {
+    const a = (i / 16) * Math.PI * 2;
+    return { cx: C + 171 * Math.cos(a), cy: C + 171 * Math.sin(a) };
+  });
+  const lockBolts = Array.from({ length: 8 }, (_, i) => {
+    const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
+    return {
+      x1: C + 58 * Math.cos(a),
+      y1: C + 58 * Math.sin(a),
+      x2: C + 138 * Math.cos(a),
+      y2: C + 138 * Math.sin(a),
+    };
+  });
+  const wheel = Array.from({ length: 6 }, (_, i) => {
+    const a = (i / 6) * Math.PI * 2;
+    return { x2: C + 44 * Math.cos(a), y2: C + 44 * Math.sin(a) };
+  });
+  return (
+    <svg
+      viewBox="0 0 400 400"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={5}
+      strokeLinecap="round"
+      className={className}
+      aria-hidden
+    >
+      <circle cx={C} cy={C} r={192} />
+      <circle cx={C} cy={C} r={150} />
+      {bolts.map((b, i) => (
+        <circle key={`b${i}`} cx={b.cx} cy={b.cy} r={5} fill="currentColor" stroke="none" />
+      ))}
+      {lockBolts.map((s, i) => (
+        <line key={`l${i}`} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} />
+      ))}
+      <circle cx={C} cy={C} r={52} />
+      {wheel.map((w, i) => (
+        <line key={`w${i}`} x1={C} y1={C} x2={w.x2} y2={w.y2} />
+      ))}
+      <circle cx={C} cy={C} r={12} fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 /* Official Robinhood feather mark (public/brand/robinhood-mark.svg), inlined
  * so it can inherit color/opacity, used as the "Built on Robinhood Chain"
  * section backdrop. */
@@ -203,24 +253,27 @@ export function Landing() {
       </section>
 
       {/* calculator */}
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:py-24 lg:grid-cols-2 lg:gap-16">
-        <div>
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-            What could that earn?
-          </h2>
-          <p className="max-w-md pt-4 text-lg leading-relaxed text-muted">
-            Liquidity positions earn a share of the fee on every trade in their
-            pool. This is the live rate from real trading over the last 24
-            hours — not a projection we made up.
-          </p>
-          <button
-            onClick={login}
-            className="mt-7 rounded-full bg-accent px-8 py-3 font-semibold text-black transition-colors hover:bg-accent-strong"
-          >
-            Start earning
-          </button>
+      <section className="relative isolate overflow-hidden">
+        <VaultDoor className="pointer-events-none absolute -left-40 top-1/2 hidden h-[640px] w-[640px] -translate-y-1/2 -z-10 text-accent opacity-20 lg:block" />
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:py-24 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+              What could that earn?
+            </h2>
+            <p className="max-w-md pt-4 text-lg leading-relaxed text-muted">
+              Liquidity positions earn a share of the fee on every trade in their
+              pool. This is the live rate from real trading over the last 24
+              hours — not a projection we made up.
+            </p>
+            <button
+              onClick={login}
+              className="mt-7 rounded-full bg-accent px-8 py-3 font-semibold text-black transition-colors hover:bg-accent-strong"
+            >
+              Start earning
+            </button>
+          </div>
+          <EarningsCalculator />
         </div>
-        <EarningsCalculator />
       </section>
 
       {/* how */}
