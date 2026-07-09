@@ -21,33 +21,16 @@ import { fmtPct, fmtUsd } from "@/lib/format";
  * Evokes the brand name + stored/growing wealth; mirrors the feather's
  * treatment on the opposite edge. Drawn in our accent green (vs the Robinhood
  * feather's #00c805) so "our vault" reads distinct from "their chain". */
-function VaultDoor({ className }: { className?: string }) {
-  const C = 200;
-  const P = (r: number, a: number) => [C + r * Math.cos(a), C + r * Math.sin(a)] as const;
-  // fine graduation ticks around the dial (safe-combination look); every 6th longer
-  const ticks = Array.from({ length: 72 }, (_, i) => {
-    const a = (i / 72) * Math.PI * 2;
-    const long = i % 6 === 0;
-    const [x1, y1] = P(long ? 150 : 156, a);
-    const [x2, y2] = P(165, a);
-    return { x1, y1, x2, y2, long };
-  });
-  // radial locking bolts between the dial and the hub
-  const bolts = Array.from({ length: 8 }, (_, i) => {
-    const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
-    const [x1, y1] = P(92, a);
-    const [x2, y2] = P(120, a);
-    return { x1, y1, x2, y2 };
-  });
-  // handle-wheel spokes, each capped with a small knob
-  const spokes = Array.from({ length: 6 }, (_, i) => {
-    const a = (i / 6) * Math.PI * 2;
-    const [x, y] = P(72, a);
-    return { x, y };
-  });
+function BankBuilding({ className }: { className?: string }) {
+  const cols = 5;
+  const first = 92;
+  const gap = 54;
+  const colXs = Array.from({ length: cols }, (_, i) => first + i * gap);
+  const capY = 150;
+  const baseY = 250;
   return (
     <svg
-      viewBox="0 0 400 400"
+      viewBox="0 0 420 320"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -55,37 +38,27 @@ function VaultDoor({ className }: { className?: string }) {
       className={className}
       aria-hidden
     >
-      {/* frame: bold outer, hairline inner (depth), door edge */}
-      <circle cx={C} cy={C} r={196} strokeWidth={2.5} />
-      <circle cx={C} cy={C} r={187} strokeWidth={0.75} opacity={0.55} />
-      <circle cx={C} cy={C} r={171} strokeWidth={1.75} />
-      {/* combination dial */}
-      {ticks.map((t, i) => (
-        <line
-          key={`t${i}`}
-          x1={t.x1}
-          y1={t.y1}
-          x2={t.x2}
-          y2={t.y2}
-          strokeWidth={t.long ? 1.75 : 0.9}
-          opacity={t.long ? 1 : 0.65}
-        />
-      ))}
-      <circle cx={C} cy={C} r={131} strokeWidth={1.25} />
-      {/* locking bolts */}
-      {bolts.map((b, i) => (
-        <line key={`b${i}`} x1={b.x1} y1={b.y1} x2={b.x2} y2={b.y2} strokeWidth={2.75} />
-      ))}
-      {/* hub + knobbed handle wheel */}
-      <circle cx={C} cy={C} r={62} strokeWidth={1.75} />
-      <circle cx={C} cy={C} r={20} strokeWidth={1.75} />
-      {spokes.map((s, i) => (
-        <g key={`s${i}`}>
-          <line x1={C} y1={C} x2={s.x} y2={s.y} strokeWidth={2.25} />
-          <circle cx={s.x} cy={s.y} r={7} strokeWidth={1.75} />
+      {/* pediment (roof) + inner cornice line for depth */}
+      <path d="M40 122 L210 44 L380 122" strokeWidth={2.5} />
+      <path d="M74 118 L210 56 L346 118" strokeWidth={0.75} opacity={0.5} />
+      {/* entablature */}
+      <line x1={46} y1={122} x2={374} y2={122} strokeWidth={2.5} />
+      <line x1={40} y1={134} x2={380} y2={134} strokeWidth={2.5} />
+      <line x1={54} y1={143} x2={366} y2={143} strokeWidth={0.75} opacity={0.5} />
+      {/* columns: capital, fluted shaft, base */}
+      {colXs.map((x, i) => (
+        <g key={`c${i}`}>
+          <line x1={x - 13} y1={capY} x2={x + 13} y2={capY} strokeWidth={2} />
+          <line x1={x - 9} y1={capY} x2={x - 9} y2={baseY} strokeWidth={2} />
+          <line x1={x + 9} y1={capY} x2={x + 9} y2={baseY} strokeWidth={2} />
+          <line x1={x} y1={capY + 4} x2={x} y2={baseY - 4} strokeWidth={0.7} opacity={0.5} />
+          <line x1={x - 13} y1={baseY} x2={x + 13} y2={baseY} strokeWidth={2} />
         </g>
       ))}
-      <circle cx={C} cy={C} r={4.5} fill="currentColor" stroke="none" />
+      {/* stylobate / steps */}
+      <line x1={44} y1={256} x2={376} y2={256} strokeWidth={2.5} />
+      <line x1={32} y1={272} x2={388} y2={272} strokeWidth={2.5} />
+      <line x1={20} y1={288} x2={400} y2={288} strokeWidth={2.5} />
     </svg>
   );
 }
@@ -277,7 +250,7 @@ export function Landing() {
 
       {/* calculator */}
       <section className="relative isolate overflow-hidden">
-        <VaultDoor className="pointer-events-none absolute -left-28 top-6 -z-10 h-[380px] w-[380px] text-accent opacity-[0.18] sm:opacity-20 lg:-left-40 lg:top-1/2 lg:h-[640px] lg:w-[640px] lg:-translate-y-1/2" />
+        <BankBuilding className="pointer-events-none absolute -left-6 top-6 -z-10 h-[280px] w-[368px] text-accent opacity-[0.18] sm:opacity-20 lg:-left-4 lg:top-auto lg:bottom-6 lg:h-[420px] lg:w-[551px]" />
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:py-24 lg:grid-cols-2 lg:gap-16">
           <div>
             <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
