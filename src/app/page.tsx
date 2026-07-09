@@ -61,8 +61,8 @@ function AddFundsPanel({
       </div>
 
       <p className="pt-3 text-xs text-muted">
-        <span className="text-foreground">Robinhood Chain only.</span> Funds sent
-        on any other network won&apos;t arrive. Buying with a card can&apos;t
+        <span className="text-foreground">Robinhood Chain only.</span>{" "}
+        Funds sent on any other network won&apos;t arrive. Buying with a card can&apos;t
         deliver to Robinhood Chain yet — the Robinhood app is the simplest way in.
       </p>
     </div>

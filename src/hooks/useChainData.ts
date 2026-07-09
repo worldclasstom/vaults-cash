@@ -1,16 +1,25 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { usePrivy } from "@privy-io/react-auth";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { erc20Abi, formatUnits } from "viem";
 import { getPoolState, publicClient, tickToUsdgPrice } from "@/lib/onchain";
 import { MARKETS, USDG, type Market } from "@/lib/markets";
 
 /** The address funds live at: the embedded EOA (which, via EIP-7702
- *  delegation, is also the smart account — one address forever). */
+ *  delegation, is also the smart account — one address forever).
+ *
+ *  Prefer the embedded (Privy) wallet whenever one exists — that's the account
+ *  the deposit/withdraw path spends from (useSendCalls' atomic 7702 path).
+ *  Only fall back to user.wallet (a linked external wallet) when there is no
+ *  embedded wallet, which matches the sequential path's account. This keeps the
+ *  displayed/QR deposit address identical to the wallet the app transacts with,
+ *  even for a user who signed in by email and later linked an external wallet. */
 export function useActiveAddress(): `0x${string}` | undefined {
   const { user } = usePrivy();
-  return user?.wallet?.address as `0x${string}` | undefined;
+  const { wallets } = useWallets();
+  const embedded = wallets.find((w) => w.walletClientType === "privy");
+  return (embedded?.address ?? user?.wallet?.address) as `0x${string}` | undefined;
 }
 
 export function useUsdgBalance() {
