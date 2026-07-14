@@ -103,6 +103,7 @@ export const MARKETS: Market[] = [
   stock("AAPL", "Apple", "AAPL", "#a2aaad"),
   stock("GOOGL", "Alphabet", "GOOGL", "#4285f4"),
   stock("META", "Meta", "META", "#0866ff"),
+  stock("MSFT", "Microsoft", "MSFT", "#00a4ef"),
   stock("PLTR", "Palantir", "PLTR", "#6e7681"),
   stock("AMD", "AMD", "AMD", "#ed1c24"),
   stock("MU", "Micron", "MU", "#0071ce"),

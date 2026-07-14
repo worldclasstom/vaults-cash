@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T18:57:42.163Z",
+  "generatedAt": "2026-07-14T17:10:27.296Z",
   "chainId": 4663,
   "verified": true,
   "uniswap": {
@@ -24,7 +24,7 @@
       "name": "Global Dollar",
       "symbol": "USDG",
       "decimals": 6,
-      "totalSupply": "193772083540090",
+      "totalSupply": "221673422777256",
       "uiMultiplier": null
     },
     "WETH": {
@@ -32,7 +32,7 @@
       "name": "WETH",
       "symbol": "WETH",
       "decimals": 18,
-      "totalSupply": "18669698973460756481437",
+      "totalSupply": "18428802244097480914585",
       "uiMultiplier": null
     },
     "TSLA": {
@@ -40,7 +40,7 @@
       "name": "Tesla • Robinhood Token",
       "symbol": "TSLA",
       "decimals": 18,
-      "totalSupply": "2040665000000000000000",
+      "totalSupply": "2041501000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "AAPL": {
@@ -48,7 +48,7 @@
       "name": "Apple • Robinhood Token",
       "symbol": "AAPL",
       "decimals": 18,
-      "totalSupply": "1471146000000000000000",
+      "totalSupply": "1599257000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "AMD": {
@@ -56,7 +56,7 @@
       "name": "AMD • Robinhood Token",
       "symbol": "AMD",
       "decimals": 18,
-      "totalSupply": "1619662000000000000000",
+      "totalSupply": "1529662000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "AMZN": {
@@ -64,7 +64,7 @@
       "name": "Amazon • Robinhood Token",
       "symbol": "AMZN",
       "decimals": 18,
-      "totalSupply": "1705017000000000000000",
+      "totalSupply": "1705142000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "BABA": {
@@ -72,7 +72,7 @@
       "name": "Alibaba • Robinhood Token",
       "symbol": "BABA",
       "decimals": 18,
-      "totalSupply": "2609518000000000000000",
+      "totalSupply": "1575323000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "BE": {
@@ -136,7 +136,7 @@
       "name": "Microsoft • Robinhood Token",
       "symbol": "MSFT",
       "decimals": 18,
-      "totalSupply": "1092275000000000000000",
+      "totalSupply": "1092340000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "MU": {
@@ -152,7 +152,7 @@
       "name": "NVIDIA • Robinhood Token",
       "symbol": "NVDA",
       "decimals": 18,
-      "totalSupply": "5454996000000000000000",
+      "totalSupply": "5695166000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "ORCL": {
@@ -176,7 +176,7 @@
       "name": "Sandisk Corporation • Robinhood Token",
       "symbol": "SNDK",
       "decimals": 18,
-      "totalSupply": "381411000000000000000",
+      "totalSupply": "403938000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "SPCX": {
@@ -184,7 +184,7 @@
       "name": "Space Exploration Technologies Corp. Class A Common Stock • Robinhood Token",
       "symbol": "SPCX",
       "decimals": 18,
-      "totalSupply": "3155532000000000000000",
+      "totalSupply": "3666663000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "USAR": {
@@ -216,7 +216,7 @@
       "name": "iShares Silver Trust • Robinhood Token",
       "symbol": "SLV",
       "decimals": 18,
-      "totalSupply": "7541926000000000000000",
+      "totalSupply": "8459926000000000000000",
       "uiMultiplier": "1000000000000000000"
     },
     "SPY": {
@@ -232,7 +232,7 @@
       "name": "United States Oil Fund • Robinhood Token",
       "symbol": "USO",
       "decimals": 18,
-      "totalSupply": "4237748000000000000000",
+      "totalSupply": "4395786000000000000000",
       "uiMultiplier": "1000000000000000000"
     }
   },
@@ -242,23 +242,23 @@
       "pair": "ETH/USDG",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -201256,
-      "liquidity": "11547187522919915"
+      "tick": -201001,
+      "liquidity": "14087341691013972"
     },
     {
       "poolId": "0x387bf619da4d3fb62bb276482693dba1b9b3520f573cabdfe033384a24125982",
       "pair": "ETH/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -201260,
-      "liquidity": "26285080912240319"
+      "tick": -201004,
+      "liquidity": "25574493699239094"
     },
     {
       "poolId": "0xd313d79d9d6a714e7bdf02fc42a2c27ede7e51928ffd605126fe9e1192630cf8",
       "pair": "ETH/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -201261,
+      "tick": -200961,
       "liquidity": "617771360287"
     },
     {
@@ -266,8 +266,8 @@
       "pair": "ETH/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -201331,
-      "liquidity": "692419183711221"
+      "tick": -201031,
+      "liquidity": "932996000438096"
     },
     {
       "poolId": "0xb5998c9af568f06a07c1eabcd227d695abf27db2a420e3f693f071202f5c0ea2",
@@ -275,14 +275,38 @@
       "fee": 50000,
       "tickSpacing": 1000,
       "tick": -201330,
-      "liquidity": "29076681415422"
+      "liquidity": "0"
+    },
+    {
+      "poolId": "0x35d5055f7162c8e8e1742f0559f53376287e998c0e4845ffefd275d85cc1701a",
+      "pair": "WETH/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -200996,
+      "liquidity": "1213957310103534"
+    },
+    {
+      "poolId": "0xfcfae8fa0bd6da961bcf5d990f27690932deac4f093e99bf3e871691c6586593",
+      "pair": "WETH/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -201006,
+      "liquidity": "78810578191630978"
+    },
+    {
+      "poolId": "0x77c25b9386d47de62e0155c393696e9f43f7e6d036c6ca52f66735ccbb8808a7",
+      "pair": "WETH/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -201001,
+      "liquidity": "143106655880662040"
     },
     {
       "poolId": "0x4e61f742ae3516c0223997579cc13753b653a3ed299dcf40f3baf5a4daa6e353",
       "pair": "WETH/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -201346,
+      "tick": -201354,
       "liquidity": "0"
     },
     {
@@ -290,23 +314,23 @@
       "pair": "TSLA/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -216214,
-      "liquidity": "13023278034543082"
+      "tick": -216491,
+      "liquidity": "10312921635489348"
     },
     {
       "poolId": "0xf55e03a600310950b9d5cacdef20ce52cc7d542a0950534fbe46006c65d2d650",
       "pair": "TSLA/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -216197,
-      "liquidity": "158323123560029"
+      "tick": -216492,
+      "liquidity": "159864192833065"
     },
     {
       "poolId": "0xdd5458c88d3de32b83514b9448bbfaa7f8df1d5f0a00939c95df4a5ceee53bf6",
       "pair": "TSLA/USDG",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": -215711,
+      "tick": -216052,
       "liquidity": "368794272216"
     },
     {
@@ -314,24 +338,32 @@
       "pair": "ETH/TSLA",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": 14793,
-      "liquidity": "181035078943425415047"
+      "tick": 15245,
+      "liquidity": "272598804469967045287"
     },
     {
       "poolId": "0xfc92d9360d3cf2333b1ff0b43122fb230deb83377a7df63d82d0dee8153e1e6c",
       "pair": "AAPL/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 218777,
-      "liquidity": "295666648201812"
+      "tick": 218793,
+      "liquidity": "987370569129880"
+    },
+    {
+      "poolId": "0xc748f4671a867db48b552f6b7650bf3255e05f80f00e3f7aad1b17ccb7898fdb",
+      "pair": "AAPL/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 218858,
+      "liquidity": "1858622532763700"
     },
     {
       "poolId": "0xda4116b5894ee7479e64eae9276e1a2944ef0e5ce863a299d296a15618deee01",
       "pair": "AAPL/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 218913,
-      "liquidity": "32238512343982390"
+      "tick": 218821,
+      "liquidity": "50185393473229697"
     },
     {
       "poolId": "0x36b9a6280ac5ac147255a45b33f5bcdc61b073ad829403e681a78cd81476354e",
@@ -339,31 +371,31 @@
       "fee": 50000,
       "tickSpacing": 1000,
       "tick": 218978,
-      "liquidity": "2120279163410686"
+      "liquidity": "6603254975899"
     },
     {
       "poolId": "0xf4dda6b92ccfaa5db9d241651557195e3ef3959f1bbedb2acc38c57919a18052",
       "pair": "ETH/AAPL",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": 17441,
-      "liquidity": "103330859430329899526"
+      "tick": 17495,
+      "liquidity": "200150255772013137369"
     },
     {
       "poolId": "0xde9f85fdd9e05a943a52f2c69ffafe3064a3287df03d02c9b431bc92d4781274",
       "pair": "AMD/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 213136,
-      "liquidity": "1707247128130501"
+      "tick": 213184,
+      "liquidity": "128169643402277"
     },
     {
       "poolId": "0x7299841b076c2e7021cc1cad26b0f96046a32bd5212851b68ee3cf1958f57e3d",
       "pair": "ETH/AMD",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": 11612,
-      "liquidity": "86397684671649945557"
+      "tick": 11764,
+      "liquidity": "88993493054427508536"
     },
     {
       "poolId": "0xf50fb6880e6e2d57e9f01a072fbb2c6a196188303582bb63b625c6c7f4b526ad",
@@ -378,7 +410,7 @@
       "pair": "ETH/COIN",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -8435,
+      "tick": 23910,
       "liquidity": "822333266722"
     },
     {
@@ -410,16 +442,24 @@
       "pair": "ETH/CRWV",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 49260,
+      "tick": 49099,
       "liquidity": "724900826634"
+    },
+    {
+      "poolId": "0xd4ecb79fdc521d7725d22b33ed43cb4e47aa96bfad76aa29577e3151f723ac5e",
+      "pair": "GOOGL/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -217593,
+      "liquidity": "5710318865224395"
     },
     {
       "poolId": "0xef22239f96c6ac95dcd57b90c6b14c0cc8c3c16844def34daef68dc9dd945344",
       "pair": "GOOGL/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -217626,
-      "liquidity": "13804330350262209"
+      "tick": -217617,
+      "liquidity": "2019219581292828"
     },
     {
       "poolId": "0x9ce6688d1f56315093aa0610bb37a20b96da36a28f98c851f5860b83acf41c6e",
@@ -427,7 +467,7 @@
       "fee": 50000,
       "tickSpacing": 1000,
       "tick": -217526,
-      "liquidity": "372193448302118"
+      "liquidity": "0"
     },
     {
       "poolId": "0x73326ba7b37d8f91b495b46551da4990bb96372858976fa03428d2acca96fad4",
@@ -450,7 +490,7 @@
       "pair": "ETH/GOOGL",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": 16119,
+      "tick": 16328,
       "liquidity": "527926342587954238"
     },
     {
@@ -466,7 +506,7 @@
       "pair": "META/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 211263,
+      "tick": 211355,
       "liquidity": "3446210733125895"
     },
     {
@@ -486,12 +526,28 @@
       "liquidity": "561856630517"
     },
     {
+      "poolId": "0x42a076f7c02257747f27bbe473ccc969ccd2b6a761c09eb8d262316b6c231b17",
+      "pair": "MSFT/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 216760,
+      "liquidity": "114494008442300"
+    },
+    {
+      "poolId": "0x9a761e9bdfd840b7737f2f49df5e459b15c8629f4ed00a9373124a8119343566",
+      "pair": "MU/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 207381,
+      "liquidity": "426704044242064"
+    },
+    {
       "poolId": "0x6fa3ee0048e78bf0a513eb0ab56f482944a767c21db990fcf555605e69f05659",
       "pair": "MU/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 207404,
-      "liquidity": "1132027523840464"
+      "tick": 207444,
+      "liquidity": "1133053937103613"
     },
     {
       "poolId": "0xa035260cfcf05327baf8961e40ad25e1d05b48efa8889e0e7d4dcc546c897bdd",
@@ -514,16 +570,16 @@
       "pair": "NVDA/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 222770,
-      "liquidity": "35081343654522574"
+      "tick": 222817,
+      "liquidity": "30275947922724781"
     },
     {
       "poolId": "0x5e86db9a096faa8c8b12d7b41ef49b245035e242cc8ee83f86467891de85b8ac",
       "pair": "NVDA/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 222776,
-      "liquidity": "88448227870501"
+      "tick": 223003,
+      "liquidity": "422356727698196"
     },
     {
       "poolId": "0x98be496c51741e7a41b565aa52ba2731e8bb17e45246e220729cfbf835d84fd8",
@@ -546,15 +602,15 @@
       "pair": "ETH/NVDA",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": 21835,
-      "liquidity": "2270415898085338184538"
+      "tick": 21646,
+      "liquidity": "522754211152929353785"
     },
     {
       "poolId": "0x7ff028999aa71df80148b936f8aa272e8fbd7b60109e66cbd849dc0be76f9471",
       "pair": "ETH/ORCL",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 29038,
+      "tick": 29004,
       "liquidity": "480341386756"
     },
     {
@@ -562,8 +618,8 @@
       "pair": "PLTR/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 227991,
-      "liquidity": "3463499084586159"
+      "tick": 227712,
+      "liquidity": "0"
     },
     {
       "poolId": "0x2eaa3bc103861a5b6e97584366dd9d8282bbfa1607b105a6c9f8dd6b1307c8fa",
@@ -578,8 +634,8 @@
       "pair": "SNDK/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 200679,
-      "liquidity": "213467457354018"
+      "tick": 201575,
+      "liquidity": "2289156259073"
     },
     {
       "poolId": "0x0f6951750c817d6ba3555d267bb9b0cdbfcae805b87164a8103def7bf05eb848",
@@ -610,8 +666,8 @@
       "pair": "SPCX/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -226567,
-      "liquidity": "20881045353919999"
+      "tick": -227049,
+      "liquidity": "64996875510598871"
     },
     {
       "poolId": "0xd2f570761d0db7e2878ca414341d2fc570d1fead5b79ff94731936b4a446fbdf",
@@ -626,24 +682,24 @@
       "pair": "ETH/SPCX",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 25311,
-      "liquidity": "215339017987142593"
+      "tick": 26077,
+      "liquidity": "21767918661464173703"
     },
     {
       "poolId": "0x7cf7a805185bce4766278dc4e4047fbc5d8e2bc8a33b3268270d43b86e10236b",
       "pair": "ETH/SPCX",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": 24925,
-      "liquidity": "229681727446371527854"
+      "tick": 25630,
+      "liquidity": "987370660971737188295"
     },
     {
       "poolId": "0xd3d49eaab15eb8f4d1d480a8518fc3ce4e60ca81d69904b3e7dc53b4fc0ce2d9",
       "pair": "QQQ/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 210341,
-      "liquidity": "5087657891011"
+      "tick": 210500,
+      "liquidity": "221712009808868"
     },
     {
       "poolId": "0x7ba2c8a5f53ee4cda9ef07effe81bb8509efafb79a26d0e33b28ada879e5bb52",
@@ -662,20 +718,28 @@
       "liquidity": "1408864128407"
     },
     {
+      "poolId": "0xfe2a80bb5618fd14984b92ca6d45bf5ba67443ddb1435e28b2e48df2fc1526cd",
+      "pair": "SPY/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -210135,
+      "liquidity": "8203106604999130"
+    },
+    {
       "poolId": "0x7eeda68cd84620339e6ad4bf054af9b19878ac13139991c7aaec018c40a8bb6a",
       "pair": "SPY/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -210069,
-      "liquidity": "415891162628118"
+      "tick": -210075,
+      "liquidity": "1024322404506091"
     },
     {
       "poolId": "0x2030e8cd19e37be95e580dc4b921bd435a9ee435c194e616ab9178a3678905a1",
       "pair": "SPY/USDG",
       "fee": 50000,
       "tickSpacing": 1000,
-      "tick": -210613,
-      "liquidity": "540641862862631"
+      "tick": -210006,
+      "liquidity": "129307522655899"
     },
     {
       "poolId": "0x7d32bc830f40a330af8723b8bb50d4d6b0152297d659e9898e6a47b785686459",
@@ -691,71 +755,26 @@
       "geckoAddress": "0x52e65b17fb6e5ba00ed806f37afcd2daa50271ca",
       "name": "USDG / WETH 0.01%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 2206510.3454,
-      "volume24hUsd": 99013999.3210813,
+      "reserveUsd": 3254172.5633,
+      "volume24hUsd": 112419391.103575,
       "baseToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x24b63537a20fb447635de89d7723411c3b9326cb",
-      "name": "DATABEAR / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 181735.4935,
-      "volume24hUsd": 18377213.1885465,
-      "baseToken": "0x90079857237da767c38d1d261a39848ea424319e",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x02ba1a74c99016c9258d271e760ce71c52b465d9",
-      "name": "$1 / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 190144.2019,
-      "volume24hUsd": 20748313.685587,
-      "baseToken": "0x6365fd27ddefc42f50895994b67b04fab5f08d5e",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
       "geckoAddress": "0xd95e8e2cd04c207625c6f23c974d365a5f3a91d3",
       "name": "VIRTUAL / WETH",
       "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 2149182.0034,
-      "volume24hUsd": 7537247.04135849,
+      "reserveUsd": 3451233.4889,
+      "volume24hUsd": 7216129.40158258,
       "baseToken": "0xc6911796042b15d7fa4f6cde69e245ddcd3d9c31",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x137a7b1256fbf4c71e024015ab8e2efb120989b8",
-      "name": "SCATMAN / WETH",
-      "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 6111.6199,
-      "volume24hUsd": 5630321.33492529,
-      "baseToken": "0x9bef0a6e2717957f6c51551de892553c3fb86604",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x6fa0a930ae5ffb797f3ecce3905eb9b06612dbb4",
-      "name": "SCATMAN / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 58092.9322,
-      "volume24hUsd": 5226195.55348481,
-      "baseToken": "0x6feefb56bf77c4348dae5aba3225a2143361cccc",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x69bfaf19c9f377bb306a89aed9f6b07e2c1a8d9a",
-      "name": "USDG / WETH 0.05%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 3153240.5054,
-      "volume24hUsd": 15215830.2239321,
-      "baseToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
       "geckoAddress": "0x24107d152f14a76d292123265ae3f3c71f863fc2f4ef7ba49d64e78d28ea379e",
       "name": "WETH / USDG 0.01%",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 57283.5068,
-      "volume24hUsd": 2056284.67338477,
+      "reserveUsd": 98171.1853,
+      "volume24hUsd": 2472185.38613256,
       "baseToken": "0x0000000000000000000000000000000000000000",
       "quoteToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168"
     },
@@ -763,153 +782,198 @@
       "geckoAddress": "0xd42a491087a15e5afd51feb3606066cc152d2b09",
       "name": "CASHCAT / WETH 0.3%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 423240.5118,
-      "volume24hUsd": 10109239.9711631,
+      "reserveUsd": 1361952.8666,
+      "volume24hUsd": 21969455.424155,
       "baseToken": "0x020bfc650a365f8bb26819deaabf3e21291018b4",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0xfa51c69a386b9e864d0c2f6fb7f1ef1b7d46402a",
-      "name": "$1 / WETH",
-      "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 603851.5333,
-      "volume24hUsd": 13547924.017652,
-      "baseToken": "0x8c515613d4910a989d1465f931bb5004b42cccf7",
+      "geckoAddress": "0x1bfca787bb5948ab93406d7f4bd32c24e6790b2ee445b8d57e934d1f8f9da33b",
+      "name": "UNICORN / WETH 1%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 272538.1826,
+      "volume24hUsd": 3903172.27953438,
+      "baseToken": "0x5f94e24a3293cf12c97d8b21c2f960adf471c951",
+      "quoteToken": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "geckoAddress": "0x69bfaf19c9f377bb306a89aed9f6b07e2c1a8d9a",
+      "name": "USDG / WETH 0.05%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 3344855.9153,
+      "volume24hUsd": 18204033.3411629,
+      "baseToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0xe39078fc024188927e10b26d91e4720a600fba85",
-      "name": "530A / WETH 1%",
+      "geckoAddress": "0x245bedb26d3cf482407a4ab32c01ba8eceb54f11",
+      "name": "bcat / WETH 1%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 193919.4972,
-      "volume24hUsd": 5878287.79648961,
-      "baseToken": "0x6e47d95928cb39b5e51be425aab2a5190418e943",
+      "reserveUsd": 72484.8593,
+      "volume24hUsd": 3056450.37375281,
+      "baseToken": "0x05d79bcb148e82d5dba5005e3d9b7ab01be3bfb3",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0x2ae6ce140bc8a236a86a38ff08d48b4d3da0fdca",
-      "name": "RobinhoodieLife / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 34057.9291,
-      "volume24hUsd": 2395589.64535544,
-      "baseToken": "0xe70deffd04b4ea92847fda6b29ef72268182fcd1",
+      "geckoAddress": "0x1299aa8c4ea0db5b8453757ed129ed8e916561925926a161cb89842e3987401a",
+      "name": "AGENTOS / WETH",
+      "dex": "bankr-robinhood",
+      "reserveUsd": 455944.9944,
+      "volume24hUsd": 4403586.46463132,
+      "baseToken": "0x6eda83fc299c10d474068a7e69771c809bcbbba3",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0x37b3d5602871c9c7db725c003909da0838d5319e",
-      "name": "FD / WETH 1%",
+      "geckoAddress": "0x31b0f07bab73814ba35789f51b2d14a60d57791ca2133cedd55d25f92c3a49bb",
+      "name": "KLIK / WETH",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 11674.2768,
+      "volume24hUsd": 2817782.38151301,
+      "baseToken": "0x6989a8217359ac1c7aa9b651cb67f226c2fd3ca8",
+      "quoteToken": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "geckoAddress": "0x121adf3c5fb72be4dfc19d2921c0adbac40614cc",
+      "name": "NOXA / WETH 1%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 35201.7681,
-      "volume24hUsd": 300972.295575362,
-      "baseToken": "0x73641b2b9d5a66f2dbdf7cb57dd204a94d5e28f2",
+      "reserveUsd": 73672.0836,
+      "volume24hUsd": 3802215.28750517,
+      "baseToken": "0x39e0d9057bd9039cd14590f54de20b9d3457c56e",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
       "geckoAddress": "0xa70fc67c9f69da90b63a0e4c05d229954574e313",
       "name": "CASHCAT / WETH 1%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 10607247.9747,
-      "volume24hUsd": 31956237.7827721,
+      "reserveUsd": 9785667.351,
+      "volume24hUsd": 31795528.1689564,
       "baseToken": "0x020bfc650a365f8bb26819deaabf3e21291018b4",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0x9efba477b6d67a4f3080ec91cd7a17288a83165e",
-      "name": "BROKEBEAR / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 22814.473,
-      "volume24hUsd": 2545743.73813193,
-      "baseToken": "0xa1a76de6a79c8a4c5f5e8ef603b710ecf541cccc",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x90d956bd20893fe84e7bd114042db792c16992f8",
-      "name": "13 / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 42599.5956,
-      "volume24hUsd": 3608576.32483159,
-      "baseToken": "0xb035433102605446884c41c6253bd9da4552a8f9",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x4c28b7384ae80b5ff33a39b976128f74803f8caa",
-      "name": "HOODCAT / WETH",
-      "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 2046.4578,
-      "volume24hUsd": 29369013.4045352,
-      "baseToken": "0x46cbbcf9daa5140080015924965cc605355dddf9",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x121adf3c5fb72be4dfc19d2921c0adbac40614cc",
-      "name": "NOXA / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 75821.2788,
-      "volume24hUsd": 2843921.30165364,
-      "baseToken": "0x39e0d9057bd9039cd14590f54de20b9d3457c56e",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x9501a20bedb8bea0798fe5d4c411f5e270965d49",
-      "name": "WALLET / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 365806.766,
-      "volume24hUsd": 6329720.9462823,
-      "baseToken": "0x0339f5459fc690ac85f1782e15782a151b4a9e1b",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0x556e9a0078206a452a5c9eeb9cf8a50cd3f819f3",
-      "name": "HOODIE / WETH",
-      "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 106595.9727,
-      "volume24hUsd": 27745459.8751175,
-      "baseToken": "0x3eb2bc6996a4ca6e87a6d215bbc3fdc103361b47",
-      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
-    },
-    {
-      "geckoAddress": "0xee0d95c4644e0847eca78d5f5333abe1ab798b159fdd01712327258a755d4423",
-      "name": "CASHCAT / USDG 0.5%",
+      "geckoAddress": "0xea420e327fabe378ec21e855a17f69c2c9249c8dfc4321fddb24b3b89e2f2185",
+      "name": "Trump / WETH",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 1068586.4307,
-      "volume24hUsd": 9336277.81317191,
-      "baseToken": "0x020bfc650a365f8bb26819deaabf3e21291018b4",
-      "quoteToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168"
+      "reserveUsd": 9367.1991,
+      "volume24hUsd": 2083300.62051146,
+      "baseToken": "0xb6f15563a0df68ca81abdcfbb177fb7240a3cccc",
+      "quoteToken": "0x0000000000000000000000000000000000000000"
     },
     {
-      "geckoAddress": "0x451c0da3b774045a822a129eedcc5c667dcbfdd8",
-      "name": "HOODRAT / WETH",
-      "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 349356.5433,
-      "volume24hUsd": 4734304.13201205,
-      "baseToken": "0x8e62f281f282686fca6dcb39288069a93fc23f1c",
+      "geckoAddress": "0x10cc6bd38112cac182db90b6a71d8bb5939526ba",
+      "name": "PONS / WETH 1%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 305689.9052,
+      "volume24hUsd": 5357341.14513993,
+      "baseToken": "0x39dbed3a2bd333467115de45665cc57f813c4571",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
       "geckoAddress": "0x54f7883914619af9105355bf83ed678bcf9f63560218ac61c9963b9503d0ba32",
       "name": "WETH / USDG 0.046%",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 2058040.9296,
-      "volume24hUsd": 10554306.4862863,
+      "reserveUsd": 1954744.1985,
+      "volume24hUsd": 12378816.1045462,
       "baseToken": "0x0000000000000000000000000000000000000000",
       "quoteToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168"
     },
     {
-      "geckoAddress": "0x84dc671903bf10498047ac19ee7cffe852726f72",
-      "name": "BYCOCKET / WETH",
-      "dex": "uniswap-v2-robinhood",
-      "reserveUsd": 29033.3806,
-      "volume24hUsd": 16559730.8303229,
-      "baseToken": "0x9ef73ffb67d0c8b2beec3c44898d9342ac873997",
+      "geckoAddress": "0x4622b2cc886325a27a9fa13499591cfd0be7aad5",
+      "name": "TITCAT / WETH 1%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 21259.1905,
+      "volume24hUsd": 1736778.60313667,
+      "baseToken": "0x09319c5891fc3eb218f367d909363fb5562e28b1",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     },
     {
-      "geckoAddress": "0x1a4c1bb24eee4c8d82ceabaef9a18143de511470",
-      "name": "BOW / WETH 1%",
+      "geckoAddress": "0x4dfca89eb922ce39226d9f004fa737b8ce0959d68c509f7ddb711477350f53a1",
+      "name": "TRASH / WETH 1%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 188031.6942,
+      "volume24hUsd": 4128471.93023019,
+      "baseToken": "0xbe4f4bc2ecdca72a6e0d9c963ad71a5869a9fa65",
+      "quoteToken": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "geckoAddress": "0xfcfae8fa0bd6da961bcf5d990f27690932deac4f093e99bf3e871691c6586593",
+      "name": "USDG / WETH 0.05%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 53968.6454,
+      "volume24hUsd": 3184949.10628492,
+      "baseToken": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0x9cc8c4f6118419a27f113723f1dea646685be55f",
+      "name": "VIRTUAL / WETH 0.05%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 47218.8771,
-      "volume24hUsd": 1781230.65261948,
-      "baseToken": "0x9fb101579e716b2571ab069c2718cd06b69ffdd7",
+      "reserveUsd": 113130.192,
+      "volume24hUsd": 3281284.27477788,
+      "baseToken": "0xc6911796042b15d7fa4f6cde69e245ddcd3d9c31",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0x31c6cbb6dd23579711a7cf3aec61846622442cd8",
+      "name": "RIBBIT / WETH 1%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 72202.9262,
+      "volume24hUsd": 95441.3800384351,
+      "baseToken": "0xdae109b18129751a4283e5a72e183abfc728c024",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0xa76909e5365272bd9ad1dcc2ea8491b14aecdcb8",
+      "name": "CASH / WETH 0.01%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 2.336174914e-11,
+      "volume24hUsd": 4604137.24084961,
+      "baseToken": "0xb7e781c3c2124a91c07ec1fb0eccdbf0d979f95a",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0x17045642d03677b0c773cee9da5b81d89b8f2f07",
+      "name": "ROBIN / WETH 1%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 7814.0479,
+      "volume24hUsd": 1207039.18665114,
+      "baseToken": "0x08aebdf2140bc05fd27a507ede5af2428044b9b4",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0x2d6779d558e1b3a77e1dafccf524cbe58d9d8aec",
+      "name": "Rocket / WETH",
+      "dex": "uniswap-v2-robinhood",
+      "reserveUsd": 270907.8096,
+      "volume24hUsd": 6001719.59153626,
+      "baseToken": "0x71d85639fb6f9585ceeed7572c8c03662d9739d5",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0xf752895867c5a635caaeced7d7a6c038a0d6451b",
+      "name": "530A / WETH",
+      "dex": "uniswap-v2-robinhood",
+      "reserveUsd": 222091.6534,
+      "volume24hUsd": 4092790.80471788,
+      "baseToken": "0x15e8b90d9444d1a5e9b39f5c9547a104ae69ba11",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0x7ad1eed380501e037a3207c3355de4a1be789559",
+      "name": "meow / WETH 1%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 309913.1408,
+      "volume24hUsd": 3851629.97769093,
+      "baseToken": "0x75c8258eaa6d0f94b82951194191ca3efb0bcbe2",
+      "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
+    },
+    {
+      "geckoAddress": "0xb4b09951d16053eacd5392ec9fcadf474f52d19c",
+      "name": "DRIP / WETH",
+      "dex": "uniswap-v2-robinhood",
+      "reserveUsd": 23077.6257,
+      "volume24hUsd": 1585941.11614316,
+      "baseToken": "0x1151043399a734ca7c0ae711714ff8428fad7777",
       "quoteToken": "0x0bd7d308f8e1639fab988df18a8011f41eacad73"
     }
   ]
