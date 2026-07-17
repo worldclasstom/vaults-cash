@@ -1,10 +1,11 @@
 /**
- * Phase 0 ground-truth verification for vaults.cash.
+ * Phase 0 ground-truth verification for vaults.cash on Base.
  *
- * Verifies against Robinhood Chain mainnet RPC:
- *  1. chain id
- *  2. Uniswap v4/v3/Permit2 contracts have bytecode
- *  3. USDG + candidate asset tokens (symbol/decimals/supply, ERC-8056 uiMultiplier)
+ * Verifies against Base mainnet RPC:
+ *  1. chain id 8453
+ *  2. Uniswap v4 + Permit2 contracts have bytecode at the documented addresses
+ *     (Uniswap warns addresses differ per chain — never assume)
+ *  3. USDC + candidate crypto tokens (symbol/decimals/supply read on-chain)
  *  4. discovers live pools via GeckoTerminal + confirms v4 pools on-chain (StateView)
  *
  * Writes src/lib/registry.json — the only source of addresses the app may use.
@@ -22,44 +23,65 @@ import {
 } from "viem";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { robinhoodChain, UNISWAP } from "../src/lib/chain";
+import { baseChain, UNISWAP } from "../src/lib/chain";
 
-const client = createPublicClient({ chain: robinhoodChain, transport: http() });
+// mainnet.base.org rate-limits hard on a scan this size — use the CDP RPC
+// (BASE_RPC_URL in .env.local), falling back to a public node.
+// NOTE: once the CDP key has a domain allowlist, origin-less requests are
+// REJECTED (same trap Alchemy sprang on us), so send an explicit Origin.
+const RPC = process.env.BASE_RPC_URL || "https://base-rpc.publicnode.com";
+const client = createPublicClient({
+  chain: baseChain,
+  transport: http(RPC, {
+    batch: true,
+    retryCount: 5,
+    retryDelay: 700,
+    timeout: 30_000,
+    fetchOptions: { headers: { Origin: "https://vaults.cash" } },
+  }),
+});
 
-// Official token registry from docs.robinhood.com/chain/contracts (2026-07-02).
+/** Candidate Base tokens. Addresses are VERIFIED below by reading symbol/
+ *  decimals on-chain — a wrong address surfaces as a symbol mismatch, never a
+ *  silent bad market. Crypto only: no tokenized equities on this product. */
 const CANDIDATES = {
-  USDG: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
-  WETH: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
-  TSLA: "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
-  AAPL: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
-  AMD: "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
-  AMZN: "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
-  BABA: "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4",
-  BE: "0x822CC93fFD030293E9842c30BBD678F530701867",
-  COIN: "0x6330D8C3178a418788dF01a47479c0ce7CCF450b",
-  CRCL: "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5",
-  CRWV: "0x5f10A1C971B69e47e059e1dC91901B59b3fB49C3",
-  GOOGL: "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
-  INTC: "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681",
-  META: "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
-  MSFT: "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
-  MU: "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
-  NVDA: "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
-  ORCL: "0xb0992820E760d836549ba69BC7598b4af75dEE03",
-  PLTR: "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
-  SNDK: "0xB90A19fF0Af67f7779afF50A882A9CfF42446400",
-  SPCX: "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
-  USAR: "0xd917B029C761D264c6A312BBbcDA868658eF86a6",
-  QQQ: "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
-  SGOV: "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
-  SLV: "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
-  SPY: "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
-  CUSO: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344",
+  USDC: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  WETH: "0x4200000000000000000000000000000000000006",
+  cbBTC: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+  cbETH: "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+  wstETH: "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
+  rETH: "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c",
+  weETH: "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+  DAI: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+  USDT: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+  EURC: "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+  AERO: "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
+  LINK: "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196",
+  AAVE: "0x63706e401c06ac8513145b7687A14804d17f814b",
+  VIRTUAL: "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+  DEGEN: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
 } as const;
 
-const uiMultiplierAbi = parseAbi([
-  "function uiMultiplier() view returns (uint256)",
-]);
+/** Expected symbol per candidate — guards against a wrong address quietly
+ *  resolving to some other token. */
+const EXPECTED_SYMBOL: Record<string, string> = {
+  USDC: "USDC",
+  WETH: "WETH",
+  cbBTC: "cbBTC",
+  cbETH: "cbETH",
+  wstETH: "wstETH",
+  rETH: "rETH",
+  weETH: "weETH",
+  DAI: "DAI",
+  USDT: "USDT",
+  EURC: "EURC",
+  AERO: "AERO",
+  LINK: "LINK",
+  AAVE: "AAVE",
+  VIRTUAL: "VIRTUAL",
+  DEGEN: "DEGEN",
+};
+
 const stateViewAbi = parseAbi([
   "function getSlot0(bytes32 poolId) view returns (uint160 sqrtPriceX96, int24 tick, uint24 protocolFee, uint24 lpFee)",
   "function getLiquidity(bytes32 poolId) view returns (uint128 liquidity)",
@@ -70,7 +92,6 @@ const TICK_SPACING: Record<number, number> = {
   500: 10,
   3000: 60,
   10000: 200,
-  50000: 1000, // observed 5% tier on the TSLA/WETH pool
 };
 
 function v4PoolId(tokenA: string, tokenB: string, fee: number): `0x${string}` {
@@ -107,35 +128,29 @@ async function checkToken(label: string, address: string) {
     client.readContract({ address: addr, abi: erc20Abi, functionName: "decimals" }),
     client.readContract({ address: addr, abi: erc20Abi, functionName: "totalSupply" }),
   ]);
-  let uiMultiplier: string | null = null;
-  try {
-    uiMultiplier = (
-      await client.readContract({ address: addr, abi: uiMultiplierAbi, functionName: "uiMultiplier" })
-    ).toString();
-  } catch {
-    /* not an ERC-8056 token */
+  const expected = EXPECTED_SYMBOL[label];
+  if (expected && symbol.toLowerCase() !== expected.toLowerCase()) {
+    fail(label, `SYMBOL MISMATCH: expected ${expected}, chain says ${symbol} @ ${addr}`);
+    return null;
   }
-  ok(label, `${name} (${symbol}), ${decimals} dec, supply ${totalSupply}${uiMultiplier ? `, uiMultiplier ${uiMultiplier}` : ""}`);
-  return { address: addr, name, symbol, decimals, totalSupply: totalSupply.toString(), uiMultiplier };
+  ok(label, `${name} (${symbol}), ${decimals} dec`);
+  return { address: addr, name, symbol, decimals, totalSupply: totalSupply.toString() };
 }
 
 async function main() {
   console.log("\n— 1. Chain —");
   const chainId = await client.getChainId();
-  chainId === 4663 ? ok("chain id 4663") : fail(`chain id mismatch: ${chainId}`);
-  const block = await client.getBlockNumber();
-  ok("RPC live", `block ${block}`);
+  chainId === 8453 ? ok("chain id 8453 (Base)") : fail(`chain id mismatch: ${chainId}`);
+  ok("RPC live", `block ${await client.getBlockNumber()}`);
 
-  console.log("\n— 2. Uniswap contracts —");
+  console.log("\n— 2. Uniswap v4 contracts on Base —");
   const contracts: Record<string, string> = {
     "v4 PoolManager": UNISWAP.v4.poolManager,
     "v4 PositionManager": UNISWAP.v4.positionManager,
-    "UniversalRouter": UNISWAP.v4.universalRouter,
-    "V4Quoter": UNISWAP.v4.quoter,
-    "StateView": UNISWAP.v4.stateView,
-    "v3 Factory": UNISWAP.v3.factory,
-    "v3 PositionManager": UNISWAP.v3.positionManager,
-    "Permit2": UNISWAP.permit2,
+    UniversalRouter: UNISWAP.v4.universalRouter,
+    V4Quoter: UNISWAP.v4.quoter,
+    StateView: UNISWAP.v4.stateView,
+    Permit2: UNISWAP.permit2,
   };
   for (const [label, addr] of Object.entries(contracts)) {
     const code = await client.getCode({ address: getAddress(addr) });
@@ -143,28 +158,27 @@ async function main() {
   }
 
   console.log("\n— 3. Tokens —");
-  const tokens: Record<string, Awaited<ReturnType<typeof checkToken>>> = {};
+  const tokens: Record<string, NonNullable<Awaited<ReturnType<typeof checkToken>>>> = {};
   for (const [label, addr] of Object.entries(CANDIDATES)) {
     try {
-      tokens[label] = await checkToken(label, addr);
+      const t = await checkToken(label, addr);
+      if (t) tokens[label] = t;
     } catch (e) {
-      fail(label, `read failed at ${addr}: ${(e as Error).message.slice(0, 120)}`);
+      fail(label, `read failed at ${addr}: ${(e as Error).message.slice(0, 100)}`);
     }
   }
 
-  console.log("\n— 4. Pool discovery (GeckoTerminal, network=robinhood) —");
+  console.log("\n— 4. Pool discovery (GeckoTerminal, network=base) —");
   const discovered: Array<{
     geckoAddress: string;
     name: string;
     dex: string;
     reserveUsd: number;
     volume24hUsd: number;
-    baseToken: string;
-    quoteToken: string;
   }> = [];
   for (const page of [1, 2]) {
     const res = await fetch(
-      `https://api.geckoterminal.com/api/v2/networks/robinhood/pools?page=${page}&include=base_token,quote_token,dex`,
+      `https://api.geckoterminal.com/api/v2/networks/base/pools?page=${page}&include=dex`,
       { headers: { accept: "application/json" } },
     );
     if (!res.ok) {
@@ -179,34 +193,15 @@ async function main() {
         dex: p.relationships?.dex?.data?.id ?? "?",
         reserveUsd: Number(p.attributes.reserve_in_usd ?? 0),
         volume24hUsd: Number(p.attributes.volume_usd?.h24 ?? 0),
-        baseToken: (p.relationships?.base_token?.data?.id ?? "").replace("robinhood_", ""),
-        quoteToken: (p.relationships?.quote_token?.data?.id ?? "").replace("robinhood_", ""),
       });
     }
   }
   ok(`fetched ${discovered.length} pools`);
-  for (const p of discovered.slice(0, 15)) {
+  for (const p of discovered.slice(0, 12)) {
     console.log(
-      `     ${p.name.padEnd(24)} ${p.dex.padEnd(16)} $${Math.round(p.reserveUsd).toLocaleString()} tvl, $${Math.round(p.volume24hUsd).toLocaleString()} 24h`,
+      `     ${p.name.padEnd(26)} ${p.dex.padEnd(18)} $${Math.round(p.reserveUsd).toLocaleString()} tvl, $${Math.round(p.volume24hUsd).toLocaleString()} 24h`,
     );
   }
-
-  // Try to identify WETH from discovered pools (token paired in "WETH / x" names)
-  const wethPool = discovered.find((p) => /WETH/i.test(p.name));
-  let wethAddr: string | null = null;
-  if (wethPool) {
-    const parts = [wethPool.baseToken, wethPool.quoteToken];
-    const idx = wethPool.name.trim().toUpperCase().startsWith("WETH") ? 0 : 1;
-    wethAddr = parts[idx] || null;
-  }
-  if (wethAddr) {
-    try {
-      tokens["WETH"] = await checkToken("WETH (discovered)", wethAddr);
-    } catch {
-      fail("WETH readback", wethAddr);
-      wethAddr = null;
-    }
-  } else fail("WETH not found in GeckoTerminal pools");
 
   console.log("\n— 5. On-chain v4 pool confirmation (StateView) —");
   const confirmedPools: Array<{
@@ -217,13 +212,12 @@ async function main() {
     tick: number;
     liquidity: string;
   }> = [];
-  // probe every asset vs USDG and vs native ETH across all fee tiers
+  // probe every asset vs USDC, plus native ETH vs USDC
   const pairsToProbe: Array<[string, string, string]> = [];
-  if (tokens.USDG) pairsToProbe.push(["ETH/USDG", zeroAddress, tokens.USDG.address]);
+  if (tokens.USDC) pairsToProbe.push(["ETH/USDC", zeroAddress, tokens.USDC.address]);
   for (const [sym, t] of Object.entries(tokens)) {
-    if (sym === "USDG") continue;
-    if (tokens.USDG) pairsToProbe.push([`${sym}/USDG`, t.address, tokens.USDG.address]);
-    pairsToProbe.push([`ETH/${sym}`, zeroAddress, t.address]);
+    if (sym === "USDC") continue;
+    if (tokens.USDC) pairsToProbe.push([`${sym}/USDC`, t.address, tokens.USDC.address]);
   }
   for (const [pair, a, b] of pairsToProbe) {
     for (const fee of Object.keys(TICK_SPACING).map(Number)) {
@@ -248,7 +242,7 @@ async function main() {
   console.log("\n— Registry —");
   const registry = {
     generatedAt: new Date().toISOString(),
-    chainId: 4663,
+    chainId: 8453,
     verified: failures === 0,
     uniswap: UNISWAP,
     tokens,

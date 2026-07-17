@@ -69,7 +69,7 @@ export function MarketList() {
         </div>
       ) : isError || !data ? (
         <p className="rounded-2xl bg-surface p-4 text-sm text-muted">
-          Couldn&apos;t reach Robinhood Chain. Check your connection and try again.
+          Couldn&apos;t reach Base. Check your connection and try again.
         </p>
       ) : (
         <>
@@ -85,7 +85,7 @@ export function MarketList() {
                     <span className="font-semibold">{market.symbol}</span>
                     <span className="text-sm text-muted">
                       {market.name}
-                      {market.kind === "stock" && " · Stock token"}
+                      {market.kind === "stable" && " · Stablecoin"}
                     </span>
                   </span>
                   <span className="flex flex-col items-end">

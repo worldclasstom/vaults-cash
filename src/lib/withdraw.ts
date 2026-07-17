@@ -1,19 +1,19 @@
 /**
- * Withdraw: burn the v4 position, swap the asset side back to USDG (with the
- * platform fee skimmed from the swap output), leaving the user all-USDG.
+ * Withdraw: burn the v4 position, swap the asset side back to USDC (with the
+ * platform fee skimmed from the swap output), leaving the user all-USDC.
  * Built as one atomic batch like the deposit zap.
  */
 import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
 import { Percent } from "@uniswap/sdk-core";
 import { Position, V4PositionManager } from "@uniswap/v4-sdk";
-import { NATIVE_ETH, USDG } from "./markets";
+import { NATIVE_ETH, USDC } from "./markets";
 import { getPoolState } from "./onchain";
 import { buildPool } from "./zap";
 import {
   buildSwapCall,
   erc20Approve,
   permit2Approve,
-  quoteAssetToUsdg,
+  quoteAssetToUsdc,
   PERMIT2,
   POSM,
   ROUTER,
@@ -24,7 +24,7 @@ import type { OwnedPosition } from "./positions";
 export type WithdrawPlan = {
   calls: Call[];
   assetOutMin: bigint;
-  usdgOutMin: bigint;
+  usdcOutMin: bigint;
   feeAmount: bigint;
 };
 
@@ -66,12 +66,12 @@ export async function buildWithdrawPlan(params: {
     (market.assetIsCurrency0 ? min0 : min1).toString(),
   );
 
-  // 2. swap the asset side back to USDG (skip if out-of-range all-USDG)
-  let usdgOutMin = 0n;
+  // 2. swap the asset side back to USDC (skip if out-of-range all-USDC)
+  let usdcOutMin = 0n;
   let feeAmount = 0n;
   if (assetOutMin > 0n) {
-    const { amountOut } = await quoteAssetToUsdg(market, assetOutMin);
-    usdgOutMin = (amountOut * BigInt(10_000 - slippageBps)) / 10_000n;
+    const { amountOut } = await quoteAssetToUsdc(market, assetOutMin);
+    usdcOutMin = (amountOut * BigInt(10_000 - slippageBps)) / 10_000n;
 
     if (market.token !== NATIVE_ETH) {
       calls.push(erc20Approve(market.token, PERMIT2));
@@ -80,18 +80,18 @@ export async function buildWithdrawPlan(params: {
     calls.push(
       buildSwapCall({
         market,
-        direction: "assetToUsdg",
+        direction: "assetToUsdc",
         amountIn: assetOutMin,
-        minAmountOut: usdgOutMin,
+        minAmountOut: usdcOutMin,
         deadline,
       }),
     );
 
     // 3. platform fee on the swapped output
-    feeAmount = (usdgOutMin * feeBps) / 10_000n;
+    feeAmount = (usdcOutMin * feeBps) / 10_000n;
     if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
       calls.push({
-        to: USDG.address,
+        to: USDC.address,
         value: 0n,
         data: encodeFunctionData({
           abi: erc20Abi,
@@ -102,7 +102,7 @@ export async function buildWithdrawPlan(params: {
     }
   }
 
-  return { calls, assetOutMin, usdgOutMin, feeAmount };
+  return { calls, assetOutMin, usdcOutMin, feeAmount };
 }
 
 /** Collect accrued fees without touching principal. */

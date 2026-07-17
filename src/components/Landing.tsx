@@ -17,10 +17,6 @@ import {
 import type { MarketStats } from "@/app/api/stats/route";
 import { fmtPct, fmtUsd } from "@/lib/format";
 
-/* Bank-vault door — line-art backdrop for the "What could that earn?" section.
- * Evokes the brand name + stored/growing wealth; mirrors the feather's
- * treatment on the opposite edge. Drawn in our accent green (vs the Robinhood
- * feather's #00c805) so "our vault" reads distinct from "their chain". */
 /* The vaults.cash cash-stack mark (from icon.svg), minus its dark tile, used
  * as a large watermark. */
 function CashStack({ className }: { className?: string }) {
@@ -37,20 +33,12 @@ function CashStack({ className }: { className?: string }) {
   );
 }
 
-/* Official Robinhood feather mark (public/brand/robinhood-mark.svg), inlined
- * so it can inherit color/opacity, used as the "Built on Robinhood Chain"
- * section backdrop. */
-function RobinhoodMark({ className }: { className?: string }) {
+/* Base brandmark — backdrop for the "Built on Base" section, mirroring the
+ * cash-stack on the opposite edge. */
+function BaseMark({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 598 800"
-      fill="currentColor"
-      className={className}
-      aria-hidden
-    >
-      <path d="m250.85 627.43-5.28 1.78c-34.2 11.36-84.77 28.85-130.17 49.71-2.43 1.14-4.03 4.32-4.03 4.32-.84 1.95-1.89 4.35-3.08 7.07l-.18.35c-5.08 11.57-12.1 28.98-15.1 36.07l-2.34 5.58c-.36.88-.15 1.9.56 2.57.42.4.93.63 1.55.65.32 0 .7-.07 1.03-.24l5.49-2.61c12.41-5.9 28.14-14.86 44.63-22.69l.57-.27c31.35-14.87 66.74-31.65 88.06-41.81 0-.01 3.42-1.84 5.15-5.26l15.95-31.99c.42-.83.29-1.85-.29-2.56-.65-.7-1.63-.96-2.52-.67zm-127.46-49.58c2.22-4.37 12.59-24.26 14.93-28.72l.42-.76c69.24-130.58 153.63-253.74 250.77-366.06l2.69-3.1c.82-.97.97-2.36.38-3.49-.64-1.13-1.92-1.75-3.15-1.58l-4.07.55c-63.76 8.78-128.26 20.94-191.82 36.12-6.3 1.76-10.37 5.87-11.26 6.83-47.56 56.94-92.61 116.89-133.93 178.31-2.07 3.1-2.29 10.52-2.29 10.52s10.41 79.98 25.57 138.92c-37.57 108.01-71.11 250.35-71.11 250.35-.27.92-.08 1.91.47 2.69.57.78 1.47 1.23 2.44 1.26h21.38a3.17 3.17 0 0 0 3.02-2.03l1.45-4c21.83-59.51 46.73-118.29 74.23-175.55 6.4-13.34 19.88-40.26 19.88-40.26z" />
-      <path d="m420.88 205.66-.04-4.07c-.04-1.28-.84-2.43-2.02-2.86-1.2-.45-2.58-.11-3.4.87l-2.66 3.08c-113.27 130.96-208.47 276.32-282.97 432.03l-1.73 3.64c-.57 1.15-.33 2.54.52 3.46.59.61 1.37.95 2.22.95.37.02.83-.06 1.22-.22l3.73-1.55c63.62-26.35 128.6-49.18 193.15-67.83 3.86-1.12 7.13-3.81 8.96-7.39 28.29-55.13 93.99-161.86 93.99-161.86 1.69-2.41 1.26-5.98 1.26-5.98s-11.51-127.67-12.23-192.27z" />
-      <path d="m567.34 21.53c-16.08-13.94-39.4-20.49-75.66-21.27-32.87-.7-71.97 6.37-116.24 20.97-6.64 2.33-11.91 6-16.64 10.65a2138.718 2138.718 0 0 0 -130.22 133.41l-3.19 3.53c-.88 1-1.01 2.45-.36 3.6a3.07 3.07 0 0 0 3.33 1.47l4.64-.98c66.73-14.26 134.11-25.16 200.19-32.39 4.35-.48 8.84.97 12.09 3.93 3.24 2.99 5.1 7.24 5.02 11.67-1.09 65.57 1.28 131.47 7.13 195.89l.37 4.2a3.099 3.099 0 0 0 2.32 2.7c.22.06.44.11.73.12.98.01 2-.46 2.6-1.32l2.42-3.46c37.24-53.11 77.77-104.74 120.38-153.57l-.02-.01c4.77-5.43 6.04-8.87 6.93-13.8 13.42-85.84-7.29-149.28-25.82-165.34z" />
+    <svg viewBox="0 0 111 111" fill="currentColor" className={className} aria-hidden>
+      <path d="M54.921 110.034c30.438 0 55.117-24.632 55.117-55.017C110.038 24.632 85.359 0 54.921 0 26.041 0 2.353 22.171 0 50.392h72.847v9.25H0c2.353 28.222 26.04 50.392 54.921 50.392z" />
     </svg>
   );
 }
@@ -96,7 +84,7 @@ function EarningsCalculator() {
           {monthly !== undefined ? `${fmtUsd(monthly)} / month` : "…"}
         </p>
         <p className="text-xs leading-relaxed text-muted">
-          at the ETH/USDG pool&apos;s recent activity
+          at the ETH/USDC pool&apos;s recent activity
           {eth ? ` (${fmtPct(eth.estAprPct)} APR) ` : " "}— a live estimate from
           the last 24h of real trading, not a promise. Earnings vary with
           volume, and positions carry market &amp; impermanent-loss risk.
@@ -123,7 +111,7 @@ export function Landing() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-16 sm:pt-24 lg:grid-cols-2 lg:gap-16 lg:pb-28">
           <div className="flex flex-col items-start gap-6">
             <p className="rounded-full bg-accent/10 px-4 py-1.5 text-xs font-semibold text-accent">
-              Now live on Robinhood Chain
+              Now live on Base
             </p>
             <h1 className="text-balance text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl xl:text-7xl">
               Every trade pays a fee. Be the one{" "}
@@ -131,7 +119,7 @@ export function Landing() {
             </h1>
             <p className="max-w-md text-balance text-lg text-muted">
               vaults.cash puts your cash on the earning side of the market:
-              hold blue-chip crypto and tokenized stocks, and collect a slice
+              hold blue-chip crypto like ETH and Bitcoin, and collect a slice
               of every trade — without trading.
             </p>
             <div className="flex items-center gap-5 pt-2">
@@ -215,7 +203,7 @@ export function Landing() {
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Your assets sit in a market position that traders trade
                 against. You keep holding; every trade pays you a fee — in
-                ETH, USDG, or stock tokens.
+                ETH, USDC, or stock tokens.
               </p>
             </div>
           </div>
@@ -262,7 +250,7 @@ export function Landing() {
               {
                 n: "2",
                 t: "Pick a market, deposit cash",
-                d: "One tap turns USDG into an earning position — atomically, all or nothing.",
+                d: "One tap turns USDC into an earning position — atomically, all or nothing.",
               },
               {
                 n: "3",
@@ -292,34 +280,33 @@ export function Landing() {
 
       {/* chain */}
       <section className="relative isolate overflow-hidden">
-        <RobinhoodMark
-          className="pointer-events-none absolute -right-12 -top-20 -z-10 h-[440px] w-[329px] text-[#00C805] opacity-[0.18] sm:-right-8 sm:h-[760px] sm:w-[568px] sm:opacity-[0.22]"
-        />
+        <BaseMark className="pointer-events-none absolute -right-16 -top-16 -z-10 h-[380px] w-[380px] text-[#0052ff] opacity-[0.16] sm:-right-12 sm:h-[620px] sm:w-[620px] sm:opacity-20" />
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-        <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-          Built on Robinhood Chain
-        </h2>
-        <p className="max-w-2xl pt-4 text-lg leading-relaxed text-muted">
-          Robinhood Chain is the new blockchain launched by Robinhood in July
-          2026 — built for tokenized stocks and markets that never close. It is
-          why vaults.cash can exist:
-        </p>
-        <ul className="grid gap-5 pt-10 md:grid-cols-3">
-          {[
-            ["24/7 markets", "Tokenized stocks and crypto trade around the clock — your position earns while you sleep."],
-            ["Wall Street, tokenized", "Real equities — TSLA, NVDA, SPY — live here as tokens. Earn on stocks, not just crypto."],
-            ["Fully public", "Every position, fee, and trade is verifiable on the public explorer. Nothing happens behind a curtain."],
-          ].map(([t, d]) => (
-            <li key={t} className="rounded-3xl border border-borderline bg-surface p-7">
-              <p className="text-lg font-semibold">{t}</p>
-              <p className="pt-2 text-sm leading-relaxed text-muted">{d}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="pt-6 text-xs text-muted/70">
-          vaults.cash is an independent app built on Robinhood Chain. It is not
-          affiliated with, endorsed by, or sponsored by Robinhood Markets.
-        </p>
+          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+            Built on Base
+          </h2>
+          <p className="max-w-2xl pt-4 text-lg leading-relaxed text-muted">
+            Base is Coinbase&apos;s Ethereum layer-2 — one of the most active
+            chains in crypto, with billions in real trading. That depth is what
+            makes the fees worth collecting:
+          </p>
+          <ul className="grid gap-5 pt-10 md:grid-cols-3">
+            {[
+              ["Markets never close", "Crypto trades around the clock — your position earns while you sleep, weekends included."],
+              ["Real depth", "ETH, Bitcoin, and blue-chip DeFi, with the trading volume to actually generate fees."],
+              ["Fully public", "Every position, fee, and trade is verifiable on the public explorer. Nothing happens behind a curtain."],
+            ].map(([t, d]) => (
+              <li key={t} className="rounded-3xl border border-borderline bg-surface p-7">
+                <p className="text-lg font-semibold">{t}</p>
+                <p className="pt-2 text-sm leading-relaxed text-muted">{d}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="pt-6 text-xs text-muted/70">
+            vaults.cash is an independent app built on Base. It is not
+            affiliated with, endorsed by, or sponsored by Coinbase or Uniswap
+            Labs.
+          </p>
         </div>
       </section>
 

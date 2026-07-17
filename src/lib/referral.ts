@@ -2,7 +2,7 @@ import { createRemoteJWKSet, jwtVerify } from "jose";
 import { customAlphabet } from "nanoid";
 import { parseAbiItem } from "viem";
 import { ensureSchema, sql } from "./db";
-import { USDG } from "./markets";
+import { USDC } from "./markets";
 import { publicClient } from "./onchain";
 
 /** Share of the platform fee earmarked for the referrer (50% of 60bps). */
@@ -66,7 +66,7 @@ export async function referralStats(privyDid: string, wallet: string) {
   const [{ count }] = await q`
     SELECT count(*)::int AS count FROM users WHERE referred_by = ${user.ref_code}`;
   const [{ earned }] = await q`
-    SELECT COALESCE(sum(amount_usdg), 0)::float8 AS earned
+    SELECT COALESCE(sum(amount_usdc), 0)::float8 AS earned
     FROM fee_events WHERE referrer_wallet = ${user.wallet}`;
   return {
     refCode: user.ref_code,
@@ -85,7 +85,7 @@ const MAX_CHUNK = 50_000n;
 const MAX_CHUNKS_PER_RUN = 12;
 
 /**
- * Scan USDG transfers into the fee wallet and ledger them, attributing each
+ * Scan USDC transfers into the fee wallet and ledger them, attributing each
  * to the payer's referrer (frozen at event time). Idempotent; resumes from
  * the last scanned block.
  */
@@ -104,7 +104,7 @@ export async function syncFeeEvents() {
   while (from <= head && chunks < MAX_CHUNKS_PER_RUN) {
     const to = from + MAX_CHUNK - 1n > head ? head : from + MAX_CHUNK - 1n;
     const logs = await publicClient.getLogs({
-      address: USDG.address,
+      address: USDC.address,
       event: TRANSFER,
       args: { to: feeWallet },
       fromBlock: from,
@@ -117,7 +117,7 @@ export async function syncFeeEvents() {
         WHERE u.wallet = ${payer}`;
       const referrer = referrerRows.length ? (referrerRows[0].wallet as string) : null;
       const res = await q`
-        INSERT INTO fee_events (tx_hash, log_index, payer, amount_usdg, block_number, referrer_wallet)
+        INSERT INTO fee_events (tx_hash, log_index, payer, amount_usdc, block_number, referrer_wallet)
         VALUES (${log.transactionHash}, ${log.logIndex}, ${payer}, ${(log.args.value as bigint).toString()}, ${log.blockNumber.toString()}, ${referrer})
         ON CONFLICT (tx_hash, log_index) DO NOTHING
         RETURNING id`;
@@ -130,7 +130,7 @@ export async function syncFeeEvents() {
     chunks++;
   }
   const [totals] = await q`
-    SELECT count(*)::int AS events, COALESCE(sum(amount_usdg), 0)::float8 AS fees
+    SELECT count(*)::int AS events, COALESCE(sum(amount_usdc), 0)::float8 AS fees
     FROM fee_events`;
   return {
     scanned: chunks,

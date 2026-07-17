@@ -7,8 +7,8 @@ export const revalidate = 15;
 export async function GET() {
   const markets = await Promise.all(MARKETS.map(marketSnapshot));
   return NextResponse.json({
-    chainId: 4663,
-    chainName: "Robinhood Chain",
+    chainId: 8453,
+    chainName: "Base",
     markets,
     docs: AGENT_DOCS,
   });

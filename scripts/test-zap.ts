@@ -4,8 +4,8 @@
  * Run: npx tsx scripts/test-zap.ts
  */
 import { formatUnits } from "viem";
-import { MARKETS, USDG } from "../src/lib/markets";
-import { getPoolState, tickToUsdgPrice } from "../src/lib/onchain";
+import { MARKETS, USDC } from "../src/lib/markets";
+import { getPoolState, tickToUsdcPrice } from "../src/lib/onchain";
 import { buildZapPlan, planSummary } from "../src/lib/zap";
 import { buildWithdrawPlan } from "../src/lib/withdraw";
 
@@ -14,7 +14,7 @@ let failures = 0;
 async function main() {
   for (const market of MARKETS) {
     const poolState = await getPoolState(market);
-    const price = tickToUsdgPrice(market, poolState.tick);
+    const price = tickToUsdcPrice(market, poolState.tick);
     console.log(
       `\n=== ${market.symbol} (${market.pool.fee / 10_000}% pool, asset=${market.assetIsCurrency0 ? "c0" : "c1"}) — $${price.toFixed(2)} ===`,
     );
@@ -23,7 +23,7 @@ async function main() {
         const plan = await buildZapPlan({
           market,
           owner: "0x1111111111111111111111111111111111111111",
-          usdgAmount: 20_000_000n, // $20
+          usdcAmount: 20_000_000n, // $20
           preset,
           slippageBps: 100,
           poolState,
@@ -31,8 +31,8 @@ async function main() {
         const s = planSummary(plan, price, market.tokenDecimals);
         console.log(
           `  ${preset.padEnd(9)} ticks [${plan.tickLower}, ${plan.tickUpper}] ` +
-            `swap ${formatUnits(plan.swapIn, USDG.decimals)} USDG -> ≥${Number(formatUnits(plan.swapOutMin, market.tokenDecimals)).toFixed(6)} ${market.symbol} ` +
-            `| ~$${s.assetUsd.toFixed(2)} + $${s.usdgUsd.toFixed(2)} | ${plan.calls.length} calls`,
+            `swap ${formatUnits(plan.swapIn, USDC.decimals)} USDC -> ≥${Number(formatUnits(plan.swapOutMin, market.tokenDecimals)).toFixed(6)} ${market.symbol} ` +
+            `| ~$${s.assetUsd.toFixed(2)} + $${s.usdcUsd.toFixed(2)} | ${plan.calls.length} calls`,
         );
       } catch (e) {
         failures++;
@@ -54,7 +54,7 @@ async function main() {
       });
       console.log(
         `  withdraw  ${plan.calls.length} calls, assetOutMin ${Number(formatUnits(plan.assetOutMin, market.tokenDecimals)).toFixed(6)} ${market.symbol}, ` +
-          `usdgOutMin ${formatUnits(plan.usdgOutMin, 6)}, fee ${formatUnits(plan.feeAmount, 6)}`,
+          `usdcOutMin ${formatUnits(plan.usdcOutMin, 6)}, fee ${formatUnits(plan.feeAmount, 6)}`,
       );
     } catch (e) {
       failures++;

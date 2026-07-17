@@ -6,7 +6,7 @@ import { buildWithdrawPlan } from "@/lib/withdraw";
 /**
  * POST /api/agent/withdraw-plan
  * body: { owner, tokenId, slippageBps? }
- * Returns calls that burn the position and convert everything back to USDG.
+ * Returns calls that burn the position and convert everything back to USDC.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -27,13 +27,13 @@ export async function POST(req: NextRequest) {
 
     const plan = await buildWithdrawPlan({ position, slippageBps });
     return NextResponse.json({
-      chainId: 4663,
+      chainId: 8453,
       market: position.market.symbol,
       calls: serializeCalls(plan.calls),
       summary: {
         minAssetOut: plan.assetOutMin.toString(),
-        minUsdgFromSwap: plan.usdgOutMin.toString(),
-        feeUsdg: plan.feeAmount.toString(),
+        minUsdcFromSwap: plan.usdcOutMin.toString(),
+        feeUsdc: plan.feeAmount.toString(),
       },
       docs: AGENT_DOCS,
     });

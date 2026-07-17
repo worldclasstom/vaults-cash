@@ -13,14 +13,14 @@ import {
   toSimple7702SmartAccount,
 } from "viem/account-abstraction";
 import type { PrivateKeyAccount, SignedAuthorization } from "viem";
-import { robinhoodChain } from "@/lib/chain";
+import { baseChain } from "@/lib/chain";
 import { publicClient } from "@/lib/onchain";
 import type { Call } from "@/lib/zap";
 
 /**
  * Atomic path: the embedded EOA acts as an ERC-4337 sender at its own
  * address via EIP-7702 (EF's canonical Simple7702Account delegate, verified
- * deployed on 4663). UserOps go through Alchemy's bundler with the signed
+ * deployed on 8453). UserOps go through Alchemy's bundler with the signed
  * authorization attached — Privy's signer can't send type-4 transactions
  * directly (it strips authorizationList; verified on-chain), but it CAN sign
  * the authorization and the EIP-712 userOp hash, which is all this needs.
@@ -115,7 +115,7 @@ export function useSendCalls() {
           throw new Error("bundler does not serve EntryPoint v0.8");
 
         const eoa = embedded.address as `0x${string}`;
-        await embedded.switchChain(robinhoodChain.id);
+        await embedded.switchChain(baseChain.id);
         const provider = await embedded.getEthereumProvider();
 
         // viem only needs signTypedData from the owner (EP v0.8 userOps are
@@ -153,7 +153,7 @@ export function useSendCalls() {
         });
 
         // Alchemy Gas Manager sponsorship (ERC-7677) — active when a policy
-        // id is configured; swaps to a USDG paymaster policy later without
+        // id is configured; swaps to a USDC paymaster policy later without
         // code changes.
         const policyId = process.env.NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID;
         const bundlerClient = createBundlerClient({
@@ -196,7 +196,7 @@ export function useSendCalls() {
           const nonce = await publicClient.getTransactionCount({ address: eoa });
           const auth = await signAuthorization({
             contractAddress: DELEGATE,
-            chainId: robinhoodChain.id,
+            chainId: baseChain.id,
             nonce,
           });
           // Privy returns yParity/chainId/nonce in loosely-typed encodings
@@ -235,7 +235,7 @@ export function useSendCalls() {
         to: call.to,
         value: call.value,
         data: call.data,
-        chainId: robinhoodChain.id,
+        chainId: baseChain.id,
       };
       const uiOptions = {
         description: `${opts.description} — step ${i + 1} of ${calls.length}`,

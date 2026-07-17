@@ -1,53 +1,29 @@
-import { defineChain } from "viem";
+import { base } from "viem/chains";
 
-export const robinhoodChain = defineChain({
-  id: 4663,
-  name: "Robinhood Chain",
-  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-  rpcUrls: {
-    default: { http: ["https://rpc.mainnet.chain.robinhood.com"] },
-  },
-  blockExplorers: {
-    default: {
-      name: "Blockscout",
-      url: "https://robinhoodchain.blockscout.com",
-      apiUrl: "https://robinhoodchain.blockscout.com/api/v2",
-    },
-  },
-});
+/** Base mainnet (chain id 8453) — the chain vaults.cash runs on.
+ *  Pivoted from Base 2026-07-12: no fiat onramp reaches 8453 and
+ *  its stock tokens are non-US-only, so US users could never fund or use it.
+ *  Base has a real onramp (Coinbase), deep liquidity, and crypto-only markets
+ *  (no tokenized securities => no geofence, no counsel gate). */
+export const baseChain = base;
 
-export const robinhoodTestnet = defineChain({
-  id: 46630,
-  name: "Robinhood Chain Testnet",
-  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-  rpcUrls: {
-    default: { http: ["https://rpc.testnet.chain.robinhood.com"] },
-  },
-  blockExplorers: {
-    default: {
-      name: "Blockscout",
-      url: "https://explorer.testnet.chain.robinhood.com",
-    },
-  },
-  testnet: true,
-});
-
-/** Uniswap deployments on Robinhood Chain (chain id 4663), per
- *  developers.uniswap.org deployment pages. verify-chain.ts asserts
- *  bytecode exists at each address before the app trusts them. */
+/** Uniswap v4 deployments on Base (chain id 8453), per
+ *  developers.uniswap.org/contracts/v4/deployments. Uniswap explicitly warns
+ *  addresses are NOT the same across chains, so verify-chain.ts asserts
+ *  bytecode exists at each of these before the app trusts them. */
 export const UNISWAP = {
   v4: {
-    poolManager: "0x8366a39cc670b4001a1121b8f6a443a643e40951",
-    positionManager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
-    universalRouter: "0x8876789976decbfcbbbe364623c63652db8c0904",
-    quoter: "0x8dc178efb8111bb0973dd9d722ebeff267c98f94",
-    stateView: "0xf3334192d15450cdd385c8b70e03f9a6bd9e673b",
-  },
-  v3: {
-    factory: "0x1f7d7550b1b028f7571e69a784071f0205fd2efa",
-    positionManager: "0x73991a25c818bf1f1128deaab1492d45638de0d3",
-    swapRouter02: "0xcaf681a66d020601342297493863e78c959e5cb2",
-    quoterV2: "0x33e885ed0ec9bf04ecfb19341582aadcb4c8a9e7",
+    poolManager: "0x498581ff718922c3f8e6a244956af099b2652b2b",
+    positionManager: "0x7c5f5a4bbd8fd63184577525326123b519429bdc",
+    universalRouter: "0x6ff5693b99212da76ad316178a184ab56d299b43",
+    quoter: "0x0d5e0f971ed27fbff6c2837bf31316121532048d",
+    stateView: "0xa3c0c9b65bad0b08107aa264b0f3db444b867a71",
   },
   permit2: "0x000000000022D473030F116dDEE9F6B43aC78BA3",
+} as const;
+
+/** Blockscout on Base — used to enumerate a user's v4 position NFTs. */
+export const EXPLORER = {
+  url: "https://base.blockscout.com",
+  apiUrl: "https://base.blockscout.com/api/v2",
 } as const;

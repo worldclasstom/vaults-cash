@@ -6,7 +6,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { usePlanAdd, useSendDeposit } from "@/hooks/useDeposit";
 import { useCollect, usePositions, useWithdraw, type PositionView } from "@/hooks/usePositions";
-import { useUsdgBalance } from "@/hooks/useChainData";
+import { useUsdcBalance } from "@/hooks/useChainData";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { planSummary } from "@/lib/zap";
 
@@ -14,7 +14,7 @@ import { planSummary } from "@/lib/zap";
 const MIN_COLLECT_USD = 0.05;
 
 function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
-  const { data: balance } = useUsdgBalance();
+  const { data: balance } = useUsdcBalance();
   const [amount, setAmount] = useState("");
   const plan = usePlanAdd();
   const send = useSendDeposit();
@@ -46,7 +46,7 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
         <p className="font-semibold">Confirm add</p>
         <p className="pt-1 text-muted">
           {fmtUsd(amountNum)} → ~{fmtUsd(s.assetUsd)} {p.market.symbol} + ~
-          {fmtUsd(s.usdgUsd)} USDG into this position&apos;s existing range.
+          {fmtUsd(s.usdcUsd)} USDC into this position&apos;s existing range.
           Fee {fmtUsd(s.feeUsd)}.
         </p>
         {!p.inRange && (
@@ -97,7 +97,7 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
         </button>
       </div>
       <p className="pt-1 text-xs text-muted">
-        Available: {balance ? fmtUsd(balance.formatted) : "—"} USDG
+        Available: {balance ? fmtUsd(balance.formatted) : "—"} USDC
         {insufficient && <span className="text-negative"> — not enough</span>}
       </p>
       <div className="mt-3 flex gap-2">
@@ -135,7 +135,7 @@ function PositionCard({ p }: { p: PositionView }) {
       <div className="flex items-center justify-between">
         <div>
           <p className="font-semibold">
-            {p.market.symbol} / USDG
+            {p.market.symbol} / USDC
             <span
               className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
                 p.inRange ? "bg-accent/15 text-accent" : "bg-negative/15 text-negative"
@@ -145,7 +145,7 @@ function PositionCard({ p }: { p: PositionView }) {
             </span>
           </p>
           <p className="text-sm text-muted">
-            {fmtAmount(p.assetAmount, 5)} {p.market.symbol} + {fmtUsd(p.usdgAmount)}
+            {fmtAmount(p.assetAmount, 5)} {p.market.symbol} + {fmtUsd(p.usdcAmount)}
           </p>
           <p className="text-sm">
             <span className="text-muted">Fees earned: </span>
@@ -168,7 +168,7 @@ function PositionCard({ p }: { p: PositionView }) {
           disabled={withdraw.isPending}
           className="grow rounded-full bg-surface-raised py-2 text-sm font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
         >
-          {withdraw.isPending ? "Withdrawing…" : "Withdraw to USDG"}
+          {withdraw.isPending ? "Withdrawing…" : "Withdraw to USDC"}
         </button>
         <button
           onClick={() => collect.mutate(p)}
@@ -192,7 +192,7 @@ function PositionCard({ p }: { p: PositionView }) {
 export default function PortfolioPage() {
   const { ready, authenticated, login } = usePrivy();
   const { data: positions, isLoading, isError } = usePositions();
-  const { data: balance } = useUsdgBalance();
+  const { data: balance } = useUsdcBalance();
 
   const total = (positions ?? []).reduce((s, p) => s + p.valueUsd, 0);
 
@@ -214,7 +214,7 @@ export default function PortfolioPage() {
             <p className="text-sm text-muted">Total invested</p>
             <p className="py-1 text-5xl font-bold tracking-tight">{fmtUsd(total)}</p>
             <p className="text-sm text-muted">
-              + {balance ? fmtUsd(balance.formatted) : "—"} USDG available
+              + {balance ? fmtUsd(balance.formatted) : "—"} USDC available
             </p>
           </section>
           <section>

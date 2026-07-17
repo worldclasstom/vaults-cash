@@ -36,17 +36,17 @@ export default function HowItWorksPage() {
             When you deposit — say, $100 into the ETH market
           </h2>
           <ol className="space-y-5">
-            <Step n={1} title="Your USDG is split for the pool">
+            <Step n={1} title="Your USDC is split for the pool">
               A liquidity position holds two assets. We compute the exact split
               your chosen price range needs right now (for example ~$49.70 of
-              ETH and ~$49.70 of USDG), and swap that share on Uniswap with a
+              ETH and ~$49.70 of USDC), and swap that share on Uniswap with a
               slippage bound — if the market moves too much mid-transaction,
               everything reverts and you keep your money.
             </Step>
             <Step n={2} title="Your position is created — owned by you">
               The two halves go into the official Uniswap v4 pool, and the
               position comes back to your wallet as an NFT. It is yours the
-              same way the USDG was: vaults.cash has no key, no admin switch,
+              same way the USDC was: vaults.cash has no key, no admin switch,
               and no way to touch it.
             </Step>
             <Step n={3} title={`Our fee comes last: ${FEE_PCT}% flat`}>
@@ -77,11 +77,11 @@ export default function HowItWorksPage() {
         <section className="rounded-3xl bg-surface p-6">
           <h2 className="pb-2 text-lg font-semibold">When you withdraw</h2>
           <p className="text-sm leading-relaxed text-muted">
-            The position is burned, both halves come back, and the non-USDG
-            half is swapped to USDG — landing in your wallet as cash. The same
+            The position is burned, both halves come back, and the non-USDC
+            half is swapped to USDC — landing in your wallet as cash. The same
             flat {FEE_PCT}% applies to the amount converted on the way out.
-            You can also send funds anywhere on Robinhood Chain (including
-            back to Robinhood) from your dashboard.
+            You can also send funds anywhere on Base (including
+            back to an exchange) from your dashboard.
           </p>
         </section>
 
@@ -108,7 +108,7 @@ export default function HowItWorksPage() {
             </li>
             <li>
               <span className="font-semibold text-foreground">This chain is new.</span>{" "}
-              Robinhood Chain launched July 2026; some pools are still thin.
+              Base launched July 2026; some pools are still thin.
               Thin pools mean bigger price impact — we warn you before any
               deposit where this bites.
             </li>
@@ -121,12 +121,12 @@ export default function HowItWorksPage() {
             Every claim above is checkable. Your wallet, your positions, our
             fee address, every transaction: all public on{" "}
             <a
-              href="https://robinhoodchain.blockscout.com"
+              href="https://base.blockscout.com"
               target="_blank"
               rel="noreferrer"
               className="text-accent underline-offset-2 hover:underline"
             >
-              the Robinhood Chain explorer
+              the Base explorer
             </a>
             . Full fee schedule and legal detail on the{" "}
             <Link href="/disclosures" className="text-accent underline-offset-2 hover:underline">

@@ -16,7 +16,7 @@ export async function GET() {
     MARKETS.map(async (m) => {
       try {
         const res = await fetch(
-          `https://api.geckoterminal.com/api/v2/networks/robinhood/pools/${m.pool.poolId}`,
+          `https://api.geckoterminal.com/api/v2/networks/base/pools/${m.pool.poolId}`,
           { headers: { accept: "application/json" }, next: { revalidate: 60 } },
         );
         if (!res.ok) return;

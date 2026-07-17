@@ -1,6 +1,6 @@
 # vaults.cash
 
-> One-call Uniswap v4 liquidity positions on Robinhood Chain (chain id 4663).
+> One-call Uniswap v4 liquidity positions on Base (chain id 8453).
 > Convert USDG into slippage-bounded, atomic LP position call-batches. Fee
 > 0.30% of converted amounts, embedded in the returned calls. Self-custodial:
 > the executing wallet owns the position NFT; vaults.cash never holds funds.
@@ -26,7 +26,7 @@ Execute calls IN ORDER from `owner`; batch atomically if the wallet supports it
 
 ## Important
 
-- Chain: Robinhood Chain, id 4663, RPC https://rpc.mainnet.chain.robinhood.com, gas ETH.
+- Chain: Base, id 8453, RPC https://mainnet.base.org, gas ETH.
 - USDG (6 decimals) is the deposit/withdraw currency.
 - Markets flagged restricted=true are tokenized stocks: not offerable to US
   persons or in CA/GB/CH/AE. Only request plans for eligible parties.

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
-import { useActiveAddress, useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
+import { useActiveAddress, useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 
@@ -46,7 +46,7 @@ function LogoutConfirm({ onCancel, onConfirm }: { onCancel: () => void; onConfir
 export default function AccountPage() {
   const { ready, authenticated, login, logout, user } = usePrivy();
   const address = useActiveAddress();
-  const { data: usdg } = useUsdgBalance();
+  const { data: usdc } = useUsdcBalance();
   const { data: eth } = useTokenBalance(NATIVE_ETH, 18);
   const [confirming, setConfirming] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -76,7 +76,7 @@ export default function AccountPage() {
           </section>
 
           <section className="rounded-3xl bg-surface p-5">
-            <p className="pb-1 text-sm text-muted">Your wallet on Robinhood Chain</p>
+            <p className="pb-1 text-sm text-muted">Your wallet on Base</p>
             {address && (
               <>
                 <button
@@ -95,14 +95,14 @@ export default function AccountPage() {
                 <div className="flex items-center justify-between pt-3 text-sm">
                   <span className="text-muted">Balance</span>
                   <span>
-                    {usdg ? fmtUsd(usdg.formatted) : "—"} USDG
+                    {usdc ? fmtUsd(usdc.formatted) : "—"} USDC
                     {eth && eth.raw > 0n && (
                       <span className="text-muted"> · {fmtAmount(eth.formatted, 5)} ETH</span>
                     )}
                   </span>
                 </div>
                 <a
-                  href={`https://robinhoodchain.blockscout.com/address/${address}`}
+                  href={`https://base.blockscout.com/address/${address}`}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-2 inline-block text-sm text-accent underline-offset-2 hover:underline"

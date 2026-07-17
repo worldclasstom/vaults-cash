@@ -1,5 +1,5 @@
 import { createPublicClient, http, parseAbi } from "viem";
-import { robinhoodChain, UNISWAP } from "./chain";
+import { baseChain, UNISWAP } from "./chain";
 import type { Market } from "./markets";
 
 /** Browser on the production domain uses the Alchemy endpoint (protected by
@@ -11,7 +11,7 @@ const rpcUrl =
     : process.env.NEXT_PUBLIC_RPC_URL || undefined;
 
 export const publicClient = createPublicClient({
-  chain: robinhoodChain,
+  chain: baseChain,
   transport: http(rpcUrl),
 });
 
@@ -42,11 +42,11 @@ export async function getPoolState(market: Market) {
 }
 
 /**
- * Mid-price of the market asset in USDG, derived from the pool tick.
+ * Mid-price of the market asset in USDC, derived from the pool tick.
  * 1.0001^tick is the raw currency1-per-currency0 price; whether that's the
  * asset price or its inverse depends on address-sort order.
  */
-export function tickToUsdgPrice(market: Market, tick: number): number {
+export function tickToUsdcPrice(market: Market, tick: number): number {
   const raw = Math.pow(1.0001, tick);
   const shift = Math.pow(10, market.tokenDecimals - 6);
   return market.assetIsCurrency0 ? raw * shift : shift / raw;

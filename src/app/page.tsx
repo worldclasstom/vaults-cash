@@ -12,7 +12,7 @@ import {
   useActiveAddress,
   useAssetBalances,
   useTokenBalance,
-  useUsdgBalance,
+  useUsdcBalance,
 } from "@/hooks/useChainData";
 import { GAS_SPONSORED } from "@/lib/config";
 import { fmtAmount, fmtUsd } from "@/lib/format";
@@ -28,8 +28,8 @@ function AddFundsPanel({
   onCopy: () => void;
 }) {
   const steps = [
-    <>Buy <span className="text-foreground">USDG</span> in the Robinhood app (or on any exchange that supports it).</>,
-    <>Send it on <span className="text-foreground">Robinhood Chain</span> to the address below — scan the code or paste it.</>,
+    <>Buy <span className="text-foreground">USDC</span> in the Robinhood app (or on any exchange that supports it).</>,
+    <>Send it on <span className="text-foreground">Base</span> to the address below — scan the code or paste it.</>,
     <>It lands in your account here within seconds{GAS_SPONSORED ? "" : ", along with a little ETH for network fees"}.</>,
   ];
   return (
@@ -61,9 +61,9 @@ function AddFundsPanel({
       </div>
 
       <p className="pt-3 text-xs text-muted">
-        <span className="text-foreground">Robinhood Chain only.</span>{" "}
+        <span className="text-foreground">Base only.</span>{" "}
         Funds sent on any other network won&apos;t arrive. Buying with a card can&apos;t
-        deliver to Robinhood Chain yet — the Robinhood app is the simplest way in.
+        deliver to Base yet — the Robinhood app is the simplest way in.
       </p>
     </div>
   );
@@ -71,7 +71,7 @@ function AddFundsPanel({
 
 function Dashboard() {
   const address = useActiveAddress();
-  const { data: balance, isLoading } = useUsdgBalance();
+  const { data: balance, isLoading } = useUsdcBalance();
   const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
   const { data: assetBalances } = useAssetBalances();
   const [showReceive, setShowReceive] = useState(false);
@@ -81,7 +81,7 @@ function Dashboard() {
   return (
     <div className="animate-rise">
       <section className="py-8">
-        <p className="text-sm text-muted">Cash available (USDG)</p>
+        <p className="text-sm text-muted">Cash available (USDC)</p>
         <p className="py-1 text-5xl font-bold tracking-tight">
           {isLoading || !balance ? "—" : fmtUsd(balance.formatted)}
         </p>
@@ -99,8 +99,8 @@ function Dashboard() {
             <span className="text-muted/60">(from withdrawals)</span>
           </p>
         )}
-        {/* Card onramp removed until providers can deliver to Robinhood Chain
-            (tested 2026-07-03: Privy funding modal has no route to 4663). */}
+        {/* Card onramp removed until providers can deliver to Base
+            (tested 2026-07-03: Privy funding modal has no route to 8453). */}
         <div className="mt-3 flex items-center gap-3">
           <button
             onClick={() => {

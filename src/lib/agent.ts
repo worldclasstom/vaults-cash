@@ -5,8 +5,8 @@
  * own wallet instead.
  */
 import { isAddress } from "viem";
-import { MARKETS, marketBySymbol, USDG, type Market } from "./markets";
-import { getPoolState, tickToUsdgPrice } from "./onchain";
+import { MARKETS, marketBySymbol, USDC, type Market } from "./markets";
+import { getPoolState, tickToUsdcPrice } from "./onchain";
 import type { Call } from "./zap";
 
 export function serializeCalls(calls: Call[]) {
@@ -46,10 +46,9 @@ export async function marketSnapshot(market: Market) {
     symbol: market.symbol,
     name: market.name,
     kind: market.kind,
-    restricted: market.restricted,
     token: market.token,
     tokenDecimals: market.tokenDecimals,
-    usdg: USDG.address,
+    usdc: USDC.address,
     pool: {
       poolId: market.pool.poolId,
       feeBps: market.pool.fee / 100,
@@ -57,7 +56,7 @@ export async function marketSnapshot(market: Market) {
       currency0: market.pool.currency0,
       currency1: market.pool.currency1,
     },
-    priceUsdg: tickToUsdgPrice(market, state.tick),
+    priceUsdc: tickToUsdcPrice(market, state.tick),
     tick: state.tick,
     liquidity: state.liquidity.toString(),
   };
@@ -66,9 +65,9 @@ export async function marketSnapshot(market: Market) {
 export const AGENT_DOCS = {
   execution:
     "Calls MUST be executed in order from the `owner` address. Smart accounts (ERC-4337/EIP-7702) should batch them atomically; EOAs must send them as sequential transactions and stop on any revert.",
-  fees: `vaults.cash takes ${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of the deposit (and of the asset->USDG conversion on withdraw), included in the returned calls.`,
-  restricted:
-    "Markets with restricted=true are stock tokens that may not be offered to US persons or in CA/GB/CH/AE. By requesting a plan you represent the executing party is eligible.",
+  fees: `vaults.cash takes ${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of the deposit (and of the asset->USDC conversion on withdraw), included in the returned calls.`,
+  markets:
+    "All markets are crypto on Base (chain 8453), paired against USDC. There are no tokenized securities here, so no market is geo-restricted. Markets with kind=stable are USDC-correlated pairs with minimal impermanent loss.",
   slippage:
     "Plans embed amountOutMinimum and amountMax bounds; if the pool moves beyond slippageBps the batch reverts. Quotes expire — rebuild plans older than ~60s.",
 };

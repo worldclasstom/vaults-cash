@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useSendTransaction } from "@privy-io/react-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData, erc20Abi, formatUnits, isAddress, parseUnits } from "viem";
-import { robinhoodChain } from "@/lib/chain";
+import { baseChain } from "@/lib/chain";
 import { fmtAmount } from "@/lib/format";
-import { NATIVE_ETH, USDG } from "@/lib/markets";
+import { NATIVE_ETH, USDC } from "@/lib/markets";
 import { publicClient } from "@/lib/onchain";
-import { useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
+import { useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
 
-type Asset = "USDG" | "ETH";
+type Asset = "USDC" | "ETH";
 
 /** gas a plain transfer needs, with headroom — reserved out of an ETH "Max" */
 const GAS_LIMIT = 30_000n;
@@ -18,16 +18,16 @@ const GAS_LIMIT = 30_000n;
 export function SendPanel({ onClose }: { onClose: () => void }) {
   const { sendTransaction } = useSendTransaction();
   const queryClient = useQueryClient();
-  const { data: usdgBalance } = useUsdgBalance();
+  const { data: usdcBalance } = useUsdcBalance();
   const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
 
-  const [asset, setAsset] = useState<Asset>("USDG");
+  const [asset, setAsset] = useState<Asset>("USDC");
   const [amount, setAmount] = useState("");
   const [to, setTo] = useState("");
   const [reviewing, setReviewing] = useState(false);
 
-  const decimals = asset === "USDG" ? USDG.decimals : 18;
-  const balance = asset === "USDG" ? usdgBalance : ethBalance;
+  const decimals = asset === "USDC" ? USDC.decimals : 18;
+  const balance = asset === "USDC" ? usdcBalance : ethBalance;
 
   let amountRaw = 0n;
   try {
@@ -42,8 +42,8 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
 
   const setMax = async () => {
     if (!balance) return;
-    if (asset === "USDG") {
-      setAmount(formatUnits(balance.raw, USDG.decimals));
+    if (asset === "USDC") {
+      setAmount(formatUnits(balance.raw, USDC.decimals));
       return;
     }
     // leave enough ETH behind to pay for this transfer itself
@@ -58,22 +58,22 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
       const recipient = to.trim() as `0x${string}`;
       const tx =
         asset === "ETH"
-          ? { to: recipient, value: amountRaw, chainId: robinhoodChain.id }
+          ? { to: recipient, value: amountRaw, chainId: baseChain.id }
           : {
-              to: USDG.address,
+              to: USDC.address,
               data: encodeFunctionData({
                 abi: erc20Abi,
                 functionName: "transfer",
                 args: [recipient, amountRaw],
               }),
-              chainId: robinhoodChain.id,
+              chainId: baseChain.id,
             };
       const { hash } = await sendTransaction(tx);
       await publicClient.waitForTransactionReceipt({ hash: hash as `0x${string}` });
       return hash as `0x${string}`;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["usdg-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
       queryClient.invalidateQueries({ queryKey: ["token-balance"] });
     },
   });
@@ -86,7 +86,7 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
           {fmtAmount(Number(amount), 6)} {asset} is on its way.
         </p>
         <a
-          href={`https://robinhoodchain.blockscout.com/tx/${send.data}`}
+          href={`https://base.blockscout.com/tx/${send.data}`}
           target="_blank"
           rel="noreferrer"
           className="mt-2 block break-all font-mono text-xs text-accent hover:underline"
@@ -108,7 +108,7 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
       {!reviewing ? (
         <>
           <div className="flex gap-2 pb-3">
-            {(["USDG", "ETH"] as const).map((a) => (
+            {(["USDC", "ETH"] as const).map((a) => (
               <button
                 key={a}
                 onClick={() => {
@@ -154,15 +154,14 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
             <p className="pt-1 text-xs text-negative">That doesn&apos;t look like a valid address.</p>
           )}
           <p className="pt-2 text-xs text-muted">
-            Sends on <span className="text-foreground">Robinhood Chain</span> only.
-            To move funds back to Robinhood, use the deposit address the Robinhood
-            app shows for {asset === "ETH" ? "Ethereum" : "USDG"} on{" "}
-            <span className="text-foreground">Robinhood Chain</span> — addresses
+            Sends on <span className="text-foreground">Base</span> only.
+            To move funds to an exchange, use the deposit address it shows for {asset === "ETH" ? "Ethereum" : "USDC"} on{" "}
+            <span className="text-foreground">Base</span> — addresses
             for other networks won&apos;t receive it.
           </p>
-          {noGas && asset === "USDG" && (
+          {noGas && asset === "USDC" && (
             <p className="pt-1 text-xs text-negative">
-              You need a little ETH for the network fee to send USDG.
+              You need a little ETH for the network fee to send USDC.
             </p>
           )}
           <button
@@ -178,7 +177,7 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
           <p className="text-lg font-semibold">
             Send {fmtAmount(Number(amount), 6)} {asset}
           </p>
-          <p className="pt-2 text-xs text-muted">To (Robinhood Chain):</p>
+          <p className="pt-2 text-xs text-muted">To (Base):</p>
           <p className="break-all font-mono text-xs">{to.trim()}</p>
           <p className="pt-2 text-xs text-muted">
             No vaults.cash fee. Network fee comes out of your ETH. Transfers

@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseUnits } from "viem";
-import { USDG, type Market } from "@/lib/markets";
+import { USDC, type Market } from "@/lib/markets";
 import { getPoolState } from "@/lib/onchain";
 import { buildZapPlan, type RangePreset, type ZapPlan } from "@/lib/zap";
 import { useActiveAddress } from "./useChainData";
@@ -26,7 +26,7 @@ export function usePlanDeposit() {
       return buildZapPlan({
         market: input.market,
         owner,
-        usdgAmount: parseUnits(input.amountUsd.toFixed(USDG.decimals), USDG.decimals),
+        usdcAmount: parseUnits(input.amountUsd.toFixed(USDC.decimals), USDC.decimals),
         preset: input.preset,
         customWidth: input.customWidth,
         slippageBps: input.slippageBps,
@@ -36,7 +36,7 @@ export function usePlanDeposit() {
   });
 }
 
-/** Build a plan that adds USDG to an EXISTING position (same range, no new
+/** Build a plan that adds USDC to an EXISTING position (same range, no new
  *  NFT). The swap share is computed from the position's range at the current
  *  price, so out-of-center — even fully out-of-range — adds split correctly. */
 export function usePlanAdd() {
@@ -52,7 +52,7 @@ export function usePlanAdd() {
       return buildZapPlan({
         market: input.position.market,
         owner,
-        usdgAmount: parseUnits(input.amountUsd.toFixed(USDG.decimals), USDG.decimals),
+        usdcAmount: parseUnits(input.amountUsd.toFixed(USDC.decimals), USDC.decimals),
         preset: "full", // ignored — addTo's ticks win
         slippageBps: input.slippageBps,
         poolState,
@@ -71,7 +71,7 @@ export function useSendDeposit() {
     mutationFn: async (plan: ZapPlan) =>
       sendCalls(plan.calls, { description: "Deposit into your liquidity position" }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["usdg-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
       queryClient.invalidateQueries({ queryKey: ["positions"] });
       // nudge the fee ledger so referral earnings show up immediately
       fetch("/api/referral/sync").catch(() => {});

@@ -27,7 +27,7 @@ export function ensureSchema(): Promise<void> {
         tx_hash text NOT NULL,
         log_index int NOT NULL,
         payer text NOT NULL,
-        amount_usdg numeric NOT NULL,
+        amount_usdc numeric NOT NULL,
         block_number bigint NOT NULL,
         referrer_wallet text,
         created_at timestamptz NOT NULL DEFAULT now(),

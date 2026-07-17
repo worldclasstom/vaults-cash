@@ -1,12 +1,12 @@
 /**
  * The vaults.cash zap engine.
  *
- * Turns N USDG into a Uniswap v4 LP position in one atomic batch of calls
+ * Turns N USDC into a Uniswap v4 LP position in one atomic batch of calls
  * (executed as a single ERC-4337 userOp from the user's smart wallet):
  *
- *   1. skim platform fee (plain USDG transfer)
- *   2. approve USDG -> Permit2 -> UniversalRouter
- *   3. UniversalRouter V4_SWAP: swap the computed share of USDG into the asset
+ *   1. skim platform fee (plain USDC transfer)
+ *   2. approve USDC -> Permit2 -> UniversalRouter
+ *   3. UniversalRouter V4_SWAP: swap the computed share of USDC into the asset
  *   4. approve both currencies -> Permit2 -> PositionManager
  *   5. PositionManager.modifyLiquidities: mint the position NFT
  *
@@ -18,12 +18,12 @@
 import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
 import { Ether, Percent, Token, type Currency } from "@uniswap/sdk-core";
 import { Pool, Position, V4PositionManager } from "@uniswap/v4-sdk";
-import { NATIVE_ETH, USDG, type Market } from "./markets";
+import { NATIVE_ETH, USDC, type Market } from "./markets";
 import {
   buildSwapCall,
   erc20Approve,
   permit2Approve,
-  quoteUsdgToAsset,
+  quoteUsdcToAsset,
   PERMIT2,
   POSM,
   ROUTER,
@@ -31,7 +31,7 @@ import {
 } from "./uniswap";
 
 export type { Call } from "./uniswap";
-export { quoteUsdgToAsset, quoteAssetToUsdg } from "./uniswap";
+export { quoteUsdcToAsset, quoteAssetToUsdc } from "./uniswap";
 
 export type RangePreset = "full" | "balanced" | "aggressive";
 /** half-width of the range as a fraction of price; full = entire curve */
@@ -40,7 +40,7 @@ export const PRESET_WIDTH: Record<Exclude<RangePreset, "full">, number> = {
   aggressive: 0.15,
 };
 
-const CHAIN_ID = 4663;
+const CHAIN_ID = 8453;
 const MIN_TICK = -887272;
 const MAX_TICK = 887272;
 
@@ -49,7 +49,7 @@ export function marketCurrency(market: Market): Currency {
     ? Ether.onChain(CHAIN_ID)
     : new Token(CHAIN_ID, market.token, market.tokenDecimals, market.symbol);
 }
-const usdgToken = new Token(CHAIN_ID, USDG.address, USDG.decimals, "USDG");
+const usdcToken = new Token(CHAIN_ID, USDC.address, USDC.decimals, "USDC");
 
 export function buildPool(
   market: Market,
@@ -59,7 +59,7 @@ export function buildPool(
 ): Pool {
   return new Pool(
     marketCurrency(market),
-    usdgToken,
+    usdcToken,
     market.pool.fee,
     market.pool.tickSpacing,
     zeroAddress,
@@ -99,7 +99,7 @@ export function presetTicks(
 }
 
 /**
- * Which share of the (post-fee) USDG must be swapped into the asset so the
+ * Which share of the (post-fee) USDC must be swapped into the asset so the
  * two sides match the range's required ratio at the current price. Float
  * math is fine here: the result only seeds the quote, and the batch is
  * guarded by amountOutMinimum/amountMax.
@@ -129,7 +129,7 @@ export type ZapPlan = {
   feeAmount: bigint;
   swapIn: bigint;
   swapOutMin: bigint;
-  usdgToPosition: bigint;
+  usdcToPosition: bigint;
   tickLower: number;
   tickUpper: number;
 };
@@ -137,7 +137,7 @@ export type ZapPlan = {
 export async function buildZapPlan(params: {
   market: Market;
   owner: `0x${string}`;
-  usdgAmount: bigint;
+  usdcAmount: bigint;
   preset: RangePreset;
   customWidth?: number;
   slippageBps: number;
@@ -145,21 +145,21 @@ export async function buildZapPlan(params: {
   /** add to this position (its range) instead of minting a new one */
   addTo?: { tokenId: bigint; tickLower: number; tickUpper: number };
 }): Promise<ZapPlan> {
-  const { market, owner, usdgAmount, preset, customWidth, slippageBps, poolState, addTo } =
+  const { market, owner, usdcAmount, preset, customWidth, slippageBps, poolState, addTo } =
     params;
 
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 20 * 60);
 
-  const feeAmount = (usdgAmount * feeBps) / 10_000n;
-  const net = usdgAmount - feeAmount;
+  const feeAmount = (usdcAmount * feeBps) / 10_000n;
+  const net = usdcAmount - feeAmount;
 
   const { tickLower, tickUpper } =
     addTo ?? presetTicks(market, poolState.tick, preset, customWidth);
   const share = swapShare(poolState.tick, tickLower, tickUpper, market.assetIsCurrency0);
   const swapIn = (net * BigInt(Math.round(share * 1_000_000))) / 1_000_000n;
-  const usdgToPosition = net - swapIn;
+  const usdcToPosition = net - swapIn;
 
   const calls: Call[] = [];
 
@@ -167,16 +167,16 @@ export async function buildZapPlan(params: {
   const slippage = BigInt(10_000 - slippageBps);
 
   if (swapIn > 0n) {
-    const { amountOut } = await quoteUsdgToAsset(market, swapIn);
+    const { amountOut } = await quoteUsdcToAsset(market, swapIn);
     swapOutMin = (amountOut * slippage) / 10_000n;
 
-    // 2. USDG -> Permit2 -> UniversalRouter, then the swap itself
-    calls.push(erc20Approve(USDG.address, PERMIT2));
-    calls.push(permit2Approve(USDG.address, ROUTER, deadline));
+    // 2. USDC -> Permit2 -> UniversalRouter, then the swap itself
+    calls.push(erc20Approve(USDC.address, PERMIT2));
+    calls.push(permit2Approve(USDC.address, ROUTER, deadline));
     calls.push(
       buildSwapCall({
         market,
-        direction: "usdgToAsset",
+        direction: "usdcToAsset",
         amountIn: swapIn,
         minAmountOut: swapOutMin,
         deadline,
@@ -185,20 +185,20 @@ export async function buildZapPlan(params: {
   }
 
   // 4. approvals for PositionManager
-  if (usdgToPosition > 0n) calls.push(permit2Approve(USDG.address, POSM, deadline));
+  if (usdcToPosition > 0n) calls.push(permit2Approve(USDC.address, POSM, deadline));
   if (market.token !== NATIVE_ETH && swapOutMin > 0n) {
     calls.push(erc20Approve(market.token, PERMIT2));
     calls.push(permit2Approve(market.token, POSM, deadline));
   }
 
-  // 5. mint — sized from guaranteed amounts (swapOutMin + kept USDG)
+  // 5. mint — sized from guaranteed amounts (swapOutMin + kept USDC)
   const pool = buildPool(market, poolState.sqrtPriceX96, poolState.tick, poolState.liquidity);
   const position = Position.fromAmounts({
     pool,
     tickLower,
     tickUpper,
-    amount0: (market.assetIsCurrency0 ? swapOutMin : usdgToPosition).toString(),
-    amount1: (market.assetIsCurrency0 ? usdgToPosition : swapOutMin).toString(),
+    amount0: (market.assetIsCurrency0 ? swapOutMin : usdcToPosition).toString(),
+    amount1: (market.assetIsCurrency0 ? usdcToPosition : swapOutMin).toString(),
     useFullPrecision: true,
   });
   const common = {
@@ -219,7 +219,7 @@ export async function buildZapPlan(params: {
   // (an abandoned attempt costs the user nothing).
   if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
     calls.push({
-      to: USDG.address,
+      to: USDC.address,
       value: 0n,
       data: encodeFunctionData({
         abi: erc20Abi,
@@ -229,16 +229,16 @@ export async function buildZapPlan(params: {
     });
   }
 
-  return { calls, feeAmount, swapIn, swapOutMin, usdgToPosition, tickLower, tickUpper };
+  return { calls, feeAmount, swapIn, swapOutMin, usdcToPosition, tickLower, tickUpper };
 }
 
-/** Estimated USDG value of the planned position (for the confirm sheet). */
+/** Estimated USDC value of the planned position (for the confirm sheet). */
 export function planSummary(plan: ZapPlan, assetPrice: number, assetDecimals: number) {
   const assetUsd = (Number(plan.swapOutMin) / 10 ** assetDecimals) * assetPrice;
-  const usdgUsd = Number(plan.usdgToPosition) / 1e6;
+  const usdcUsd = Number(plan.usdcToPosition) / 1e6;
   return {
     assetUsd,
-    usdgUsd,
+    usdcUsd,
     feeUsd: Number(plan.feeAmount) / 1e6,
   };
 }

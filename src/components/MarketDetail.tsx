@@ -4,14 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { useMarketQuote, useTokenBalance, useUsdgBalance } from "@/hooks/useChainData";
+import { useMarketQuote, useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
 import { NATIVE_ETH } from "@/lib/markets";
 import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
 import { formatEther } from "viem";
 import { GAS_SPONSORED } from "@/lib/config";
 import { fmtUsd, fmtPct } from "@/lib/format";
 import { UNISWAP } from "@/lib/chain";
-import { marketBySymbol, USDG } from "@/lib/markets";
+import { marketBySymbol, USDC } from "@/lib/markets";
 import { planSummary, PRESET_WIDTH, type RangePreset, type ZapPlan } from "@/lib/zap";
 import type { MarketStats } from "@/app/api/stats/route";
 
@@ -34,7 +34,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
   const router = useRouter();
   const { data: quote } = useMarketQuote(market);
   const { data: stats } = useStats();
-  const { data: balance } = useUsdgBalance();
+  const { data: balance } = useUsdcBalance();
 
   const [amount, setAmount] = useState("");
   const [preset, setPreset] = useState<RangePreset>("full");
@@ -79,7 +79,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
         <header>
           <p className="text-sm text-muted">
             {market.name}
-            {market.kind === "stock" && " · Stock token"}
+            {market.kind === "stable" && " · Stablecoin"}
           </p>
           <p className="text-4xl font-bold tracking-tight">
             {quote ? fmtUsd(quote.price) : "—"}
@@ -94,16 +94,9 @@ export function MarketDetail({ symbol }: { symbol: string }) {
           </div>
         </header>
 
-        {market.restricted && (
-          <p className="rounded-2xl border border-borderline bg-surface p-3 text-xs text-muted">
-            Stock tokens may not be offered to US persons and are unavailable in
-            some regions. By continuing you confirm you&apos;re eligible.
-          </p>
-        )}
-
         <section className="rounded-3xl bg-surface p-5">
           <label className="text-sm text-muted" htmlFor="amount">
-            Deposit USDG
+            Deposit USDC
           </label>
           <div className="flex items-baseline gap-2 py-1">
             <span className="text-3xl font-bold">$</span>
@@ -181,7 +174,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
           {!GAS_SPONSORED && noGas && amountNum > 0 && (
             <p className="mt-3 text-xs text-negative">
               Your wallet has no ETH for network fees. Send a small amount of
-              ETH on Robinhood Chain (about $1 covers many transactions) — see
+              ETH on Base (about $1 covers many transactions) — see
               Receive on the home screen.
             </p>
           )}
@@ -199,7 +192,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
             className="mt-4 w-full rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-40"
           >
             {insufficient
-              ? "Insufficient USDG"
+              ? "Insufficient USDC"
               : planMutation.isPending
                 ? "Getting quote…"
                 : "Review deposit"}
@@ -224,7 +217,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
             <h3 className="text-lg font-semibold">Confirm deposit</h3>
             <dl className="space-y-2 py-4 text-sm">
               <Row k={`${market.symbol} side`} v={`~${fmtUsd(summary.assetUsd)}`} />
-              <Row k="USDG side" v={fmtUsd(summary.usdgUsd)} />
+              <Row k="USDC side" v={fmtUsd(summary.usdcUsd)} />
               <Row k={`vaults.cash fee (${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}%)`} v={fmtUsd(summary.feeUsd)} />
               <Row
                 k="Range"
@@ -259,7 +252,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
 }
 
 const CONTRACT_LABELS: Record<string, string> = {
-  [USDG.address.toLowerCase()]: "USDG token",
+  [USDC.address.toLowerCase()]: "USDC token",
   [UNISWAP.permit2.toLowerCase()]: "Permit2 (approvals)",
   [UNISWAP.v4.universalRouter.toLowerCase()]: "Uniswap Universal Router (swap)",
   [UNISWAP.v4.positionManager.toLowerCase()]: "Uniswap Position Manager (mint)",

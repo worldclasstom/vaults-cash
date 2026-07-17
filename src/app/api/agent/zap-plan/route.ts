@@ -1,14 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { parseUnits } from "viem";
 import { AGENT_DOCS, AgentError, requireMarket, requireOwner, serializeCalls } from "@/lib/agent";
-import { USDG } from "@/lib/markets";
+import { USDC } from "@/lib/markets";
 import { getPoolState } from "@/lib/onchain";
 import { buildZapPlan, type RangePreset } from "@/lib/zap";
 
 /**
  * POST /api/agent/zap-plan
  * body: { market, amountUsd, owner, preset?, widthPct?, slippageBps? }
- * Returns the executable call batch that converts `amountUsd` USDG (held by
+ * Returns the executable call batch that converts `amountUsd` USDC (held by
  * `owner`) into a Uniswap v4 LP position owned by `owner`.
  */
 export async function POST(req: NextRequest) {
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const plan = await buildZapPlan({
       market,
       owner,
-      usdgAmount: parseUnits(amountUsd.toFixed(USDG.decimals), USDG.decimals),
+      usdcAmount: parseUnits(amountUsd.toFixed(USDC.decimals), USDC.decimals),
       preset,
       customWidth: body.widthPct !== undefined ? Number(body.widthPct) / 100 : undefined,
       slippageBps,
@@ -40,15 +40,14 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      chainId: 4663,
+      chainId: 8453,
       market: market.symbol,
-      restricted: market.restricted,
       calls: serializeCalls(plan.calls),
       summary: {
-        feeUsdg: plan.feeAmount.toString(),
-        swapInUsdg: plan.swapIn.toString(),
+        feeUsdc: plan.feeAmount.toString(),
+        swapInUsdc: plan.swapIn.toString(),
         minAssetOut: plan.swapOutMin.toString(),
-        usdgToPosition: plan.usdgToPosition.toString(),
+        usdcToPosition: plan.usdcToPosition.toString(),
         tickLower: plan.tickLower,
         tickUpper: plan.tickUpper,
       },

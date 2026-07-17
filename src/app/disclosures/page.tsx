@@ -12,10 +12,11 @@ export default function DisclosuresPage() {
             <h2 className="pb-1 font-semibold text-foreground">What vaults.cash is</h2>
             <p>
               vaults.cash is a self-custodial interface for providing liquidity to
-              Uniswap pools on Robinhood Chain. Your funds sit in your own wallet
+              Uniswap pools on Base. Your funds sit in your own wallet
               and in pool positions you own — vaults.cash never takes custody.
               vaults.cash is not affiliated with, endorsed by, or sponsored by
-              Robinhood Markets, Uniswap Labs, or Paxos.
+              Coinbase, Uniswap Labs, or Circle. Every market is crypto — we do
+              not offer tokenized stocks or any security.
             </p>
           </section>
           <section>
@@ -40,15 +41,14 @@ export default function DisclosuresPage() {
             </p>
           </section>
           <section>
-            <h2 className="pb-1 font-semibold text-foreground">Stock tokens</h2>
+            <h2 className="pb-1 font-semibold text-foreground">Stablecoin pairs</h2>
             <p>
-              Stock tokens are tokenized debt securities issued by Robinhood
-              Assets (Jersey) Limited that track underlying equities. They may not
-              be offered, sold, or delivered in the United States or to US
-              persons, and are restricted in other jurisdictions. Access is gated
-              by region; by trading them you represent that you are eligible in
-              your jurisdiction. Stock tokens are not shares and carry issuer
-              risk.
+              Markets marked &quot;Stablecoin&quot; pair USDC against another
+              dollar-denominated token. Because both sides track the dollar,
+              impermanent loss is typically minimal — but it is not zero:
+              stablecoins can and do de-peg, and a de-peg is realized as a loss
+              in the position. Stablecoins are not bank deposits and are not
+              FDIC-insured.
             </p>
           </section>
           <section>

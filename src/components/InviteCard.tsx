@@ -57,7 +57,7 @@ export function InviteCard() {
       <h2 className="font-semibold">Invite friends, earn together</h2>
       <p className="pt-1 text-sm text-muted">
         You earn <span className="text-accent">50% of vaults.cash fees</span>{" "}
-        from every deposit your invites make. Paid in USDG.
+        from every deposit your invites make. Paid in USDC.
       </p>
       <button
         onClick={() => {

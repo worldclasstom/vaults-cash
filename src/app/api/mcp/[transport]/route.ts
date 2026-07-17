@@ -1,6 +1,6 @@
 /**
  * vaults.cash MCP server — lets AI agents (Claude, ChatGPT, Cursor, or any
- * MCP client) open and manage Uniswap v4 LP positions on Robinhood Chain.
+ * MCP client) open and manage Uniswap v4 LP positions on Base.
  * Read tools return live chain data; build tools return executable call
  * batches that the agent signs with its own wallet. vaults.cash never
  * custodies funds; the 0.6% platform fee is embedded in built calls.
@@ -10,8 +10,8 @@
 import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
 import { erc20Abi, formatEther, formatUnits, isAddress } from "viem";
-import { MARKETS, NATIVE_ETH, USDG, marketBySymbol } from "@/lib/markets";
-import { getPoolState, publicClient, tickToUsdgPrice } from "@/lib/onchain";
+import { MARKETS, NATIVE_ETH, USDC, marketBySymbol } from "@/lib/markets";
+import { getPoolState, publicClient, tickToUsdcPrice } from "@/lib/onchain";
 import { fetchPositions, getUncollectedFees } from "@/lib/positions";
 import { buildZapPlan } from "@/lib/zap";
 import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
@@ -34,7 +34,7 @@ const handler = createMcpHandler(
   (server) => {
     server.tool(
       "list_markets",
-      "List all vaults.cash markets on Robinhood Chain with live mid-prices, pool parameters, and compliance flags. Markets with restricted=true are tokenized stocks that may not be offered to US persons.",
+      "List all vaults.cash markets on Base (chain 8453) with live mid-prices and pool parameters. All markets are crypto paired against USDC; kind=stable marks USDC-correlated pairs with minimal impermanent loss.",
       {},
       async () => {
         const markets = await Promise.all(
@@ -44,26 +44,25 @@ const handler = createMcpHandler(
               symbol: m.symbol,
               name: m.name,
               kind: m.kind,
-              restricted: m.restricted,
-              priceUsdg: tickToUsdgPrice(m, s.tick),
+              priceUsdc: tickToUsdcPrice(m, s.tick),
               poolFeeBps: m.pool.fee / 100,
               poolLiquidity: s.liquidity.toString(),
             };
           }),
         );
-        return json({ chainId: 4663, usdg: USDG.address, markets });
+        return json({ chainId: 8453, usdc: USDC.address, markets });
       },
     );
 
     server.tool(
       "get_balances",
-      "USDG, ETH (gas), and per-market asset balances for a wallet on Robinhood Chain.",
+      "USDC, ETH (gas), and per-market asset balances for a wallet on Base.",
       { owner: ownerSchema },
       async ({ owner }) => {
         const addr = owner as `0x${string}`;
-        const [usdg, eth] = await Promise.all([
+        const [usdc, eth] = await Promise.all([
           publicClient.readContract({
-            address: USDG.address,
+            address: USDC.address,
             abi: erc20Abi,
             functionName: "balanceOf",
             args: [addr],
@@ -83,9 +82,9 @@ const handler = createMcpHandler(
           }),
         );
         return json({
-          usdg: formatUnits(usdg, 6),
+          usdc: formatUnits(usdc, 6),
           eth: formatEther(eth),
-          note: "ETH pays network fees (~$0.01/op). Deposits are made in USDG.",
+          note: "ETH pays network fees (~$0.01/op). Deposits are made in USDC.",
           assets,
         });
       },
@@ -93,7 +92,7 @@ const handler = createMcpHandler(
 
     server.tool(
       "get_deposit_quote",
-      "Preview how a USDG deposit would split into a two-sided LP position for a market and range preset, without building calls.",
+      "Preview how a USDC deposit would split into a two-sided LP position for a market and range preset, without building calls.",
       {
         market: marketSchema,
         amountUsd: z.number().positive(),
@@ -105,18 +104,18 @@ const handler = createMcpHandler(
         const plan = await buildZapPlan({
           market,
           owner: "0x1111111111111111111111111111111111111111",
-          usdgAmount: parseUnits(amountUsd.toFixed(6), 6),
+          usdcAmount: parseUnits(amountUsd.toFixed(6), 6),
           preset,
           slippageBps: 100,
           poolState,
         });
         return json({
           market: market.symbol,
-          priceUsdg: tickToUsdgPrice(market, poolState.tick),
-          feeUsdg: formatUnits(plan.feeAmount, 6),
-          swapInUsdg: formatUnits(plan.swapIn, 6),
+          priceUsdc: tickToUsdcPrice(market, poolState.tick),
+          feeUsdc: formatUnits(plan.feeAmount, 6),
+          swapInUsdc: formatUnits(plan.swapIn, 6),
           minAssetOut: formatUnits(plan.swapOutMin, market.tokenDecimals),
-          usdgKept: formatUnits(plan.usdgToPosition, 6),
+          usdcKept: formatUnits(plan.usdcToPosition, 6),
           tickLower: plan.tickLower,
           tickUpper: plan.tickUpper,
         });
@@ -125,7 +124,7 @@ const handler = createMcpHandler(
 
     server.tool(
       "build_deposit_calls",
-      "Build the executable call batch converting `amountUsd` of the owner's USDG into a Uniswap v4 LP position owned by them. Execute the calls IN ORDER from the owner wallet (atomically if it supports batching). Includes the 0.6% vaults.cash fee. Calls embed slippage bounds and expire ~20 minutes after building.",
+      "Build the executable call batch converting `amountUsd` of the owner's USDC into a Uniswap v4 LP position owned by them. Execute the calls IN ORDER from the owner wallet (atomically if it supports batching). Includes the 0.6% vaults.cash fee. Calls embed slippage bounds and expire ~20 minutes after building.",
       {
         market: marketSchema,
         amountUsd: z.number().positive(),
@@ -139,19 +138,18 @@ const handler = createMcpHandler(
         const plan = await buildZapPlan({
           market,
           owner: owner as `0x${string}`,
-          usdgAmount: parseUnits(amountUsd.toFixed(6), 6),
+          usdcAmount: parseUnits(amountUsd.toFixed(6), 6),
           preset,
           slippageBps,
           poolState,
         });
         return json({
-          chainId: 4663,
-          restricted: market.restricted,
+          chainId: 8453,
           calls: serializeCalls(plan.calls),
           summary: {
-            feeUsdg: formatUnits(plan.feeAmount, 6),
+            feeUsdc: formatUnits(plan.feeAmount, 6),
             minAssetOut: formatUnits(plan.swapOutMin, market.tokenDecimals),
-            usdgToPosition: formatUnits(plan.usdgToPosition, 6),
+            usdcToPosition: formatUnits(plan.usdcToPosition, 6),
             range: [plan.tickLower, plan.tickUpper],
           },
           docs: AGENT_DOCS,
@@ -171,20 +169,20 @@ const handler = createMcpHandler(
               getPoolState(p.market),
               getUncollectedFees(p).catch(() => ({ owed0: 0n, owed1: 0n })),
             ]);
-            const price = tickToUsdgPrice(p.market, state.tick);
+            const price = tickToUsdcPrice(p.market, state.tick);
             const c0 = p.market.assetIsCurrency0;
             const assetOwed = c0 ? fees.owed0 : fees.owed1;
-            const usdgOwed = c0 ? fees.owed1 : fees.owed0;
+            const usdcOwed = c0 ? fees.owed1 : fees.owed0;
             return {
               tokenId: p.tokenId.toString(),
               market: p.market.symbol,
               inRange: state.tick >= p.tickLower && state.tick < p.tickUpper,
               tickRange: [p.tickLower, p.tickUpper],
               currentTick: state.tick,
-              priceUsdg: price,
+              priceUsdc: price,
               uncollectedFeesUsd:
                 (Number(assetOwed) / 10 ** p.market.tokenDecimals) * price +
-                Number(usdgOwed) / 1e6,
+                Number(usdcOwed) / 1e6,
             };
           }),
         );
@@ -194,7 +192,7 @@ const handler = createMcpHandler(
 
     server.tool(
       "build_withdraw_calls",
-      "Build the executable call batch that burns a position (auto-collecting accrued fees) and swaps the asset side back to USDG. The 0.6% fee applies to the swapped output only.",
+      "Build the executable call batch that burns a position (auto-collecting accrued fees) and swaps the asset side back to USDC. The 0.6% fee applies to the swapped output only.",
       {
         owner: ownerSchema,
         tokenId: z.string().regex(/^\d+$/),
@@ -206,11 +204,11 @@ const handler = createMcpHandler(
         if (!position) return json({ error: `no live position ${tokenId} owned by ${owner}` });
         const plan = await buildWithdrawPlan({ position, slippageBps });
         return json({
-          chainId: 4663,
+          chainId: 8453,
           calls: serializeCalls(plan.calls),
           summary: {
-            minUsdgFromSwap: formatUnits(plan.usdgOutMin, 6),
-            feeUsdg: formatUnits(plan.feeAmount, 6),
+            minUsdcFromSwap: formatUnits(plan.usdcOutMin, 6),
+            feeUsdc: formatUnits(plan.feeAmount, 6),
           },
           docs: AGENT_DOCS,
         });
@@ -226,16 +224,15 @@ const handler = createMcpHandler(
         const position = positions.find((p) => p.tokenId === BigInt(tokenId));
         if (!position) return json({ error: `no live position ${tokenId} owned by ${owner}` });
         const calls = await buildCollectPlan(position, owner as `0x${string}`);
-        return json({ chainId: 4663, calls: serializeCalls(calls), docs: AGENT_DOCS });
+        return json({ chainId: 8453, calls: serializeCalls(calls), docs: AGENT_DOCS });
       },
     );
   },
   {
     serverInfo: { name: "vaults-cash", version: "1.0.0" },
     instructions:
-      "vaults.cash turns USDG into earning Uniswap v4 LP positions on Robinhood Chain (chain id 4663, RPC https://rpc.mainnet.chain.robinhood.com, gas: ETH). " +
+      "vaults.cash turns USDC into earning Uniswap v4 LP positions on Base (chain id 8453, RPC https://mainnet.base.org, gas: ETH). " +
       "Build tools return {to, value, data} call batches; execute them in order from the owner's wallet — atomically if it supports batching (EIP-7702/ERC-4337). " +
-      "Markets flagged restricted are tokenized stocks not offerable to US persons; only request them for eligible parties. " +
       "Plans embed slippage bounds and expire ~20 minutes after building — rebuild stale plans. Positions carry impermanent-loss risk.",
   },
   { basePath: "/api/mcp", maxDuration: 60, disableSse: true },

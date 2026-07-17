@@ -3,7 +3,7 @@
 import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import { robinhoodChain } from "@/lib/chain";
+import { baseChain } from "@/lib/chain";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -42,12 +42,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
           // embedded-wallet users. External wallets still show their own UI.
           showWalletUIs: false,
         },
-        defaultChain: robinhoodChain,
-        supportedChains: [robinhoodChain],
+        defaultChain: baseChain,
+        supportedChains: [baseChain],
       }}
     >
       {/* SmartWalletsProvider intentionally omitted: Privy has no smart-wallet
-          chain config for 4663 yet and its poller spams console errors.
+          chain config for 8453 yet and its poller spams console errors.
           Atomic batching runs via EIP-7702 in useSendCalls instead. */}
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </PrivyProvider>

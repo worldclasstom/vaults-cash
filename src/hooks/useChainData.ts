@@ -3,8 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { erc20Abi, formatUnits } from "viem";
-import { getPoolState, publicClient, tickToUsdgPrice } from "@/lib/onchain";
-import { MARKETS, USDG, type Market } from "@/lib/markets";
+import { getPoolState, publicClient, tickToUsdcPrice } from "@/lib/onchain";
+import { MARKETS, USDC, type Market } from "@/lib/markets";
 
 /** The address funds live at: the embedded EOA (which, via EIP-7702
  *  delegation, is also the smart account — one address forever).
@@ -22,20 +22,20 @@ export function useActiveAddress(): `0x${string}` | undefined {
   return (embedded?.address ?? user?.wallet?.address) as `0x${string}` | undefined;
 }
 
-export function useUsdgBalance() {
+export function useUsdcBalance() {
   const address = useActiveAddress();
   return useQuery({
-    queryKey: ["usdg-balance", address],
+    queryKey: ["usdc-balance", address],
     enabled: !!address,
     refetchInterval: 12_000,
     queryFn: async () => {
       const raw = await publicClient.readContract({
-        address: USDG.address,
+        address: USDC.address,
         abi: erc20Abi,
         functionName: "balanceOf",
         args: [address!],
       });
-      return { raw, formatted: Number(formatUnits(raw, USDG.decimals)) };
+      return { raw, formatted: Number(formatUnits(raw, USDC.decimals)) };
     },
   });
 }
@@ -60,7 +60,7 @@ export function useTokenBalance(token: `0x${string}`, decimals: number) {
   });
 }
 
-/** Non-USDG asset balances sitting in the wallet (e.g. withdrawal dust). */
+/** Non-USDC asset balances sitting in the wallet (e.g. withdrawal dust). */
 export function useAssetBalances() {
   const address = useActiveAddress();
   return useQuery({
@@ -104,7 +104,7 @@ export function useMarketQuotes() {
           const state = await getPoolState(market);
           return {
             market,
-            price: tickToUsdgPrice(market, state.tick),
+            price: tickToUsdcPrice(market, state.tick),
             tick: state.tick,
             liquidity: state.liquidity,
           };
@@ -122,7 +122,7 @@ export function useMarketQuote(market: Market | undefined) {
       const state = await getPoolState(market!);
       return {
         market: market!,
-        price: tickToUsdgPrice(market!, state.tick),
+        price: tickToUsdcPrice(market!, state.tick),
         tick: state.tick,
         sqrtPriceX96: state.sqrtPriceX96,
         liquidity: state.liquidity,

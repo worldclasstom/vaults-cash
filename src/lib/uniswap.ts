@@ -47,11 +47,11 @@ export function poolKeyOf(market: Market) {
   } as const;
 }
 
-/** Which pool currency is the asset vs USDG, per this pool's sort order. */
+/** Which pool currency is the asset vs USDC, per this pool's sort order. */
 export function currenciesOf(market: Market) {
   return market.assetIsCurrency0
-    ? { asset: market.pool.currency0, usdg: market.pool.currency1 }
-    : { asset: market.pool.currency1, usdg: market.pool.currency0 };
+    ? { asset: market.pool.currency0, usdc: market.pool.currency1 }
+    : { asset: market.pool.currency1, usdc: market.pool.currency0 };
 }
 
 export function erc20Approve(
@@ -92,16 +92,16 @@ export function permit2Approve(
  */
 export function buildSwapCall(params: {
   market: Market;
-  direction: "usdgToAsset" | "assetToUsdg";
+  direction: "usdcToAsset" | "assetToUsdc";
   amountIn: bigint;
   minAmountOut: bigint;
   deadline: bigint;
 }): Call {
   const { market, direction, amountIn, minAmountOut, deadline } = params;
-  const { asset, usdg } = currenciesOf(market);
-  const toAsset = direction === "usdgToAsset";
+  const { asset, usdc } = currenciesOf(market);
+  const toAsset = direction === "usdcToAsset";
   const zeroForOne = toAsset ? !market.assetIsCurrency0 : market.assetIsCurrency0;
-  const [settleCurrency, takeCurrency] = toAsset ? [usdg, asset] : [asset, usdg];
+  const [settleCurrency, takeCurrency] = toAsset ? [usdc, asset] : [asset, usdc];
 
   const planner = new V4Planner();
   planner.addAction(Actions.SWAP_EXACT_IN_SINGLE, [
@@ -140,8 +140,8 @@ async function quoteExactIn(market: Market, amountIn: bigint, zeroForOne: boolea
   return { amountOut: result[0], gasEstimate: result[1] };
 }
 
-export const quoteUsdgToAsset = (market: Market, amountIn: bigint) =>
+export const quoteUsdcToAsset = (market: Market, amountIn: bigint) =>
   quoteExactIn(market, amountIn, !market.assetIsCurrency0);
 
-export const quoteAssetToUsdg = (market: Market, amountIn: bigint) =>
+export const quoteAssetToUsdc = (market: Market, amountIn: bigint) =>
   quoteExactIn(market, amountIn, market.assetIsCurrency0);

@@ -8,7 +8,7 @@ export function FooterContent() {
       <p>
         <span className="text-muted">Self-custodial:</span> your funds stay in
         your own wallet and in positions you own — vaults.cash never takes
-        custody. Positions sit in official Uniswap v4 pools on Robinhood Chain.
+        custody. Positions sit in official Uniswap v4 pools on Base.
       </p>
       <p>
         LP positions carry market &amp; impermanent-loss risk and are not
@@ -23,7 +23,7 @@ export function FooterContent() {
           Disclosures &amp; fees
         </Link>
         <a
-          href="https://robinhoodchain.blockscout.com"
+          href="https://base.blockscout.com"
           target="_blank"
           rel="noreferrer"
           className="text-muted underline-offset-2 hover:text-foreground hover:underline"

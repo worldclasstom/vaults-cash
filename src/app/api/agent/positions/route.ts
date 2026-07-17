@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { AgentError, requireOwner } from "@/lib/agent";
-import { getPoolState, tickToUsdgPrice } from "@/lib/onchain";
+import { getPoolState, tickToUsdcPrice } from "@/lib/onchain";
 import { fetchPositions } from "@/lib/positions";
 
 /** GET /api/agent/positions?owner=0x… — live LP positions for a wallet. */
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
           liquidity: p.liquidity.toString(),
           inRange: state.tick >= p.tickLower && state.tick < p.tickUpper,
           currentTick: state.tick,
-          priceUsdg: tickToUsdgPrice(p.market, state.tick),
+          priceUsdc: tickToUsdcPrice(p.market, state.tick),
         };
       }),
     );

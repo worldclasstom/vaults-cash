@@ -20,9 +20,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://vaults.cash"),
-  title: "vaults.cash — earn on Robinhood Chain",
+  title: "vaults.cash — earn on Base",
   description:
-    "Every trade pays a fee. Be the one collecting it. Turn your USDG into earning liquidity positions on Robinhood Chain — tokenized stocks and blue-chip crypto, one tap.",
+    "Every trade pays a fee. Be the one collecting it. Turn your USDC into earning liquidity positions on Base — tokenized stocks and blue-chip crypto, one tap.",
   openGraph: {
     siteName: "vaults.cash",
     type: "website",

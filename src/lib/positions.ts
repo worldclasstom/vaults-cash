@@ -2,7 +2,7 @@ import { parseAbi } from "viem";
 import { UNISWAP } from "./chain";
 import { MARKETS, type Market } from "./markets";
 import { publicClient } from "./onchain";
-import { robinhoodChain } from "./chain";
+import { baseChain } from "./chain";
 
 export const POSM = UNISWAP.v4.positionManager as `0x${string}`;
 
@@ -76,7 +76,7 @@ export async function getUncollectedFees(position: OwnedPosition) {
 
 /** Enumerate the user's v4 position NFTs via Blockscout, then read live state. */
 export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPosition[]> {
-  const api = robinhoodChain.blockExplorers.default.apiUrl;
+  const api = baseChain.blockExplorers.default.apiUrl;
   const res = await fetch(`${api}/addresses/${owner}/nft?type=ERC-721`, {
     headers: { accept: "application/json" },
   });

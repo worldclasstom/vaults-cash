@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Position } from "@uniswap/v4-sdk";
-import { getPoolState, tickToUsdgPrice } from "@/lib/onchain";
+import { getPoolState, tickToUsdcPrice } from "@/lib/onchain";
 import { fetchPositions, getUncollectedFees, type OwnedPosition } from "@/lib/positions";
 import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
 import { buildPool } from "@/lib/zap";
@@ -12,7 +12,7 @@ import { useSendCalls } from "./useSendCalls";
 export type PositionView = OwnedPosition & {
   inRange: boolean;
   assetAmount: number;
-  usdgAmount: number;
+  usdcAmount: number;
   valueUsd: number;
   price: number;
   /** uncollected trading fees, in USD */
@@ -40,21 +40,21 @@ export function usePositions() {
             tickUpper: p.tickUpper,
             liquidity: p.liquidity.toString(),
           });
-          const price = tickToUsdgPrice(p.market, state.tick);
+          const price = tickToUsdcPrice(p.market, state.tick);
           const c0 = p.market.assetIsCurrency0;
           const assetAmount = Number((c0 ? sdkPos.amount0 : sdkPos.amount1).toExact());
-          const usdgAmount = Number((c0 ? sdkPos.amount1 : sdkPos.amount0).toExact());
+          const usdcAmount = Number((c0 ? sdkPos.amount1 : sdkPos.amount0).toExact());
           const assetOwed = c0 ? fees.owed0 : fees.owed1;
-          const usdgOwed = c0 ? fees.owed1 : fees.owed0;
+          const usdcOwed = c0 ? fees.owed1 : fees.owed0;
           const feesUsd =
             (Number(assetOwed) / 10 ** p.market.tokenDecimals) * price +
-            Number(usdgOwed) / 1e6;
+            Number(usdcOwed) / 1e6;
           return {
             ...p,
             inRange: state.tick >= p.tickLower && state.tick < p.tickUpper,
             assetAmount,
-            usdgAmount,
-            valueUsd: assetAmount * price + usdgAmount,
+            usdcAmount,
+            valueUsd: assetAmount * price + usdcAmount,
             price,
             feesUsd,
           };
@@ -70,13 +70,13 @@ export function useWithdraw() {
   return useMutation({
     mutationFn: async (position: OwnedPosition) => {
       // tight tolerance: the slippage buffer is exactly what comes back as
-      // non-USDG dust, and blocks are ~250ms — worst case a revert + retry
+      // non-USDC dust, and blocks are ~250ms — worst case a revert + retry
       const plan = await buildWithdrawPlan({ position, slippageBps: 25 });
-      return send(plan.calls, { description: "Withdraw position to USDG" });
+      return send(plan.calls, { description: "Withdraw position to USDC" });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["positions"] });
-      queryClient.invalidateQueries({ queryKey: ["usdg-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
     },
   });
 }
@@ -94,7 +94,7 @@ export function useCollect() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["positions"] });
-      queryClient.invalidateQueries({ queryKey: ["usdg-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
     },
   });
 }
