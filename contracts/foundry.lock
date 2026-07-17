@@ -1,0 +1,20 @@
+{
+  "lib/aqua": {
+    "tag": {
+      "name": "v1.0.0",
+      "rev": "81c26e4619ce21556ab02b3284ee2685de21fb18"
+    }
+  },
+  "lib/openzeppelin-contracts": {
+    "tag": {
+      "name": "v5.6.1",
+      "rev": "5fd1781b1454fd1ef8e722282f86f9293cacf256"
+    }
+  },
+  "lib/solidity-utils": {
+    "tag": {
+      "name": "6.9.10",
+      "rev": "2d91bb67665467afc06907a69513b0fa66c46f0d"
+    }
+  }
+}

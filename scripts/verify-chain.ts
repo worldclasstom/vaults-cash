@@ -48,6 +48,7 @@ const CANDIDATES = {
   USDC: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   WETH: "0x4200000000000000000000000000000000000006",
   cbBTC: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+  cbXRP: "0xcb585250f852C6c6bf90434AB21A00f02833a4af",
   cbETH: "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
   wstETH: "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
   rETH: "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c",
@@ -68,6 +69,7 @@ const EXPECTED_SYMBOL: Record<string, string> = {
   USDC: "USDC",
   WETH: "WETH",
   cbBTC: "cbBTC",
+  cbXRP: "cbXRP",
   cbETH: "cbETH",
   wstETH: "wstETH",
   rETH: "rETH",
@@ -212,12 +214,14 @@ async function main() {
     tick: number;
     liquidity: string;
   }> = [];
-  // probe every asset vs USDC, plus native ETH vs USDC
+  // ETH is the product's base asset: probe every token vs native ETH.
+  // Also probe vs USDC so we can see both sides of the market.
   const pairsToProbe: Array<[string, string, string]> = [];
-  if (tokens.USDC) pairsToProbe.push(["ETH/USDC", zeroAddress, tokens.USDC.address]);
   for (const [sym, t] of Object.entries(tokens)) {
-    if (sym === "USDC") continue;
-    if (tokens.USDC) pairsToProbe.push([`${sym}/USDC`, t.address, tokens.USDC.address]);
+    if (sym === "WETH") continue; // same asset as native ETH
+    pairsToProbe.push([`${sym}/ETH`, t.address, zeroAddress]);
+    if (tokens.USDC && sym !== "USDC")
+      pairsToProbe.push([`${sym}/USDC`, t.address, tokens.USDC.address]);
   }
   for (const [pair, a, b] of pairsToProbe) {
     for (const fee of Object.keys(TICK_SPACING).map(Number)) {
