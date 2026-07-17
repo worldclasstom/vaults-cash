@@ -1,10 +1,19 @@
 "use client";
 
-import { PrivyProvider } from "@privy-io/react-auth";
+import { CDPReactProvider } from "@coinbase/cdp-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import { baseChain } from "@/lib/chain";
+import { AuthProvider } from "@/components/AuthProvider";
 
+/**
+ * Coinbase CDP embedded wallets (replaced Privy + Alchemy 2026-07-12).
+ *
+ * createOnLogin: "smart" gives every user an ERC-4337 smart account, which is
+ * what makes the one-tap deposit possible: useSendUserOperation submits the
+ * whole zap (fee + approvals + swap + mint) as ONE atomic batch, and CDP's
+ * Paymaster sponsors gas on Base natively (useCdpPaymaster) — no bundler
+ * shims, no EIP-7702 authorization dance, no gas-policy ids.
+ */
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -13,43 +22,26 @@ export function Providers({ children }: { children: React.ReactNode }) {
       }),
   );
 
-  const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
-  if (!appId) {
+  const projectId = process.env.NEXT_PUBLIC_CDP_PROJECT_ID;
+  if (!projectId) {
     return (
       <div className="flex min-h-screen items-center justify-center p-8 text-center text-muted">
-        Set NEXT_PUBLIC_PRIVY_APP_ID in .env.local (see .env.example) to run vaults.cash.
+        Set NEXT_PUBLIC_CDP_PROJECT_ID in .env.local (see .env.example) to run vaults.cash.
       </div>
     );
   }
 
   return (
-    <PrivyProvider
-      appId={appId}
+    <CDPReactProvider
       config={{
-        // "apple" returns when Apple OAuth is configured in the Privy
-        // dashboard (required for the iOS app anyway — needs an Apple
-        // Developer Service ID first).
-        loginMethods: ["email", "sms", "google", "passkey", "wallet"],
-        appearance: {
-          theme: "dark",
-          accentColor: "#7cd44a",
-          landingHeader: "Log in to vaults.cash",
-        },
-        embeddedWallets: {
-          ethereum: { createOnLogin: "users-without-wallets" },
-          // Our Confirm sheet is the single human-readable prompt; Privy's
-          // raw typed-data modal (PackedUserOperation hex) only confuses
-          // embedded-wallet users. External wallets still show their own UI.
-          showWalletUIs: false,
-        },
-        defaultChain: baseChain,
-        supportedChains: [baseChain],
+        projectId,
+        ethereum: { createOnLogin: "smart" },
+        appName: "vaults.cash",
       }}
     >
-      {/* SmartWalletsProvider intentionally omitted: Privy has no smart-wallet
-          chain config for 8453 yet and its poller spams console errors.
-          Atomic batching runs via EIP-7702 in useSendCalls instead. */}
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </PrivyProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>{children}</AuthProvider>
+      </QueryClientProvider>
+    </CDPReactProvider>
   );
 }

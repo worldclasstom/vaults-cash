@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { usePrivy } from "@privy-io/react-auth";
+import { useAuth } from "@/components/AuthProvider";
 import { FooterContent } from "./Footer";
 import { captureRefFromUrl } from "./InviteCard";
 import { Wordmark } from "./Logo";
@@ -11,7 +11,7 @@ import { Wordmark } from "./Logo";
  *  disclosures): sticky wide nav + wide footer. Auth-aware — signed-in
  *  visitors get an "Open app" button instead of login CTAs. */
 export function MarketingShell({ children }: { children: React.ReactNode }) {
-  const { ready, authenticated, login } = usePrivy();
+  const { ready, authenticated, login } = useAuth();
   // referral links land on the marketing pages — capture ?ref= here too
   useEffect(() => captureRefFromUrl(), []);
 

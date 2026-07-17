@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { usePrivy } from "@privy-io/react-auth";
+import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { usePlanAdd, useSendDeposit } from "@/hooks/useDeposit";
@@ -190,7 +190,7 @@ function PositionCard({ p }: { p: PositionView }) {
 }
 
 export default function PortfolioPage() {
-  const { ready, authenticated, login } = usePrivy();
+  const { ready, authenticated, login } = useAuth();
   const { data: positions, isLoading, isError } = usePositions();
   const { data: balance } = useUsdcBalance();
 

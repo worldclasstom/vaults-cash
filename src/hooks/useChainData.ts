@@ -1,25 +1,21 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { useCurrentUser } from "@coinbase/cdp-hooks";
 import { erc20Abi, formatUnits } from "viem";
 import { getPoolState, publicClient, tickToUsdcPrice } from "@/lib/onchain";
 import { MARKETS, USDC, type Market } from "@/lib/markets";
 
-/** The address funds live at: the embedded EOA (which, via EIP-7702
- *  delegation, is also the smart account — one address forever).
+/** The address funds live at: the user's CDP smart account.
  *
- *  Prefer the embedded (Privy) wallet whenever one exists — that's the account
- *  the deposit/withdraw path spends from (useSendCalls' atomic 7702 path).
- *  Only fall back to user.wallet (a linked external wallet) when there is no
- *  embedded wallet, which matches the sequential path's account. This keeps the
- *  displayed/QR deposit address identical to the wallet the app transacts with,
- *  even for a user who signed in by email and later linked an external wallet. */
+ *  This is deliberately the SMART account (not the underlying EOA owner) —
+ *  it's the account useSendCalls sends user operations from, so it's the
+ *  account that holds the USDC and owns the LP positions. Displaying anything
+ *  else would send deposits to a wallet the app doesn't spend from. */
 export function useActiveAddress(): `0x${string}` | undefined {
-  const { user } = usePrivy();
-  const { wallets } = useWallets();
-  const embedded = wallets.find((w) => w.walletClientType === "privy");
-  return (embedded?.address ?? user?.wallet?.address) as `0x${string}` | undefined;
+  const { currentUser } = useCurrentUser();
+  // evmSmartAccountObjects, not the deprecated evmSmartAccounts
+  return currentUser?.evmSmartAccountObjects?.[0]?.address as `0x${string}` | undefined;
 }
 
 export function useUsdcBalance() {

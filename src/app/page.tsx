@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { usePrivy } from "@privy-io/react-auth";
+import { useAuth } from "@/components/AuthProvider";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { Landing } from "@/components/Landing";
@@ -144,7 +144,7 @@ function Dashboard() {
 }
 
 export default function Home() {
-  const { ready, authenticated } = usePrivy();
+  const { ready, authenticated } = useAuth();
   if (!ready) return null;
   if (!authenticated) return <Landing />;
   return (

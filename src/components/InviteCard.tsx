@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { getAccessToken, usePrivy } from "@privy-io/react-auth";
+import { useAuth } from "@/components/AuthProvider";
+import { useGetAccessToken } from "@coinbase/cdp-hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveAddress } from "@/hooks/useChainData";
 import { fmtUsd } from "@/lib/format";
@@ -21,7 +22,8 @@ export function captureRefFromUrl() {
 }
 
 export function InviteCard() {
-  const { authenticated } = usePrivy();
+  const { authenticated } = useAuth();
+  const { getAccessToken } = useGetAccessToken();
   const address = useActiveAddress();
   const [copied, setCopied] = useState(false);
 

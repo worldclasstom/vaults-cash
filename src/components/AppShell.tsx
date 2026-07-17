@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { usePrivy } from "@privy-io/react-auth";
+import { useAuth } from "@/components/AuthProvider";
 import { captureRefFromUrl } from "./InviteCard";
 import { FooterContent } from "./Footer";
 import { Wordmark } from "./Logo";
@@ -87,7 +87,7 @@ function BottomNav({ pathname }: { pathname: string }) {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { authenticated } = usePrivy();
+  const { authenticated } = useAuth();
   const pathname = usePathname();
   // referral links work on ANY page (vaults.cash/market/eth?ref=… included)
   useEffect(() => captureRefFromUrl(), []);

@@ -2,17 +2,28 @@ import { createPublicClient, http, parseAbi } from "viem";
 import { baseChain, UNISWAP } from "./chain";
 import type { Market } from "./markets";
 
-/** Browser on the production domain uses the Alchemy endpoint (protected by
- *  its domain allowlist); server-side code and localhost dev use the public
- *  RPC — Alchemy rejects origins outside the allowlist. */
+/** Coinbase CDP Base RPC on both sides.
+ *
+ *  Browser: NEXT_PUBLIC_BASE_RPC_URL is safe to ship because the CDP key is
+ *  restricted by a domain allowlist (vaults.cash + localhost:3000) — the
+ *  browser sends Origin automatically.
+ *
+ *  Server/build: the allowlist REJECTS requests with no Origin header, so
+ *  server-side calls must present one explicitly. Without this, prerendering
+ *  falls back to the public RPC and dies on rate limits. */
+const isServer = typeof window === "undefined";
 const rpcUrl =
-  typeof window === "undefined" || window.location.hostname === "localhost"
-    ? undefined
-    : process.env.NEXT_PUBLIC_RPC_URL || undefined;
+  (isServer
+    ? process.env.BASE_RPC_URL || process.env.NEXT_PUBLIC_BASE_RPC_URL
+    : process.env.NEXT_PUBLIC_BASE_RPC_URL) || undefined;
 
 export const publicClient = createPublicClient({
   chain: baseChain,
-  transport: http(rpcUrl),
+  transport: http(rpcUrl, {
+    batch: true,
+    retryCount: 3,
+    ...(isServer ? { fetchOptions: { headers: { Origin: "https://vaults.cash" } } } : {}),
+  }),
 });
 
 export const stateViewAbi = parseAbi([

@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useSendTransaction } from "@privy-io/react-auth";
+import { useSendCalls } from "@/hooks/useSendCalls";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData, erc20Abi, formatUnits, isAddress, parseUnits } from "viem";
-import { baseChain } from "@/lib/chain";
 import { fmtAmount } from "@/lib/format";
 import { NATIVE_ETH, USDC } from "@/lib/markets";
 import { publicClient } from "@/lib/onchain";
@@ -12,11 +11,8 @@ import { useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
 
 type Asset = "USDC" | "ETH";
 
-/** gas a plain transfer needs, with headroom — reserved out of an ETH "Max" */
-const GAS_LIMIT = 30_000n;
-
 export function SendPanel({ onClose }: { onClose: () => void }) {
-  const { sendTransaction } = useSendTransaction();
+  const sendCalls = useSendCalls();
   const queryClient = useQueryClient();
   const { data: usdcBalance } = useUsdcBalance();
   const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
@@ -46,31 +42,28 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
       setAmount(formatUnits(balance.raw, USDC.decimals));
       return;
     }
-    // leave enough ETH behind to pay for this transfer itself
-    const block = await publicClient.getBlock();
-    const reserve = GAS_LIMIT * (block.baseFeePerGas ?? 100_000_000n) * 3n;
-    const max = balance.raw > reserve ? balance.raw - reserve : 0n;
-    setAmount(formatUnits(max, 18));
+    // no gas reserve needed — the CDP paymaster covers the fee
+    setAmount(formatUnits(balance.raw, 18));
   };
 
   const send = useMutation({
     mutationFn: async () => {
       const recipient = to.trim() as `0x${string}`;
-      const tx =
+      const call =
         asset === "ETH"
-          ? { to: recipient, value: amountRaw, chainId: baseChain.id }
+          ? { to: recipient, value: amountRaw, data: "0x" as `0x${string}` }
           : {
               to: USDC.address,
+              value: 0n,
               data: encodeFunctionData({
                 abi: erc20Abi,
                 functionName: "transfer",
                 args: [recipient, amountRaw],
               }),
-              chainId: baseChain.id,
             };
-      const { hash } = await sendTransaction(tx);
-      await publicClient.waitForTransactionReceipt({ hash: hash as `0x${string}` });
-      return hash as `0x${string}`;
+      // one sponsored user operation — waits for inclusion, returns the tx hash
+      const { hash } = await sendCalls([call], { description: `Send ${asset}` });
+      return hash;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
@@ -159,11 +152,6 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
             <span className="text-foreground">Base</span> — addresses
             for other networks won&apos;t receive it.
           </p>
-          {noGas && asset === "USDC" && (
-            <p className="pt-1 text-xs text-negative">
-              You need a little ETH for the network fee to send USDC.
-            </p>
-          )}
           <button
             onClick={() => setReviewing(true)}
             disabled={!canReview}
@@ -180,8 +168,8 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
           <p className="pt-2 text-xs text-muted">To (Base):</p>
           <p className="break-all font-mono text-xs">{to.trim()}</p>
           <p className="pt-2 text-xs text-muted">
-            No vaults.cash fee. Network fee comes out of your ETH. Transfers
-            can&apos;t be reversed — double-check the address.
+            No vaults.cash fee, and network fees are covered by vaults.cash.
+            Transfers can&apos;t be reversed — double-check the address.
           </p>
           <div className="mt-3 flex gap-2">
             <button

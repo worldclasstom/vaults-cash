@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePrivy } from "@privy-io/react-auth";
+import { useAuth } from "@/components/AuthProvider";
+import { useCurrentUser } from "@coinbase/cdp-hooks";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { useActiveAddress, useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
@@ -44,15 +45,17 @@ function LogoutConfirm({ onCancel, onConfirm }: { onCancel: () => void; onConfir
 }
 
 export default function AccountPage() {
-  const { ready, authenticated, login, logout, user } = usePrivy();
+  const { ready, authenticated, login, logout } = useAuth();
+  const { currentUser } = useCurrentUser();
   const address = useActiveAddress();
   const { data: usdc } = useUsdcBalance();
   const { data: eth } = useTokenBalance(NATIVE_ETH, 18);
   const [confirming, setConfirming] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const auth = currentUser?.authenticationMethods;
   const loginId =
-    user?.email?.address ?? user?.google?.email ?? user?.phone?.number ?? "—";
+    auth?.email?.email ?? auth?.sms?.phoneNumber ?? auth?.google?.email ?? "—";
 
   return (
     <AppShell>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { usePrivy } from "@privy-io/react-auth";
+import { useAuth } from "@/components/AuthProvider";
 import { MarketingShell } from "@/components/MarketingShell";
 import {
   MarketChart,
@@ -97,7 +97,7 @@ function EarningsCalculator() {
 /* --------------------------------------------------------------- landing */
 
 export function Landing() {
-  const { login } = usePrivy();
+  const { login } = useAuth();
 
   return (
     <MarketingShell>
