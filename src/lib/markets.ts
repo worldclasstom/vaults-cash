@@ -53,10 +53,13 @@ function poolRef(pair: string, p: { poolId: string; fee: number; tickSpacing: nu
  *  breaks when it drains, so always resolve the live deepest pool from the
  *  registry instead. Tokens with no live pool simply aren't listed. */
 function deepestUsdcPool(symbol: string): PoolRef | null {
+  // the registry names ETH's own USDC pool "USDC/ETH" (scanner iterates
+  // tokens-vs-ETH first); accept both orderings
+  const names = symbol === "ETH" ? ["ETH/USDC", "USDC/ETH"] : [`${symbol}/USDC`];
   const best = registry.v4Pools
-    .filter((p) => p.pair === `${symbol}/USDC` && BigInt(p.liquidity) > 0n)
+    .filter((p) => names.includes(p.pair) && BigInt(p.liquidity) > 0n)
     .sort((a, b) => (BigInt(b.liquidity) > BigInt(a.liquidity) ? 1 : -1))[0];
-  return best ? poolRef(`${symbol}/USDC`, best) : null;
+  return best ? poolRef(symbol === "ETH" ? "ETH/USDC" : `${symbol}/USDC`, best) : null;
 }
 
 function market(
