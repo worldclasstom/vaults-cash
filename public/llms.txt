@@ -1,8 +1,8 @@
 # vaults.cash
 
 > One-call Uniswap v4 liquidity positions on Base (chain id 8453).
-> Convert USDG into slippage-bounded, atomic LP position call-batches. Fee
-> 0.30% of converted amounts, embedded in the returned calls. Self-custodial:
+> Convert USDC into slippage-bounded, atomic LP position call-batches. Fee
+> 0.60% of converted amounts, embedded in the returned calls. Self-custodial:
 > the executing wallet owns the position NFT; vaults.cash never holds funds.
 
 ## MCP server (recommended for agents)
@@ -16,9 +16,9 @@ Build tools return {to, value, data} call batches you sign with your own wallet.
 
 - GET  /api/agent/markets — listed markets, live prices, pool ids, docs
 - GET  /api/agent/quote?market=ETH&amountUsd=100&preset=balanced — read-only deposit split
-- POST /api/agent/zap-plan {market, amountUsd, owner, preset?, widthPct?, slippageBps?} — executable calls: USDG -> LP position
+- POST /api/agent/zap-plan {market, amountUsd, owner, preset?, widthPct?, slippageBps?} — executable calls: USDC -> LP position
 - GET  /api/agent/positions?owner=0x… — live positions for a wallet
-- POST /api/agent/withdraw-plan {owner, tokenId, slippageBps?} — executable calls: position -> USDG
+- POST /api/agent/withdraw-plan {owner, tokenId, slippageBps?} — executable calls: position -> USDC
 
 Presets: full (never rebalance) | balanced (±30%) | aggressive (±15%).
 Execute calls IN ORDER from `owner`; batch atomically if the wallet supports it
@@ -27,7 +27,7 @@ Execute calls IN ORDER from `owner`; batch atomically if the wallet supports it
 ## Important
 
 - Chain: Base, id 8453, RPC https://mainnet.base.org, gas ETH.
-- USDG (6 decimals) is the deposit/withdraw currency.
+- USDC (6 decimals) is the deposit/withdraw currency.
 - Markets flagged restricted=true are tokenized stocks: not offerable to US
   persons or in CA/GB/CH/AE. Only request plans for eligible parties.
 - LP positions carry impermanent-loss risk and can go out of range.
