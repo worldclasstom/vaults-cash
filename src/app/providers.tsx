@@ -1,18 +1,25 @@
 "use client";
 
-import { CDPReactProvider } from "@coinbase/cdp-react";
+import { PrivyProvider } from "@privy-io/react-auth";
+import { SmartWalletsProvider } from "@privy-io/react-auth/smart-wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { AuthProvider } from "@/components/AuthProvider";
+import { baseChain } from "@/lib/chain";
 
 /**
- * Coinbase CDP embedded wallets (replaced Privy + Alchemy 2026-07-12).
+ * Privy embedded wallets + Privy smart wallets (back from CDP, 2026-09-23).
  *
- * createOnLogin: "smart" gives every user an ERC-4337 smart account, which is
- * what makes the one-tap deposit possible: useSendUserOperation submits the
- * whole zap (fee + approvals + swap + mint) as ONE atomic batch, and CDP's
- * Paymaster sponsors gas on Base natively (useCdpPaymaster) — no bundler
- * shims, no EIP-7702 authorization dance, no gas-policy ids.
+ * Why Privy: it is the only provider that covers BOTH Base and Robinhood
+ * Chain with smart accounts (CDP's smart accounts/paymaster support 8 chains
+ * and 4663 is not one of them), it has native iOS + Expo SDKs for the
+ * companion app, and it revives the existing users + referral auth.
+ *
+ * Smart wallets give us atomic batching (the whole zap in one user op) and
+ * gas sponsorship — configured per chain in the Privy dashboard (smart
+ * account type + bundler + paymaster URL; Alchemy gas policy for
+ * sponsorship). Custom chains like Robinhood Chain are added there with
+ * their own bundler/paymaster/RPC URLs. Nothing chain-specific lives here.
  */
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -22,26 +29,39 @@ export function Providers({ children }: { children: React.ReactNode }) {
       }),
   );
 
-  const projectId = process.env.NEXT_PUBLIC_CDP_PROJECT_ID;
-  if (!projectId) {
+  const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+  if (!appId) {
     return (
       <div className="flex min-h-screen items-center justify-center p-8 text-center text-muted">
-        Set NEXT_PUBLIC_CDP_PROJECT_ID in .env.local (see .env.example) to run vaults.cash.
+        Set NEXT_PUBLIC_PRIVY_APP_ID in .env.local (see .env.example) to run vaults.cash.
       </div>
     );
   }
 
   return (
-    <CDPReactProvider
+    <PrivyProvider
+      appId={appId}
       config={{
-        projectId,
-        ethereum: { createOnLogin: "smart" },
-        appName: "vaults.cash",
+        loginMethods: ["email", "sms", "google", "passkey", "wallet"],
+        appearance: {
+          theme: "dark",
+          accentColor: "#7cd44a",
+          landingHeader: "Log in to vaults.cash",
+        },
+        embeddedWallets: {
+          ethereum: { createOnLogin: "users-without-wallets" },
+          // Our Confirm sheet is the single human-readable prompt.
+          showWalletUIs: false,
+        },
+        defaultChain: baseChain,
+        supportedChains: [baseChain],
       }}
     >
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>{children}</AuthProvider>
-      </QueryClientProvider>
-    </CDPReactProvider>
+      <SmartWalletsProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryClientProvider>
+      </SmartWalletsProvider>
+    </PrivyProvider>
   );
 }

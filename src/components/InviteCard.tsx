@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { useGetAccessToken } from "@coinbase/cdp-hooks";
+import { usePrivy } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveAddress } from "@/hooks/useChainData";
 import { fmtUsd } from "@/lib/format";
@@ -23,7 +23,7 @@ export function captureRefFromUrl() {
 
 export function InviteCard() {
   const { authenticated } = useAuth();
-  const { getAccessToken } = useGetAccessToken();
+  const { getAccessToken } = usePrivy();
   const address = useActiveAddress();
   const [copied, setCopied] = useState(false);
 

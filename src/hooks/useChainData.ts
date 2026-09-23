@@ -1,21 +1,22 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useCurrentUser } from "@coinbase/cdp-hooks";
+import { usePrivy } from "@privy-io/react-auth";
 import { erc20Abi, formatUnits } from "viem";
 import { getPoolState, publicClient, tickToUsdcPrice } from "@/lib/onchain";
 import { MARKETS, USDC, type Market } from "@/lib/markets";
 
-/** The address funds live at: the user's CDP smart account.
- *
- *  This is deliberately the SMART account (not the underlying EOA owner) —
- *  it's the account useSendCalls sends user operations from, so it's the
- *  account that holds the USDC and owns the LP positions. Displaying anything
- *  else would send deposits to a wallet the app doesn't spend from. */
+/** The address funds live at: the user's Privy SMART wallet (a linked
+ *  account of type "smart_wallet"), not the underlying embedded EOA — the
+ *  smart wallet is what useSendCalls spends from, so it's what holds the
+ *  USDC and owns the LP positions. Falls back to the EOA only before the
+ *  smart wallet has been created (first login) so balances still render. */
 export function useActiveAddress(): `0x${string}` | undefined {
-  const { currentUser } = useCurrentUser();
-  // evmSmartAccountObjects, not the deprecated evmSmartAccounts
-  return currentUser?.evmSmartAccountObjects?.[0]?.address as `0x${string}` | undefined;
+  const { user } = usePrivy();
+  const sw = user?.linkedAccounts.find((a) => a.type === "smart_wallet") as
+    | { address?: string }
+    | undefined;
+  return (sw?.address ?? user?.wallet?.address) as `0x${string}` | undefined;
 }
 
 export function useUsdcBalance() {

@@ -1,5 +1,6 @@
-/** Gas is always sponsored on Base: every user gets a CDP smart account and
- *  useSendCalls sends every operation with useCdpPaymaster, so no user ever
- *  needs ETH. (On Robinhood Chain this was conditional on an Alchemy gas
- *  policy; CDP's paymaster is built in, so there is nothing to configure.) */
-export const GAS_SPONSORED = true;
+/** True once a paymaster is configured for the chain in the Privy dashboard
+ *  (smart wallets → chain → paymaster URL / Alchemy gas policy). Flip
+ *  NEXT_PUBLIC_GAS_SPONSORED=1 after that, and the UI stops telling users
+ *  they need ETH for network fees. Until then users pay gas from the smart
+ *  wallet's own ETH balance. */
+export const GAS_SPONSORED = process.env.NEXT_PUBLIC_GAS_SPONSORED === "1";
