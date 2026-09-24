@@ -110,9 +110,9 @@ function AddFundsPanel({
           onClick={buyWithCard}
           className="rounded-full bg-surface-raised px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
         >
-          Buy {chain.quote.symbol} with card
+          Fund {chain.chain.name} with card or crypto
         </button>
-        <span className="text-xs text-muted">Card, exchange, or crypto from another chain — provider fees apply.</span>
+        <span className="text-xs text-muted">Card, Apple Pay, bank, exchange, or crypto from another chain.</span>
       </div>
       {cardError && <p className="pt-2 text-xs text-negative">{cardError}</p>}
 
@@ -134,6 +134,27 @@ function Dashboard() {
   const [showReceive, setShowReceive] = useState(false);
   const [showSend, setShowSend] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { addFunds } = useAddFunds();
+  const [fundError, setFundError] = useState<string | null>(null);
+
+  // Privy's unified funding flow (card / Apple Pay / bank / crypto from any
+  // chain bridged by Relay), delivering USDC on Base to this wallet — the
+  // primary path; the raw address is the fallback for manual sends
+  const openFunding = async () => {
+    if (!address) return;
+    setFundError(null);
+    setShowSend(false);
+    try {
+      await addFunds({
+        destination: { address, chain: "eip155:8453", asset: CHAINS[8453].quote.address },
+        fiat: { defaultAmount: "20" },
+        crypto: {},
+      });
+    } catch (e) {
+      const msg = (e as Error).message ?? "";
+      if (!/exit|closed|cancel/i.test(msg)) setFundError(msg || "Funding didn't complete.");
+    }
+  };
 
   return (
     <div className="animate-rise">
@@ -165,10 +186,7 @@ function Dashboard() {
             (tested 2026-07-03: Privy funding modal has no route to 8453). */}
         <div className="mt-3 flex items-center gap-3">
           <button
-            onClick={() => {
-              setShowReceive(!showReceive);
-              setShowSend(false);
-            }}
+            onClick={openFunding}
             className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
           >
             Add funds
@@ -183,6 +201,16 @@ function Dashboard() {
             Send
           </button>
         </div>
+        {fundError && <p className="pt-2 text-xs text-negative">{fundError}</p>}
+        <button
+          onClick={() => {
+            setShowReceive(!showReceive);
+            setShowSend(false);
+          }}
+          className="mt-3 block text-xs text-muted underline-offset-2 hover:text-foreground hover:underline"
+        >
+          {showReceive ? "Hide my wallet address" : "Or send directly to my wallet address →"}
+        </button>
         {showSend && <SendPanel onClose={() => setShowSend(false)} />}
         {showReceive && address && (
           <AddFundsPanel
