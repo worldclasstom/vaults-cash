@@ -198,14 +198,12 @@ function buildMarkets(chainId: ChainId, registry: Registry): Market[] {
       correlates: known?.correlates ?? null,
       uiMultiplier: reg?.uiMultiplier ? Number(BigInt(reg.uiMultiplier)) / 1e18 : 1,
       color: known?.color ?? hashColor(sym),
-      // Stock tokens: neither Robinhood's Stock Token API nor the community
-      // token lists carry company marks (every one is the generic feather), so
-      // like liquid.trade we self-host a curated per-ticker set under
-      // public/logos/stocks; TokenIcon falls back to the brand-colored
-      // monogram for a ticker without a file. Everything else comes from the
-      // registry (GeckoTerminal). Native ETH isn't a registry token (WETH's
-      // image is branded "WETH").
-      logo: known?.kind === "stock" ? `/logos/stocks/${sym}.png` : isEth ? ETH_LOGO : (reg?.logo ?? undefined),
+      // Logos come from the registry: Robinhood's official Stock Token API
+      // for stock tokens (the Robinhood feather — the same mark Uniswap and
+      // fomo show for them), GeckoTerminal for the rest. TokenIcon falls back
+      // to the brand-colored ticker monogram. Native ETH isn't a registry
+      // token (WETH's image is branded "WETH").
+      logo: isEth ? ETH_LOGO : (reg?.logo ?? undefined),
     };
   };
   tokens.set("ETH", toInfo("ETH"));
