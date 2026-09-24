@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { useAddFunds } from "@privy-io/react-auth";
 import { useAuth } from "@/components/AuthProvider";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
@@ -15,7 +16,7 @@ import {
   useTokenBalance,
   useUsdcBalance,
 } from "@/hooks/useChainData";
-import { CHAINS } from "@/lib/chain";
+import { CHAINS, CHAIN_IDS, type ChainId } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 
@@ -28,13 +29,58 @@ function AddFundsPanel({
   copied: boolean;
   onCopy: () => void;
 }) {
+  const [chainId, setChainId] = useState<ChainId>(8453);
+  const chain = CHAINS[chainId];
+  const { addFunds } = useAddFunds();
+  const [cardError, setCardError] = useState<string | null>(null);
+
   const steps = [
-    <>Buy <span className="text-foreground">USDC</span> in the Robinhood app (or on any exchange that supports it).</>,
-    <>Send it on <span className="text-foreground">Base</span> to the address below — scan the code or paste it.</>,
-    <>It lands in your account here within seconds{CHAINS[8453].gasSponsored ? "" : ", along with a little ETH for network fees"}.</>,
+    <>
+      Buy <span className="text-foreground">{chain.quote.symbol}</span> in the Robinhood app (or on any exchange that
+      supports it).
+    </>,
+    <>
+      Send it on <span className="text-foreground">{chain.chain.name}</span> to the address below — scan the code or
+      paste it.
+    </>,
+    <>
+      It lands in your account here within seconds
+      {chain.gasSponsored ? "" : " — plus a little ETH on the same network for fees (about $1 covers many transactions)"}.
+    </>,
   ];
+
+  const buyWithCard = async () => {
+    setCardError(null);
+    try {
+      // Privy's unified funding flow: card (MoonPay / Coinbase Onramp, as
+      // enabled in the dashboard), exchange transfer, or crypto from any
+      // chain bridged in — delivering this chain's stablecoin to this wallet
+      await addFunds({
+        destination: { address, chain: `eip155:${chainId}`, asset: chain.quote.address },
+        fiat: { defaultAmount: "20" },
+        crypto: {},
+      });
+    } catch (e) {
+      const msg = (e as Error).message ?? "";
+      if (!/exit|closed|cancel/i.test(msg)) setCardError(msg || "Funding didn't complete.");
+    }
+  };
+
   return (
     <div className="mt-3 rounded-2xl bg-surface p-5 text-sm">
+      <div className="flex gap-2 pb-4">
+        {CHAIN_IDS.map((id) => (
+          <button
+            key={id}
+            onClick={() => setChainId(id)}
+            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+              chainId === id ? "bg-accent text-black" : "bg-surface-raised text-muted hover:bg-borderline"
+            }`}
+          >
+            {CHAINS[id].chain.name}
+          </button>
+        ))}
+      </div>
       <ol className="space-y-3">
         {steps.map((s, i) => (
           <li key={i} className="flex gap-3">
@@ -55,16 +101,24 @@ function AddFundsPanel({
           className="w-full break-all rounded-xl bg-surface p-3 text-center font-mono text-xs transition-colors hover:bg-borderline"
         >
           {address}
-          <span className="mt-1 block font-sans text-accent">
-            {copied ? "Copied ✓" : "Tap to copy address"}
-          </span>
+          <span className="mt-1 block font-sans text-accent">{copied ? "Copied ✓" : "Tap to copy address"}</span>
         </button>
       </div>
 
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          onClick={buyWithCard}
+          className="rounded-full bg-surface-raised px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
+        >
+          Buy {chain.quote.symbol} with card
+        </button>
+        <span className="text-xs text-muted">Card, exchange, or crypto from another chain — provider fees apply.</span>
+      </div>
+      {cardError && <p className="pt-2 text-xs text-negative">{cardError}</p>}
+
       <p className="pt-3 text-xs text-muted">
-        <span className="text-foreground">Base only.</span>{" "}
-        Funds sent on any other network won&apos;t arrive. Buying with a card can&apos;t
-        deliver to Base yet — the Robinhood app is the simplest way in.
+        <span className="text-foreground">{chain.chain.name} only for this address.</span> Same address on both
+        networks, but funds sent on any other network won&apos;t arrive here.
       </p>
     </div>
   );
@@ -84,7 +138,7 @@ function Dashboard() {
   return (
     <div className="animate-rise">
       <section className="py-8">
-        <p className="text-sm text-muted">Cash available (USDC)</p>
+        <p className="text-sm text-muted">Cash available (USDC on Base)</p>
         <p className="py-1 text-5xl font-bold tracking-tight">
           {isLoading || !balance ? "—" : fmtUsd(balance.formatted)}
         </p>
@@ -95,7 +149,7 @@ function Dashboard() {
         )}
         {ethBalance && ethBalance.raw > 0n && (
           <p className="text-sm text-muted">
-            + {fmtAmount(ethBalance.formatted, 5)} ETH for network fees
+            + {fmtAmount(ethBalance.formatted, 5)} ETH on Base for network fees
           </p>
         )}
         {assetBalances && assetBalances.length > 0 && (
