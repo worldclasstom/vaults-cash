@@ -1,5 +1,8 @@
 "use client";
 
+import type { MarketStats } from "@/app/api/stats/route";
+import { fmtUsd } from "@/lib/format";
+import { poolIdle } from "@/lib/limits";
 import { useState } from "react";
 import { chainConfig } from "@/lib/chain";
 import type { Market, TokenInfo } from "@/lib/markets";
@@ -76,14 +79,33 @@ export function Chip({
 
 /** The standard chip row for a market: fee tier, chain, and what kind of
  *  pair it is in plain words. */
-export function MarketChips({ market, chain = true }: { market: Market; chain?: boolean }) {
+export function MarketChips({
+  market,
+  chain = true,
+  stats,
+}: {
+  market: Market;
+  chain?: boolean;
+  /** when known, an idle pool (no trades in 24h) is badged and loses its
+   *  Steady tag — deep but dead liquidity earns nothing */
+  stats?: MarketStats;
+}) {
+  const idle = poolIdle(stats);
+  // Steady is a promise about price risk, not about earning — but a dead
+  // pool that "barely changes what you hold" and pays nothing is just dead
+  const steady = market.lowIl && !idle && !(stats !== undefined && stats.estAprPct < 0.005);
   return (
     <span className="flex flex-wrap items-center gap-1">
       <Chip title="Share of every trade that LPs earn">{market.pool.fee / 10_000}% fee</Chip>
       {chain && <Chip tone="outline">{chainConfig(market.chainId).label}</Chip>}
-      {market.lowIl && (
+      {steady && (
         <Chip tone="accent" title="Both sides track the same thing, so price swings barely change what you hold">
           Steady
+        </Chip>
+      )}
+      {idle && (
+        <Chip tone="negative" title="Almost nothing traded here in the last 24 hours, so it paid LPs next to nothing">
+          {stats!.vol24hUsd === 0 ? "No trades in 24h" : `Only ${fmtUsd(stats!.vol24hUsd)} traded in 24h`}
         </Chip>
       )}
       {market.kind === "stock" && <Chip>Stock token</Chip>}

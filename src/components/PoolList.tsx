@@ -155,7 +155,7 @@ function PoolRow({ q, s }: { q: MarketQuote; s?: MarketStats }) {
             <span className="truncate font-semibold">
               {m.base.symbol} <span className="text-muted">/</span> {m.quote.symbol}
             </span>
-            <MarketChips market={m} />
+            <MarketChips market={m} stats={s} />
           </span>
         </span>
         {/* mobile: name + chips in the middle column */}
@@ -163,7 +163,7 @@ function PoolRow({ q, s }: { q: MarketQuote; s?: MarketStats }) {
           <span className="truncate font-semibold">
             {m.base.symbol} <span className="text-muted">/</span> {m.quote.symbol}
           </span>
-          <MarketChips market={m} />
+          <MarketChips market={m} stats={s} />
           <span className="pt-1 text-xs text-muted">
             {s ? `${fmtUsd(s.tvlUsd, { compact: true })} liquidity` : `$${fmtPrice(priceUsd)}`}
           </span>

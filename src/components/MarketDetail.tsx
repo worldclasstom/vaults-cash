@@ -14,6 +14,7 @@ import { PERMIT2, contractsOf } from "@/lib/uniswap";
 import { planSummary, presetTicks, PRESET_WIDTH, type RangePreset, type ZapPlan } from "@/lib/zap";
 import { tickToPrice } from "@/lib/onchain";
 import { MarketChips, PairIcons } from "./TokenIcon";
+import { MIN_DEPOSIT_USD, poolIdle } from "@/lib/limits";
 import { RangeBar } from "./RangeBar";
 import { useStats } from "./PoolList";
 
@@ -47,6 +48,8 @@ export function MarketDetail({ slug }: { slug: string }) {
   const s = stats?.[market.slug];
   const amountNum = Number(amount) || 0;
   const insufficient = balance !== undefined && amountNum > (balance?.formatted ?? 0);
+  const belowMin = amountNum > 0 && amountNum < MIN_DEPOSIT_USD;
+  const idle = poolIdle(s);
   const tooThin = s !== undefined && s.tvlUsd > 0 && amountNum > s.tvlUsd * 0.1;
   const noGas = ethBalance !== undefined && ethBalance.raw === 0n;
   const customWidth = advanced && customWidthPct ? Number(customWidthPct) / 100 : undefined;
@@ -93,7 +96,7 @@ export function MarketDetail({ slug }: { slug: string }) {
                 {market.base.name} · {market.quote.name}
               </p>
               <div className="pt-1.5">
-                <MarketChips market={market} />
+                <MarketChips market={market} stats={s} />
               </div>
             </div>
           </div>
@@ -138,7 +141,9 @@ export function MarketDetail({ slug }: { slug: string }) {
                 Max
               </button>
             </div>
-            <p className="pb-4 text-xs text-muted">Available: {balance ? fmtUsd(balance.formatted) : "—"}</p>
+            <p className="pb-4 text-xs text-muted">
+              Minimum {fmtUsd(MIN_DEPOSIT_USD)} · Available: {balance ? fmtUsd(balance.formatted) : "—"}
+            </p>
 
             <p className="pb-2 text-sm font-semibold">Price range</p>
             <div className="grid grid-cols-3 gap-2">
@@ -199,6 +204,13 @@ export function MarketDetail({ slug }: { slug: string }) {
                 {chain.chain.name} (about $1 covers many transactions) — see Add funds on the home screen.
               </p>
             )}
+            {idle && (
+              <p className="mt-3 text-xs text-negative">
+                {s && s.vol24hUsd > 0 ? `Only ${fmtUsd(s.vol24hUsd)} traded` : "Nobody has traded"} in this pool in the last 24
+                hours, so right now it earns next to nothing. It still holds{" "}
+                {s ? fmtUsd(s.tvlUsd, { compact: true }) : "plenty"} of liquidity — a busier pool will pay more.
+              </p>
+            )}
             {tooThin && (
               <p className="mt-3 text-xs text-negative">
                 This pool is still small — a deposit this size may move the price. Consider{" "}
@@ -207,11 +219,15 @@ export function MarketDetail({ slug }: { slug: string }) {
             )}
 
             <button
-              disabled={amountNum <= 0 || insufficient || planMutation.isPending}
+              disabled={amountNum <= 0 || belowMin || insufficient || planMutation.isPending}
               onClick={buildPlan}
               className="mt-4 w-full rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {insufficient ? `Insufficient ${stable.symbol}` : planMutation.isPending ? "Getting quote…" : "Review deposit"}
+              {insufficient
+                ? `Insufficient ${stable.symbol}`
+                : belowMin
+                  ? `Minimum ${fmtUsd(MIN_DEPOSIT_USD)}`
+                  : planMutation.isPending ? "Getting quote…" : "Review deposit"}
             </button>
             {planMutation.isError && (
               <p className="mt-2 text-xs text-negative">

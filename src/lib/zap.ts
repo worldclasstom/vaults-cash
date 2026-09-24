@@ -23,6 +23,7 @@ import { Ether, Percent, Token, type Currency } from "@uniswap/sdk-core";
 import { Pool, Position, V4PositionManager } from "@uniswap/v4-sdk";
 import { CHAINS } from "./chain";
 import { REFERRER_SHARE } from "./referral-share";
+import { MIN_DEPOSIT_USD } from "./limits";
 import { NATIVE_ETH, quoteUsdMarket, type Market, type TokenInfo } from "./markets";
 import type { PoolState } from "./onchain";
 import { getPoolState, tickToPrice } from "./onchain";
@@ -178,7 +179,11 @@ export async function buildZapPlan(params: {
   referrer?: `0x${string}` | null;
 }): Promise<ZapPlan> {
   const { market, owner, usdcAmount, preset, customWidth, slippageBps, poolState, addTo, referrer } = params;
-  const stable = CHAINS[market.chainId].quote.address;
+  const quoteToken = CHAINS[market.chainId].quote;
+  const stable = quoteToken.address;
+  if (usdcAmount < BigInt(MIN_DEPOSIT_USD) * 10n ** BigInt(quoteToken.decimals)) {
+    throw new Error(`Minimum deposit is $${MIN_DEPOSIT_USD}`);
+  }
   const { posm, router } = contractsOf(market);
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
