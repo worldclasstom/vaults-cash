@@ -193,14 +193,23 @@ export async function buildZapPlan(params: {
     calls.push(permit2Approve(market.token, posm, deadline));
   }
 
-  // 5. mint — sized from guaranteed amounts (swapOutMin + kept USDC)
+  // 5. mint — sized from guaranteed amounts (swapOutMin + kept USDC).
+  // Native ETH: the only ETH the wallet holds at this point is the swap
+  // output (≥ swapOutMin), but the SDK's `value` is amount0Max — the
+  // slippage-widened bound, several % above swapOutMin for a concentrated
+  // range — and sending it reverts. So send exactly the guaranteed amount
+  // and size the mint 1% under it, so a small adverse move between quote and
+  // inclusion still fits; the sliver left over stays in the wallet as ETH
+  // (a gas reserve on chains without a paymaster).
+  const nativeIn = market.token === NATIVE_ETH;
+  const assetForMint = nativeIn ? (swapOutMin * 99n) / 100n : swapOutMin;
   const pool = buildPool(market, poolState.sqrtPriceX96, poolState.tick, poolState.liquidity);
   const position = Position.fromAmounts({
     pool,
     tickLower,
     tickUpper,
-    amount0: (market.assetIsCurrency0 ? swapOutMin : usdcToPosition).toString(),
-    amount1: (market.assetIsCurrency0 ? usdcToPosition : swapOutMin).toString(),
+    amount0: (market.assetIsCurrency0 ? assetForMint : usdcToPosition).toString(),
+    amount1: (market.assetIsCurrency0 ? usdcToPosition : assetForMint).toString(),
     useFullPrecision: true,
   });
   const common = {
@@ -214,7 +223,8 @@ export async function buildZapPlan(params: {
     position,
     addTo ? { ...common, tokenId: addTo.tokenId.toString() } : { ...common, recipient: owner },
   );
-  calls.push({ to: posm, value: BigInt(value), data: calldata as `0x${string}` });
+  const mintValue = nativeIn && BigInt(value) > swapOutMin ? swapOutMin : BigInt(value);
+  calls.push({ to: posm, value: mintValue, data: calldata as `0x${string}` });
 
   // platform fee LAST: in the atomic path order is irrelevant, and in the
   // sequential fallback the fee is only charged once the position exists
