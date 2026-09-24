@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { AgentError, requireOwner } from "@/lib/agent";
-import { getPoolState, tickToUsdcPrice } from "@/lib/onchain";
+import { getMarketPricing } from "@/lib/onchain";
 import { fetchPositions } from "@/lib/positions";
 
 /** GET /api/agent/positions?owner=0x… — live LP positions for a wallet. */
@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const positions = await fetchPositions(owner);
     const views = await Promise.all(
       positions.map(async (p) => {
-        const state = await getPoolState(p.market);
+        const { state, price, quoteUsd, priceUsd } = await getMarketPricing(p.market);
         return {
           tokenId: p.tokenId.toString(),
           market: p.market.slug,
@@ -20,7 +20,9 @@ export async function GET(req: NextRequest) {
           liquidity: p.liquidity.toString(),
           inRange: state.tick >= p.tickLower && state.tick < p.tickUpper,
           currentTick: state.tick,
-          priceUsdc: tickToUsdcPrice(p.market, state.tick),
+          price,
+          quoteUsd,
+          priceUsd,
         };
       }),
     );

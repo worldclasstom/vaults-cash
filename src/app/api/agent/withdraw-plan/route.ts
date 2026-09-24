@@ -32,9 +32,10 @@ export async function POST(req: NextRequest) {
       quote: position.market.quote.symbol,
       calls: serializeCalls(plan.calls),
       summary: {
-        minAssetOut: plan.assetOutMin.toString(),
-        minUsdcFromSwap: plan.usdcOutMin.toString(),
-        feeUsdc: plan.feeAmount.toString(),
+        minBaseOut: plan.baseOutMin.toString(),
+        minQuoteOut: plan.quoteOutMin.toString(),
+        minStableOut: plan.stableOutMin.toString(),
+        fee: plan.feeAmount.toString(),
       },
       docs: AGENT_DOCS,
     });

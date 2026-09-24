@@ -52,7 +52,7 @@ function AccountIcon({ active }: { active: boolean }) {
 }
 
 const TABS = [
-  { href: "/", label: "Markets", Icon: MarketsIcon },
+  { href: "/", label: "Pools", Icon: MarketsIcon },
   { href: "/portfolio", label: "Portfolio", Icon: PortfolioIcon },
   { href: "/account", label: "Account", Icon: AccountIcon },
 ] as const;
@@ -106,14 +106,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-xl grow flex-col px-4 pb-24 md:pb-12">
+    <div className="mx-auto flex w-full max-w-3xl grow flex-col px-4 pb-24 md:pb-12">
       <header className="flex items-center justify-between py-5">
         <Link href="/" aria-label="vaults.cash home">
           <Wordmark />
         </Link>
         {authenticated && (
           <nav className="hidden items-center gap-1 md:flex">
-            {tab("/", "Markets")}
+            {tab("/", "Pools")}
             {tab("/portfolio", "Portfolio")}
             {tab("/account", "Account")}
           </nav>

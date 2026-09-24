@@ -1,32 +1,36 @@
 /**
- * Withdraw: burn the v4 position, swap the asset side back to USDC (with the
- * platform fee skimmed from the swap output), leaving the user all-USDC.
- * Built as one atomic batch like the deposit zap.
+ * Withdraw: burn the v4 position, swap the base leg back to the quote through
+ * the market's pool, then (when the quote isn't the stablecoin) swap the
+ * whole quote leg to the stablecoin through the quote's own pool, with the
+ * platform fee skimmed from the final stablecoin output. Built as one atomic
+ * batch like the deposit zap; the user ends up all-stablecoin.
  */
 import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
 import { Percent } from "@uniswap/sdk-core";
 import { Position, V4PositionManager } from "@uniswap/v4-sdk";
-import { NATIVE_ETH } from "./markets";
+import { CHAINS } from "./chain";
+import { quoteUsdMarket } from "./markets";
 import { getPoolState } from "./onchain";
 import { buildPool } from "./zap";
-import {
-  buildSwapCall,
-  contractsOf,
-  erc20Approve,
-  permit2Approve,
-  quoteAssetToUsdc,
-  PERMIT2,
-  type Call,
-} from "./uniswap";
+import { approvalsFor, buildSwapCall, contractsOf, quoteBaseToQuote, type Call } from "./uniswap";
 import type { OwnedPosition } from "./positions";
 
 export type WithdrawPlan = {
   chainId: number;
   calls: Call[];
+  /** guaranteed base out of the burn */
+  baseOutMin: bigint;
+  /** guaranteed quote units after the burn + base→quote swap */
+  quoteOutMin: bigint;
+  /** guaranteed stablecoin the user ends with (before fee) */
+  stableOutMin: bigint;
+  feeAmount: bigint;
+  // aliases
   assetOutMin: bigint;
   usdcOutMin: bigint;
-  feeAmount: bigint;
 };
+
+const bpsMul = (x: bigint, bps: bigint) => (x * bps) / 10_000n;
 
 export async function buildWithdrawPlan(params: {
   position: OwnedPosition;
@@ -34,11 +38,13 @@ export async function buildWithdrawPlan(params: {
 }): Promise<WithdrawPlan> {
   const { position, slippageBps } = params;
   const market = position.market;
+  const stable = CHAINS[market.chainId].quote.address;
   const { router, posm } = contractsOf(market);
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 20 * 60);
   const slippage = new Percent(slippageBps, 10_000);
+  const keep = BigInt(10_000 - slippageBps);
 
   const poolState = await getPoolState(market);
   const pool = buildPool(market, poolState.sqrtPriceX96, poolState.tick, poolState.liquidity);
@@ -61,49 +67,54 @@ export async function buildWithdrawPlan(params: {
   });
   calls.push({ to: posm, value: BigInt(value), data: calldata as `0x${string}` });
 
-  // guaranteed minimums out of the burn; the asset side depends on sort order
+  // guaranteed minimums out of the burn, per sort order
   const { amount0: min0, amount1: min1 } = sdkPosition.burnAmountsWithSlippage(slippage);
-  const assetOutMin = BigInt(
-    (market.assetIsCurrency0 ? min0 : min1).toString(),
-  );
+  const baseOutMin = BigInt((market.baseIsCurrency0 ? min0 : min1).toString());
+  let quoteOutMin = BigInt((market.baseIsCurrency0 ? min1 : min0).toString());
 
-  // 2. swap the asset side back to USDC (skip if out-of-range all-USDC)
-  let usdcOutMin = 0n;
+  // 2. base → quote through the market pool (skip if out-of-range all-quote)
+  if (baseOutMin > 0n) {
+    const { amountOut } = await quoteBaseToQuote(market, baseOutMin);
+    const minOut = bpsMul(amountOut, keep);
+    calls.push(...approvalsFor(market.base.address, router, deadline));
+    calls.push(buildSwapCall({ market, direction: "baseToQuote", amountIn: baseOutMin, minAmountOut: minOut, deadline }));
+    quoteOutMin += minOut;
+  }
+
+  // 3. quote → stablecoin when the quote isn't the stablecoin
+  let stableOutMin = quoteOutMin;
+  const qm = quoteUsdMarket(market);
+  if (qm && quoteOutMin > 0n) {
+    const { amountOut } = await quoteBaseToQuote(qm, quoteOutMin); // qm.base === market.quote
+    stableOutMin = bpsMul(amountOut, keep);
+    calls.push(...approvalsFor(market.quote.address, router, deadline));
+    calls.push(buildSwapCall({ market: qm, direction: "baseToQuote", amountIn: quoteOutMin, minAmountOut: stableOutMin, deadline }));
+  }
+
+  // 4. platform fee on the converted output only
   let feeAmount = 0n;
-  if (assetOutMin > 0n) {
-    const { amountOut } = await quoteAssetToUsdc(market, assetOutMin);
-    usdcOutMin = (amountOut * BigInt(10_000 - slippageBps)) / 10_000n;
-
-    if (market.token !== NATIVE_ETH) {
-      calls.push(erc20Approve(market.token, PERMIT2));
-      calls.push(permit2Approve(market.token, router, deadline));
-    }
-    calls.push(
-      buildSwapCall({
-        market,
-        direction: "assetToUsdc",
-        amountIn: assetOutMin,
-        minAmountOut: usdcOutMin,
-        deadline,
-      }),
-    );
-
-    // 3. platform fee on the swapped output
-    feeAmount = (usdcOutMin * feeBps) / 10_000n;
+  const converted = qm ? stableOutMin : stableOutMin - (market.baseIsCurrency0 ? BigInt(min1.toString()) : BigInt(min0.toString()));
+  if (converted > 0n) {
+    feeAmount = bpsMul(converted, feeBps);
     if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
       calls.push({
-        to: market.quote.address,
+        to: stable,
         value: 0n,
-        data: encodeFunctionData({
-          abi: erc20Abi,
-          functionName: "transfer",
-          args: [feeRecipient, feeAmount],
-        }),
+        data: encodeFunctionData({ abi: erc20Abi, functionName: "transfer", args: [feeRecipient, feeAmount] }),
       });
     }
   }
 
-  return { chainId: market.chainId, calls, assetOutMin, usdcOutMin, feeAmount };
+  return {
+    chainId: market.chainId,
+    calls,
+    baseOutMin,
+    quoteOutMin,
+    stableOutMin,
+    feeAmount,
+    assetOutMin: baseOutMin,
+    usdcOutMin: stableOutMin,
+  };
 }
 
 /** Collect accrued fees without touching principal. */

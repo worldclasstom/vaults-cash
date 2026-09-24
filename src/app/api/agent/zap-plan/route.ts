@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { parseUnits } from "viem";
 import { AGENT_DOCS, AgentError, requireMarket, requireOwner, serializeCalls } from "@/lib/agent";
+import { CHAINS } from "@/lib/chain";
 import { getPoolState } from "@/lib/onchain";
 import { buildZapPlan, type RangePreset } from "@/lib/zap";
 
@@ -27,11 +28,12 @@ export async function POST(req: NextRequest) {
     if (!Number.isInteger(slippageBps) || slippageBps < 10 || slippageBps > 1000)
       throw new AgentError(400, "slippageBps must be an integer between 10 and 1000");
 
+    const stable = CHAINS[market.chainId].quote;
     const poolState = await getPoolState(market);
     const plan = await buildZapPlan({
       market,
       owner,
-      usdcAmount: parseUnits(amountUsd.toFixed(market.quote.decimals), market.quote.decimals),
+      usdcAmount: parseUnits(amountUsd.toFixed(stable.decimals), stable.decimals),
       preset,
       customWidth: body.widthPct !== undefined ? Number(body.widthPct) / 100 : undefined,
       slippageBps,
@@ -41,13 +43,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       chainId: plan.chainId,
       market: market.slug,
-      quote: market.quote.symbol,
+      stablecoin: stable.symbol,
       calls: serializeCalls(plan.calls),
       summary: {
-        feeUsdc: plan.feeAmount.toString(),
-        swapInUsdc: plan.swapIn.toString(),
-        minAssetOut: plan.swapOutMin.toString(),
-        usdcToPosition: plan.usdcToPosition.toString(),
+        fee: plan.feeAmount.toString(),
+        quoteLeg: plan.quoteLeg ? { stableIn: plan.quoteLeg.stableIn.toString(), quoteOutMin: plan.quoteLeg.quoteOutMin.toString() } : null,
+        swapInQuote: plan.swapIn.toString(),
+        minBaseOut: plan.swapOutMin.toString(),
+        quoteToPosition: plan.quoteToPosition.toString(),
+        priceUsd: plan.price * plan.quoteUsd,
         tickLower: plan.tickLower,
         tickUpper: plan.tickUpper,
       },

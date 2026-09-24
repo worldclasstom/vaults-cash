@@ -11,8 +11,8 @@ import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
 import { erc20Abi, formatEther, formatUnits, isAddress, parseUnits } from "viem";
 import { CHAINS, CHAIN_IDS } from "@/lib/chain";
-import { MARKETS, NATIVE_ETH, marketBySymbol, marketsOnChain } from "@/lib/markets";
-import { getPoolState, publicClientFor, tickToUsdcPrice } from "@/lib/onchain";
+import { MARKETS, NATIVE_ETH, marketBySlug, marketsOnChain } from "@/lib/markets";
+import { getMarketPricing, getPoolState, publicClientFor } from "@/lib/onchain";
 import { fetchPositions, getUncollectedFees } from "@/lib/positions";
 import { buildZapPlan } from "@/lib/zap";
 import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
@@ -28,7 +28,7 @@ const ownerSchema = z
 
 const marketSchema = z
   .string()
-  .refine((s) => !!marketBySymbol(s), `one of: ${MARKETS.map((m) => m.slug).join(", ")}`);
+  .refine((s) => !!marketBySlug(s), `one of: ${MARKETS.map((m) => m.slug).join(", ")}`);
 
 const chainSummary = CHAIN_IDS.map((id) => `${CHAINS[id].chain.name} (chain ${id}, deposits in ${CHAINS[id].quote.symbol})`).join(" and ");
 
@@ -36,22 +36,25 @@ const handler = createMcpHandler(
   (server) => {
     server.tool(
       "list_markets",
-      `List all vaults.cash markets across ${chainSummary} with live mid-prices and pool parameters. Markets are identified by slug (e.g. "eth" = ETH on Base, "eth-robinhood" = ETH on Robinhood Chain). All markets are crypto paired against the chain's dollar stablecoin; kind=stable marks stablecoin-correlated pairs with minimal impermanent loss.`,
+      `List all vaults.cash markets (Uniswap v4 pools) across ${chainSummary}. Markets are pairs identified by slug "<chain>/<base>-<quote>" (e.g. "base/eth-usdc", "base/cbbtc-eth", "robinhood/tsla-eth"); deposits and withdrawals are always in the chain's stablecoin regardless of the quote. lowIl=true pairs track the same thing on both legs (minimal impermanent loss).`,
       {},
       async () => {
         const settled = await Promise.allSettled(
           MARKETS.map(async (m) => {
-            const s = await getPoolState(m);
+            const { state, price, quoteUsd, priceUsd } = await getMarketPricing(m);
             return {
               market: m.slug,
-              symbol: m.symbol,
-              name: m.name,
+              pair: m.name,
               chainId: m.chainId,
+              base: m.base.symbol,
               quote: m.quote.symbol,
               kind: m.kind,
-              priceUsdc: tickToUsdcPrice(m, s.tick),
+              lowIl: m.lowIl,
+              price,
+              quoteUsd,
+              priceUsd,
               poolFeeBps: m.pool.fee / 100,
-              poolLiquidity: s.liquidity.toString(),
+              poolLiquidity: state.liquidity.toString(),
             };
           }),
         );
@@ -80,10 +83,10 @@ const handler = createMcpHandler(
             const assets: Record<string, string> = {};
             await Promise.all(
               marketsOnChain(chainId)
-                .filter((m) => m.token !== NATIVE_ETH)
+                .filter((m) => m.base.address !== NATIVE_ETH)
                 .map(async (m) => {
-                  const bal = await client.readContract({ address: m.token, abi: erc20Abi, functionName: "balanceOf", args: [addr] });
-                  if (bal > 0n) assets[m.symbol] = formatUnits(bal, m.tokenDecimals);
+                  const bal = await client.readContract({ address: m.base.address, abi: erc20Abi, functionName: "balanceOf", args: [addr] });
+                  if (bal > 0n) assets[m.base.symbol] = formatUnits(bal, m.base.decimals);
                 }),
             );
             return {
@@ -113,13 +116,13 @@ const handler = createMcpHandler(
         preset: z.enum(["full", "balanced", "aggressive"]).default("full"),
       },
       async ({ market: sym, amountUsd, preset }) => {
-        const market = marketBySymbol(sym)!;
-        const d = market.quote.decimals;
+        const market = marketBySlug(sym)!;
+        const stable = CHAINS[market.chainId].quote;
         const poolState = await getPoolState(market);
         const plan = await buildZapPlan({
           market,
           owner: "0x1111111111111111111111111111111111111111",
-          usdcAmount: parseUnits(amountUsd.toFixed(d), d),
+          usdcAmount: parseUnits(amountUsd.toFixed(stable.decimals), stable.decimals),
           preset,
           slippageBps: 100,
           poolState,
@@ -127,12 +130,13 @@ const handler = createMcpHandler(
         return json({
           market: market.slug,
           chainId: market.chainId,
-          quote: market.quote.symbol,
-          priceUsdc: tickToUsdcPrice(market, poolState.tick),
-          feeUsdc: formatUnits(plan.feeAmount, d),
-          swapInUsdc: formatUnits(plan.swapIn, d),
-          minAssetOut: formatUnits(plan.swapOutMin, market.tokenDecimals),
-          usdcKept: formatUnits(plan.usdcToPosition, d),
+          stablecoin: stable.symbol,
+          priceUsd: plan.price * plan.quoteUsd,
+          fee: formatUnits(plan.feeAmount, stable.decimals),
+          quoteLeg: plan.quoteLeg ? `${formatUnits(plan.quoteLeg.stableIn, stable.decimals)} ${stable.symbol} -> ≥${formatUnits(plan.quoteLeg.quoteOutMin, market.quote.decimals)} ${market.quote.symbol}` : null,
+          swapInQuote: `${formatUnits(plan.swapIn, market.quote.decimals)} ${market.quote.symbol}`,
+          minBaseOut: `${formatUnits(plan.swapOutMin, market.base.decimals)} ${market.base.symbol}`,
+          quoteToPosition: `${formatUnits(plan.quoteToPosition, market.quote.decimals)} ${market.quote.symbol}`,
           tickLower: plan.tickLower,
           tickUpper: plan.tickUpper,
         });
@@ -141,7 +145,7 @@ const handler = createMcpHandler(
 
     server.tool(
       "build_deposit_calls",
-      "Build the executable call batch converting `amountUsd` of the owner's stablecoin (USDC on Base, USDG on Robinhood Chain) into a Uniswap v4 LP position owned by them. Execute the calls IN ORDER from the owner wallet on the returned chainId (atomically if it supports batching). Includes the 0.6% vaults.cash fee. Calls embed slippage bounds and expire ~20 minutes after building.",
+      "Build the executable call batch converting `amountUsd` of the owner's stablecoin (USDC on Base, USDG on Robinhood Chain) into a Uniswap v4 LP position in the given pair, owned by them. Execute the calls IN ORDER from the owner wallet on the returned chainId (atomically if it supports batching). Includes the 0.6% vaults.cash fee. Calls embed slippage bounds and expire ~20 minutes after building.",
       {
         market: marketSchema,
         amountUsd: z.number().positive(),
@@ -150,13 +154,13 @@ const handler = createMcpHandler(
         slippageBps: z.number().int().min(10).max(1000).default(100),
       },
       async ({ market: sym, amountUsd, owner, preset, slippageBps }) => {
-        const market = marketBySymbol(sym)!;
-        const d = market.quote.decimals;
+        const market = marketBySlug(sym)!;
+        const stable = CHAINS[market.chainId].quote;
         const poolState = await getPoolState(market);
         const plan = await buildZapPlan({
           market,
           owner: owner as `0x${string}`,
-          usdcAmount: parseUnits(amountUsd.toFixed(d), d),
+          usdcAmount: parseUnits(amountUsd.toFixed(stable.decimals), stable.decimals),
           preset,
           slippageBps,
           poolState,
@@ -166,9 +170,9 @@ const handler = createMcpHandler(
           market: market.slug,
           calls: serializeCalls(plan.calls),
           summary: {
-            feeUsdc: formatUnits(plan.feeAmount, d),
-            minAssetOut: formatUnits(plan.swapOutMin, market.tokenDecimals),
-            usdcToPosition: formatUnits(plan.usdcToPosition, d),
+            fee: `${formatUnits(plan.feeAmount, stable.decimals)} ${stable.symbol}`,
+            minBaseOut: `${formatUnits(plan.swapOutMin, market.base.decimals)} ${market.base.symbol}`,
+            quoteToPosition: `${formatUnits(plan.quoteToPosition, market.quote.decimals)} ${market.quote.symbol}`,
             range: [plan.tickLower, plan.tickUpper],
           },
           docs: AGENT_DOCS,
@@ -184,14 +188,13 @@ const handler = createMcpHandler(
         const positions = await fetchPositions(owner as `0x${string}`);
         const views = await Promise.all(
           positions.map(async (p) => {
-            const [state, fees] = await Promise.all([
-              getPoolState(p.market),
+            const [{ state, price, quoteUsd, priceUsd }, fees] = await Promise.all([
+              getMarketPricing(p.market),
               getUncollectedFees(p).catch(() => ({ owed0: 0n, owed1: 0n })),
             ]);
-            const price = tickToUsdcPrice(p.market, state.tick);
-            const c0 = p.market.assetIsCurrency0;
-            const assetOwed = c0 ? fees.owed0 : fees.owed1;
-            const usdcOwed = c0 ? fees.owed1 : fees.owed0;
+            const c0 = p.market.baseIsCurrency0;
+            const baseOwed = Number(c0 ? fees.owed0 : fees.owed1) / 10 ** p.market.base.decimals;
+            const quoteOwed = Number(c0 ? fees.owed1 : fees.owed0) / 10 ** p.market.quote.decimals;
             return {
               tokenId: p.tokenId.toString(),
               market: p.market.slug,
@@ -199,10 +202,10 @@ const handler = createMcpHandler(
               inRange: state.tick >= p.tickLower && state.tick < p.tickUpper,
               tickRange: [p.tickLower, p.tickUpper],
               currentTick: state.tick,
-              priceUsdc: price,
-              uncollectedFeesUsd:
-                (Number(assetOwed) / 10 ** p.market.tokenDecimals) * price +
-                Number(usdcOwed) / 10 ** p.market.quote.decimals,
+              price,
+              quoteUsd,
+              priceUsd,
+              uncollectedFeesUsd: (baseOwed * price + quoteOwed) * quoteUsd,
             };
           }),
         );
@@ -212,7 +215,7 @@ const handler = createMcpHandler(
 
     server.tool(
       "build_withdraw_calls",
-      "Build the executable call batch that burns a position (auto-collecting accrued fees) and swaps the asset side back to the chain's stablecoin. The 0.6% fee applies to the swapped output only. Execute on the returned chainId.",
+      "Build the executable call batch that burns a position (auto-collecting accrued fees) and converts everything back to the chain's stablecoin (through the quote leg's stablecoin pool when needed). The 0.6% fee applies to the converted output. Execute on the returned chainId.",
       {
         owner: ownerSchema,
         tokenId: z.string().regex(/^\d+$/),
@@ -226,14 +229,14 @@ const handler = createMcpHandler(
         );
         if (!position) return json({ error: `no live position ${tokenId} owned by ${owner}` });
         const plan = await buildWithdrawPlan({ position, slippageBps });
-        const d = position.market.quote.decimals;
+        const stable = CHAINS[position.market.chainId].quote;
         return json({
           chainId: plan.chainId,
           market: position.market.slug,
           calls: serializeCalls(plan.calls),
           summary: {
-            minUsdcFromSwap: formatUnits(plan.usdcOutMin, d),
-            feeUsdc: formatUnits(plan.feeAmount, d),
+            minStableOut: `${formatUnits(plan.stableOutMin, stable.decimals)} ${stable.symbol}`,
+            fee: `${formatUnits(plan.feeAmount, stable.decimals)} ${stable.symbol}`,
           },
           docs: AGENT_DOCS,
         });

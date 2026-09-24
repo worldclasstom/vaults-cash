@@ -27,8 +27,12 @@ Execute calls IN ORDER from `owner`; batch atomically if the wallet supports it
 ## Important
 
 - Chains: Base (id 8453, deposits in USDC) and Robinhood Chain (id 4663,
-  deposits in USDG). Gas is ETH on both. Markets are identified by slug
-  ("base/eth", "robinhood/tsla"); every plan returns the chainId to execute on.
+  deposits in USDG). Gas is ETH on both. Markets are Uniswap v4 pools
+  identified by pair slug "<chain>/<base>-<quote>" ("base/eth-usdc",
+  "base/cbbtc-eth", "robinhood/tsla-eth"); a bare token means its stablecoin
+  pair on Base. Deposits/withdrawals are always in the chain's stablecoin;
+  non-stablecoin quotes are converted through the quote's own pool. Every
+  plan returns the chainId to execute on.
 - kind=stock markets are Robinhood-issued tokens tracking US equities/ETFs on
   Robinhood Chain; availability depends on the party's jurisdiction.
 - LP positions carry impermanent-loss risk and can go out of range.

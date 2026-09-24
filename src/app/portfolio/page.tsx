@@ -5,11 +5,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { RangeBar } from "@/components/RangeBar";
+import { Chip, MarketChips, PairIcons } from "@/components/TokenIcon";
 import { usePlanAdd, useSendDeposit } from "@/hooks/useDeposit";
 import { useCollect, usePositions, useWithdraw, type PositionView } from "@/hooks/usePositions";
 import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
+import { CHAINS } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
-import { shareAmount } from "@/lib/markets";
+import { shareAmount, sharePrice } from "@/lib/markets";
+import { tickToPrice } from "@/lib/onchain";
 import { planSummary } from "@/lib/zap";
 
 /** don't offer collection below this — it wouldn't meaningfully beat gas */
@@ -17,6 +21,7 @@ const MIN_COLLECT_USD = 0.05;
 
 function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
   const { data: balance } = useQuoteBalance(p.market.chainId);
+  const stable = CHAINS[p.market.chainId].quote;
   const [amount, setAmount] = useState("");
   const plan = usePlanAdd();
   const send = useSendDeposit();
@@ -28,9 +33,7 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
     return (
       <div className="mt-3 rounded-2xl bg-surface-raised p-4 text-sm">
         <p className="font-semibold text-accent">Added ✓</p>
-        <p className="pt-1 text-muted">
-          Your position will reflect it in a few seconds.
-        </p>
+        <p className="pt-1 text-muted">Your position will reflect it in a few seconds.</p>
         <button
           onClick={onClose}
           className="mt-3 rounded-full bg-surface px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
@@ -42,19 +45,18 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
   }
 
   if (plan.isSuccess) {
-    const s = planSummary(plan.data, p.price, p.market.tokenDecimals);
+    const s = planSummary(plan.data, p.market);
     return (
       <div className="mt-3 rounded-2xl bg-surface-raised p-4 text-sm">
         <p className="font-semibold">Confirm add</p>
         <p className="pt-1 text-muted">
-          {fmtUsd(amountNum)} → ~{fmtUsd(s.assetUsd)} {p.market.symbol} + ~
-          {fmtUsd(s.usdcUsd)} USDC into this position&apos;s existing range.
-          Fee {fmtUsd(s.feeUsd)}.
+          {fmtUsd(amountNum)} → ~{fmtUsd(s.baseUsd)} {p.market.base.symbol} + ~{fmtUsd(s.quoteUsd)} {p.market.quote.symbol} into
+          this position&apos;s existing range. Fee {fmtUsd(s.feeUsd)}.
         </p>
         {!p.inRange && (
           <p className="pt-1 text-xs text-muted">
-            This position is out of range, so the whole amount converts to one
-            side and won&apos;t earn until price returns to the range.
+            This position is out of range, so the whole amount converts to one side and won&apos;t earn until price
+            returns to the range.
           </p>
         )}
         <div className="mt-3 flex gap-2">
@@ -73,9 +75,7 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
             {send.isPending ? "Adding…" : "Add"}
           </button>
         </div>
-        {send.isError && (
-          <p className="pt-2 text-xs text-negative">{(send.error as Error).message}</p>
-        )}
+        {send.isError && <p className="pt-2 text-xs text-negative">{(send.error as Error).message}</p>}
       </div>
     );
   }
@@ -99,29 +99,22 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
         </button>
       </div>
       <p className="pt-1 text-xs text-muted">
-        Available: {balance ? fmtUsd(balance.formatted) : "—"} {p.market.quote.symbol}
+        Available: {balance ? fmtUsd(balance.formatted) : "—"} {stable.symbol}
         {insufficient && <span className="text-negative"> — not enough</span>}
       </p>
       <div className="mt-3 flex gap-2">
-        <button
-          onClick={onClose}
-          className="rounded-full bg-surface px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline"
-        >
+        <button onClick={onClose} className="rounded-full bg-surface px-5 py-2 text-sm font-semibold transition-colors hover:bg-borderline">
           Cancel
         </button>
         <button
-          onClick={() =>
-            plan.mutate({ position: p, amountUsd: amountNum, slippageBps: 50 })
-          }
+          onClick={() => plan.mutate({ position: p, amountUsd: amountNum, slippageBps: 50 })}
           disabled={amountNum <= 0 || insufficient || plan.isPending}
           className="grow rounded-full bg-accent py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-40"
         >
           {plan.isPending ? "Quoting…" : "Review add"}
         </button>
       </div>
-      {plan.isError && (
-        <p className="pt-2 text-xs text-negative">{(plan.error as Error).message}</p>
-      )}
+      {plan.isError && <p className="pt-2 text-xs text-negative">{(plan.error as Error).message}</p>}
     </div>
   );
 }
@@ -131,33 +124,52 @@ function PositionCard({ p }: { p: PositionView }) {
   const collect = useCollect();
   const [adding, setAdding] = useState(false);
   const collectible = p.feesUsd >= MIN_COLLECT_USD;
+  const m = p.market;
+  const stable = CHAINS[m.chainId].quote;
+
+  // range in dollars per (display) share
+  const lo = tickToPrice(m, p.tickLower) * p.quoteUsd;
+  const hi = tickToPrice(m, p.tickUpper) * p.quoteUsd;
+  const lower = sharePrice(m, Math.min(lo, hi));
+  const upper = sharePrice(m, Math.max(lo, hi));
+  const priceUsd = sharePrice(m, p.price * p.quoteUsd);
 
   return (
     <li className="rounded-3xl bg-surface p-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-semibold">
-            {p.market.symbol} / {p.market.quote.symbol}
-            <span
-              className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-                p.inRange ? "bg-accent/15 text-accent" : "bg-negative/15 text-negative"
-              }`}
-            >
-              {p.inRange ? "Earning" : "Out of range"}
-            </span>
-          </p>
-          <p className="text-sm text-muted">
-            {fmtAmount(shareAmount(p.market, p.assetAmount), 5)} {p.market.symbol} + {fmtUsd(p.usdcAmount)}
-          </p>
-          <p className="text-sm">
-            <span className="text-muted">Fees earned: </span>
-            <span className={p.feesUsd > 0 ? "text-accent" : "text-muted"}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <PairIcons market={m} size={38} />
+          <div>
+            <p className="font-semibold leading-tight">
+              {m.base.symbol} <span className="text-muted">/</span> {m.quote.symbol}
+            </p>
+            <div className="flex flex-wrap items-center gap-1 pt-1">
+              <Chip tone={p.inRange ? "accent" : "negative"}>{p.inRange ? "Earning" : "Out of range"}</Chip>
+              <MarketChips market={m} />
+            </div>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-xl font-bold">{fmtUsd(p.valueUsd)}</p>
+          <p className="text-xs text-muted">
+            fees earned{" "}
+            <span className={p.feesUsd > 0 ? "text-accent" : ""}>
               {p.feesUsd >= 0.01 ? fmtUsd(p.feesUsd) : p.feesUsd > 0 ? "<$0.01" : "$0.00"}
             </span>
           </p>
         </div>
-        <p className="text-xl font-bold">{fmtUsd(p.valueUsd)}</p>
       </div>
+
+      <div className="pt-4">
+        <RangeBar price={priceUsd} lower={lower} upper={upper} inRange={p.inRange} compact />
+      </div>
+
+      <p className="pt-3 text-sm text-muted">
+        Holding {fmtAmount(shareAmount(m, p.baseAmount), 5)} {m.base.symbol} + {fmtAmount(p.quoteAmount, m.quoteIsStable ? 2 : 5)}{" "}
+        {m.quote.symbol}
+        {!p.inRange && ` · price ${priceUsd < lower ? "below" : "above"} your range`}
+      </p>
+
       <div className="mt-4 flex gap-2">
         <button
           onClick={() => setAdding(!adding)}
@@ -170,7 +182,7 @@ function PositionCard({ p }: { p: PositionView }) {
           disabled={withdraw.isPending}
           className="grow rounded-full bg-surface-raised py-2 text-sm font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
         >
-          {withdraw.isPending ? "Withdrawing…" : `Withdraw to ${p.market.quote.symbol}`}
+          {withdraw.isPending ? "Withdrawing…" : `Withdraw to ${stable.symbol}`}
         </button>
         <button
           onClick={() => collect.mutate(p)}
@@ -183,9 +195,7 @@ function PositionCard({ p }: { p: PositionView }) {
       </div>
       {adding && <AddPanel p={p} onClose={() => setAdding(false)} />}
       {(withdraw.isError || collect.isError) && (
-        <p className="mt-2 text-xs text-negative">
-          {((withdraw.error ?? collect.error) as Error).message}
-        </p>
+        <p className="mt-2 text-xs text-negative">{((withdraw.error ?? collect.error) as Error).message}</p>
       )}
     </li>
   );
@@ -200,9 +210,7 @@ function EmptyPositions() {
     return (
       <div className="rounded-3xl bg-surface p-8 text-center">
         <p className="font-semibold text-accent">Deposit confirmed ✓</p>
-        <p className="pt-2 text-sm text-muted">
-          Your position is on-chain and will show here in a few seconds.
-        </p>
+        <p className="pt-2 text-sm text-muted">Your position is on-chain and will show here in a few seconds.</p>
         <div className="mx-auto mt-4 h-1.5 w-24 animate-pulse rounded-full bg-accent/40" />
       </div>
     );
@@ -211,7 +219,7 @@ function EmptyPositions() {
     <div className="rounded-3xl bg-surface p-8 text-center">
       <p className="pb-3 text-muted">No positions yet.</p>
       <Link href="/" className="font-semibold text-accent hover:underline">
-        Explore markets →
+        Explore pools →
       </Link>
     </div>
   );
@@ -231,49 +239,60 @@ export default function PortfolioPage() {
   }, [positions, router]);
 
   const total = (positions ?? []).reduce((s, p) => s + p.valueUsd, 0);
+  const fees = (positions ?? []).reduce((s, p) => s + p.feesUsd, 0);
+  const earning = (positions ?? []).filter((p) => p.inRange).length;
 
   return (
     <AppShell>
       {!ready ? null : !authenticated ? (
         <div className="flex grow flex-col items-center justify-center gap-4 py-24">
           <p className="text-muted">Log in to see your portfolio.</p>
-          <button
-            onClick={login}
-            className="rounded-full bg-accent px-8 py-3 font-semibold text-black hover:bg-accent-strong"
-          >
+          <button onClick={login} className="rounded-full bg-accent px-8 py-3 font-semibold text-black hover:bg-accent-strong">
             Log in
           </button>
         </div>
       ) : (
         <div className="animate-rise py-4">
-          <section className="pb-8">
-            <p className="text-sm text-muted">Total invested</p>
-            <p className="py-1 text-5xl font-bold tracking-tight">{fmtUsd(total)}</p>
-            <p className="text-sm text-muted">
-              + {cash ? fmtUsd(cash.totalUsd) : "—"} cash available
-              {cash && cash.perChain.filter((c) => c.formatted > 0).length > 1 && (
-                <span className="text-muted/60">
-                  {" "}
-                  ({cash.perChain
-                    .filter((c) => c.formatted > 0)
-                    .map((c) => `${fmtUsd(c.formatted)} ${c.symbol}`)
-                    .join(" · ")})
-                </span>
-              )}
-            </p>
+          <section className="grid grid-cols-2 gap-2 pb-8 sm:grid-cols-4">
+            <div className="col-span-2 rounded-3xl bg-surface p-5 sm:col-span-2">
+              <p className="text-sm text-muted">In positions</p>
+              <p className="py-1 text-4xl font-bold tracking-tight">{fmtUsd(total)}</p>
+              <p className="text-sm text-muted">
+                + {cash ? fmtUsd(cash.totalUsd) : "—"} cash available
+                {cash && cash.perChain.filter((c) => c.formatted > 0).length > 1 && (
+                  <span className="text-muted/60">
+                    {" "}
+                    (
+                    {cash.perChain
+                      .filter((c) => c.formatted > 0)
+                      .map((c) => `${fmtUsd(c.formatted)} ${c.symbol}`)
+                      .join(" · ")}
+                    )
+                  </span>
+                )}
+              </p>
+            </div>
+            <div className="rounded-3xl bg-surface p-5">
+              <p className="text-sm text-muted">Fees to collect</p>
+              <p className="py-1 text-2xl font-bold text-accent">{fmtUsd(fees)}</p>
+            </div>
+            <div className="rounded-3xl bg-surface p-5">
+              <p className="text-sm text-muted">Earning</p>
+              <p className="py-1 text-2xl font-bold">
+                {positions ? `${earning}/${positions.length}` : "—"}
+              </p>
+            </div>
           </section>
           <section>
             <h2 className="pb-3 text-lg font-semibold">Positions</h2>
             {isLoading ? (
               <div className="h-28 animate-pulse rounded-3xl bg-surface" />
             ) : isError ? (
-              <p className="rounded-3xl bg-surface p-5 text-sm text-muted">
-                Couldn&apos;t load positions right now — refresh to retry.
-              </p>
+              <p className="rounded-3xl bg-surface p-5 text-sm text-muted">Couldn&apos;t load positions right now — refresh to retry.</p>
             ) : positions && positions.length > 0 ? (
               <ul className="space-y-3">
                 {positions.map((p) => (
-                  <PositionCard key={p.tokenId.toString()} p={p} />
+                  <PositionCard key={`${p.market.chainId}:${p.tokenId.toString()}`} p={p} />
                 ))}
               </ul>
             ) : (

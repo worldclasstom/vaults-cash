@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseAbiItem, parseEventLogs, parseUnits } from "viem";
+import { CHAINS } from "@/lib/chain";
 import { rememberPosition } from "@/lib/knownPositions";
 import type { Market } from "@/lib/markets";
 import { getPoolState, publicClientFor } from "@/lib/onchain";
@@ -29,7 +30,7 @@ export function usePlanDeposit() {
     mutationFn: async (input: DepositInput): Promise<ZapPlan> => {
       if (!owner) throw new Error("Wallet not ready yet — try again in a second.");
       const poolState = await getPoolState(input.market);
-      const { decimals } = input.market.quote;
+      const { decimals } = CHAINS[input.market.chainId].quote;
       return buildZapPlan({
         market: input.market,
         owner,
@@ -56,7 +57,7 @@ export function usePlanAdd() {
     }): Promise<ZapPlan> => {
       if (!owner) throw new Error("Wallet not ready yet — try again in a second.");
       const poolState = await getPoolState(input.position.market);
-      const { decimals } = input.position.market.quote;
+      const { decimals } = CHAINS[input.position.market.chainId].quote;
       return buildZapPlan({
         market: input.position.market,
         owner,

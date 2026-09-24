@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T03:25:57.748Z",
+  "generatedAt": "2026-09-24T04:17:18.514Z",
   "chainId": 8453,
   "verified": true,
   "uniswap": {
@@ -18,24 +18,27 @@
       "name": "USD Coin",
       "symbol": "USDC",
       "decimals": 6,
-      "totalSupply": "4262072719938794",
-      "uiMultiplier": null
+      "totalSupply": "4263335326924522",
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/6319/large/USDC.png?1769615602"
     },
     "WETH": {
       "address": "0x4200000000000000000000000000000000000006",
       "name": "Wrapped Ether",
       "symbol": "WETH",
       "decimals": 18,
-      "totalSupply": "263087690068150150355416",
-      "uiMultiplier": null
+      "totalSupply": "263154975314011917362746",
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/39810/large/weth.png?1724139790"
     },
     "cbBTC": {
       "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
       "name": "Coinbase Wrapped BTC",
       "symbol": "cbBTC",
       "decimals": 8,
-      "totalSupply": "4625698940516",
-      "uiMultiplier": null
+      "totalSupply": "4629730121377",
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/40143/large/cbbtc.webp?1726136727"
     },
     "cbXRP": {
       "address": "0xcb585250f852C6c6bf90434AB21A00f02833a4af",
@@ -43,7 +46,8 @@
       "symbol": "cbXRP",
       "decimals": 6,
       "totalSupply": "131562099030741",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/66267/large/Coinbase_Wrapped_XPR_%28cbXRP%29.png?1749023398"
     },
     "cbETH": {
       "address": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
@@ -51,7 +55,8 @@
       "symbol": "cbETH",
       "decimals": 18,
       "totalSupply": "77240644693751909949781",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/27008/large/cbeth.png?1709186989"
     },
     "wstETH": {
       "address": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
@@ -59,7 +64,8 @@
       "symbol": "wstETH",
       "decimals": 18,
       "totalSupply": "29329852403356503163586",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/53103/large/superbridge-bridged-wsteth-base.png?1735227990"
     },
     "rETH": {
       "address": "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c",
@@ -67,7 +73,8 @@
       "symbol": "rETH",
       "decimals": 18,
       "totalSupply": "1935541258647803027661",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/20764/large/reth.png?1696520159"
     },
     "weETH": {
       "address": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
@@ -75,7 +82,8 @@
       "symbol": "weETH",
       "decimals": 18,
       "totalSupply": "19088203454085098705148",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/33033/large/weETH.png?1701438396"
     },
     "DAI": {
       "address": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
@@ -83,7 +91,8 @@
       "symbol": "DAI",
       "decimals": 18,
       "totalSupply": "1885520052881596015898300",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/39807/large/dai.png?1724126571"
     },
     "USDT": {
       "address": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
@@ -91,7 +100,8 @@
       "symbol": "USDT",
       "decimals": 6,
       "totalSupply": "26915048103682",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/39963/large/usdt.png?1724952731"
     },
     "EURC": {
       "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
@@ -99,7 +109,8 @@
       "symbol": "EURC",
       "decimals": 6,
       "totalSupply": "52340169595469",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/26045/large/EURC.png?1769615705"
     },
     "AERO": {
       "address": "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
@@ -107,7 +118,8 @@
       "symbol": "AERO",
       "decimals": 18,
       "totalSupply": "1988034890229641792427930557",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/31745/large/token.png?1696530564"
     },
     "LINK": {
       "address": "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196",
@@ -115,7 +127,8 @@
       "symbol": "LINK",
       "decimals": 18,
       "totalSupply": "201323305164554384255888",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/877/large/Chainlink_Logo_500.png?1760023405"
     },
     "AAVE": {
       "address": "0x63706e401c06ac8513145b7687A14804d17f814b",
@@ -123,7 +136,8 @@
       "symbol": "AAVE",
       "decimals": 18,
       "totalSupply": "30050990655016121242182",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/12645/large/aave-token-round.png?1720472354"
     },
     "VIRTUAL": {
       "address": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
@@ -131,7 +145,8 @@
       "symbol": "VIRTUAL",
       "decimals": 18,
       "totalSupply": "497013085032629590884775503",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/34057/large/LOGOMARK.png?1708356054"
     },
     "DEGEN": {
       "address": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
@@ -139,7 +154,8 @@
       "symbol": "DEGEN",
       "decimals": 18,
       "totalSupply": "36114005629848640466839574939",
-      "uiMultiplier": null
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/34515/large/android-chrome-512x512.png?1706198225"
     }
   },
   "v4Pools": [
@@ -148,7 +164,7 @@
       "pair": "ETH/USDC",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -197393,
+      "tick": -197412,
       "liquidity": "57790948091786"
     },
     {
@@ -156,16 +172,16 @@
       "pair": "ETH/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197396,
-      "liquidity": "46228745613405370"
+      "tick": -197411,
+      "liquidity": "46624983769581899"
     },
     {
       "poolId": "0xe070797535b13431808f8fc81fdbe7b41362960ed0b55bc2b6117c49c51b7eb9",
       "pair": "ETH/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -197380,
-      "liquidity": "330266835712584862"
+      "tick": -197387,
+      "liquidity": "330363358460815646"
     },
     {
       "poolId": "0xa7d23af8df40bfaa36d3635aa84475d53f635b1fdf42a99d3cd40bad59190100",
@@ -204,7 +220,7 @@
       "pair": "WETH/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197390,
+      "tick": -197411,
       "liquidity": "71711514135813"
     },
     {
@@ -212,7 +228,7 @@
       "pair": "WETH/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -197380,
+      "tick": -197385,
       "liquidity": "25127404905614235"
     },
     {
@@ -236,15 +252,15 @@
       "pair": "cbBTC/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -264741,
-      "liquidity": "26267402438162962"
+      "tick": -264731,
+      "liquidity": "26720867559744883"
     },
     {
       "poolId": "0xe6195a1f1c8f5d0bcf0a880db26738a1df4f6863017700a8f6377a72d45366f2",
       "pair": "cbBTC/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -264764,
+      "tick": -264760,
       "liquidity": "956873152389735"
     },
     {
@@ -268,15 +284,15 @@
       "pair": "cbBTC/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -67348,
-      "liquidity": "1056805743211"
+      "tick": -67320,
+      "liquidity": "1097136728267"
     },
     {
       "poolId": "0x179492f1f9c7b2e2518a01eda215baab8adf0b02dd3a90fe68059c0cac5686f5",
       "pair": "cbBTC/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -67358,
+      "tick": -67350,
       "liquidity": "19438151565"
     },
     {
@@ -285,7 +301,7 @@
       "fee": 10000,
       "tickSpacing": 200,
       "tick": -67393,
-      "liquidity": "10477236224"
+      "liquidity": "10369710551"
     },
     {
       "poolId": "0x78e1350738bc5e265cfa1187fa3dfc7533d9da7c0eec7d4ee3699e8250117641",
@@ -316,7 +332,7 @@
       "pair": "cbXRP/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -4066,
+      "tick": -4013,
       "liquidity": "30885035266"
     },
     {
@@ -452,7 +468,7 @@
       "pair": "rETH/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -1551,
+      "tick": -1549,
       "liquidity": "11417413762289868480"
     },
     {
@@ -532,7 +548,7 @@
       "pair": "DAI/USDC",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -276325,
+      "tick": -276326,
       "liquidity": "7311828262581169"
     },
     {
@@ -564,7 +580,7 @@
       "pair": "USDT/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197359,
+      "tick": -197382,
       "liquidity": "6789157791155"
     },
     {
@@ -700,7 +716,7 @@
       "pair": "AERO/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 82815,
+      "tick": 82809,
       "liquidity": "2040723513829319641939"
     },
     {
@@ -732,7 +748,7 @@
       "pair": "AERO/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 280201,
+      "tick": 280207,
       "liquidity": "5663512989238231"
     },
     {
@@ -860,7 +876,7 @@
       "pair": "VIRTUAL/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 82336,
+      "tick": 82387,
       "liquidity": "40915078671699498751"
     },
     {
@@ -868,7 +884,7 @@
       "pair": "VIRTUAL/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 82327,
+      "tick": 82400,
       "liquidity": "1372859463426712201900"
     },
     {
@@ -900,7 +916,7 @@
       "pair": "VIRTUAL/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -279728,
+      "tick": -279801,
       "liquidity": "963611301390947692"
     },
     {
@@ -924,7 +940,7 @@
       "pair": "DEGEN/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 147197,
+      "tick": 147198,
       "liquidity": "3237113858141242832218"
     },
     {
@@ -948,7 +964,7 @@
       "pair": "DEGEN/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -344360,
+      "tick": -344479,
       "liquidity": "38223494312324"
     },
     {
@@ -973,176 +989,176 @@
       "geckoAddress": "0x72ab388e2e2f6facef59e3c3fa2c4e29011c2d38",
       "name": "WETH / USDC 0.01%",
       "dex": "pancakeswap-v3-base",
-      "reserveUsd": 4832509.2342,
-      "volume24hUsd": 71783358.3476395
+      "reserveUsd": 4833525.7101,
+      "volume24hUsd": 70934144.2153872
     },
     {
       "geckoAddress": "0xb4cb800910b228ed3d0834cf79d697127bbb00e5",
       "name": "WETH / USDC 0.01%",
       "dex": "uniswap-v3-base",
-      "reserveUsd": 363999.2518,
-      "volume24hUsd": 5407030.53206489
+      "reserveUsd": 364295.8577,
+      "volume24hUsd": 5321942.7135217
     },
     {
       "geckoAddress": "0xdb366ce311055bc3e275de10dbc320b4ade74c3ebc0179dd3fbb8efbcdb1b096",
       "name": "SPIKE / wtCOIN",
       "dex": "uniswap-v4-base",
-      "reserveUsd": 115897.9471,
-      "volume24hUsd": 4325778.09184252
+      "reserveUsd": 77368.1179,
+      "volume24hUsd": 4350826.91840765
     },
     {
       "geckoAddress": "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59",
       "name": "WETH / USDC 0.05%",
       "dex": "aerodrome-slipstream",
-      "reserveUsd": 7679144.2947,
-      "volume24hUsd": 119910838.754897
-    },
-    {
-      "geckoAddress": "0x7c7420dd105e2779316423ba3e973f434315efa9",
-      "name": "cbBTC / WETH 0.009%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 1647138.7867,
-      "volume24hUsd": 41533668.0343093
+      "reserveUsd": 7400764.9299,
+      "volume24hUsd": 115168719.571817
     },
     {
       "geckoAddress": "0xd0b53d9277642d899df5c87a3966a349a798f224",
       "name": "USDC / WETH 0.05%",
       "dex": "uniswap-v3-base",
-      "reserveUsd": 9430549.758,
-      "volume24hUsd": 24978363.7596085
+      "reserveUsd": 9446027.6085,
+      "volume24hUsd": 24664401.2580106
     },
     {
       "geckoAddress": "0xbedfdb1c91ccfd3269d5aec696c95e96457205ab9cab1ebe6be608e295a3a0a5",
       "name": "SPIKE / ETH",
       "dex": "o1-launchpad",
-      "reserveUsd": 197718.5418,
-      "volume24hUsd": 8267297.49906505
+      "reserveUsd": 192293.611,
+      "volume24hUsd": 8277869.47100486
+    },
+    {
+      "geckoAddress": "0x7c7420dd105e2779316423ba3e973f434315efa9",
+      "name": "cbBTC / WETH 0.009%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 1627906.7218,
+      "volume24hUsd": 40505764.4306179
     },
     {
       "geckoAddress": "0xb94b22332abf5f89877a14cc88f2abc48c34b3df",
       "name": "cbBTC / USDC 0.01%",
       "dex": "pancakeswap-v3-base",
-      "reserveUsd": 1777845.7121,
-      "volume24hUsd": 11542686.7274191
+      "reserveUsd": 1780354.6527,
+      "volume24hUsd": 11580293.7751486
     },
     {
       "geckoAddress": "0x4e392fbfe4d0557c82d2f97f02ec39daa31516dd",
       "name": "WETH / USDC 0.008%",
       "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 154875.8316,
-      "volume24hUsd": 2928091.59777722
+      "reserveUsd": 155176.7849,
+      "volume24hUsd": 2893836.96251998
     },
     {
       "geckoAddress": "0xc211e1f853a898bd1302385ccde55f33a8c4b3f3",
       "name": "cbBTC / WETH 0.01%",
       "dex": "pancakeswap-v3-base",
-      "reserveUsd": 5937863.9837,
-      "volume24hUsd": 40192199.3686775
+      "reserveUsd": 5946817.1706,
+      "volume24hUsd": 39161702.383034
     },
     {
       "geckoAddress": "0x3693022bd390e147d8dd89a05403c80ff21dd64b",
       "name": "ZEST / USDC 0.018%",
       "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 182396.3073,
-      "volume24hUsd": 1327997.77103318
+      "reserveUsd": 185231.0476,
+      "volume24hUsd": 1356891.18450009
     },
     {
       "geckoAddress": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
       "name": "WETH / USDC 0.3%",
       "dex": "uniswap-v3-base",
-      "reserveUsd": 151810484.5929,
-      "volume24hUsd": 107391942.770482
-    },
-    {
-      "geckoAddress": "0x3f0296bf652e19bca772ec3df08b32732f93014a",
-      "name": "VIRTUAL / WETH 0.05%",
-      "dex": "aerodrome-slipstream",
-      "reserveUsd": 366602.7246,
-      "volume24hUsd": 3300374.80387754
-    },
-    {
-      "geckoAddress": "0x20cb8f872ae894f7c9e32e621c186e5afce82fd0",
-      "name": "AERO / WETH 0.05%",
-      "dex": "pancakeswap-v3-base",
-      "reserveUsd": 176083.1535,
-      "volume24hUsd": 1489669.02935472
+      "reserveUsd": 151931076.5797,
+      "volume24hUsd": 105637331.429956
     },
     {
       "geckoAddress": "0x4618dfcbc52d9fbcd45ec4a65fc61b5da57ad205",
       "name": "wtCOIN / USDC 0.3%",
       "dex": "aerodrome-slipstream-2",
-      "reserveUsd": 227264.8819,
-      "volume24hUsd": 3637000.12286097
+      "reserveUsd": 223850.4307,
+      "volume24hUsd": 3655119.36335323
     },
     {
-      "geckoAddress": "0x160d7e9d948b16c163332a277b393c288408eb12",
-      "name": "cbBTC / USDC 0.05%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 4935588.0094,
-      "volume24hUsd": 28964418.1877068
+      "geckoAddress": "0x3f0296bf652e19bca772ec3df08b32732f93014a",
+      "name": "VIRTUAL / WETH 0.05%",
+      "dex": "aerodrome-slipstream",
+      "reserveUsd": 368989.9995,
+      "volume24hUsd": 3167706.71161765
+    },
+    {
+      "geckoAddress": "0x20cb8f872ae894f7c9e32e621c186e5afce82fd0",
+      "name": "AERO / WETH 0.05%",
+      "dex": "pancakeswap-v3-base",
+      "reserveUsd": 176129.1682,
+      "volume24hUsd": 1458781.76456916
     },
     {
       "geckoAddress": "0x8a8e4170c09074b109352190d47e54d7c1f61e4e",
       "name": "PROS / USDC 0.01%",
       "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 875280.6048,
-      "volume24hUsd": 2475819.89621438
+      "reserveUsd": 888889.3094,
+      "volume24hUsd": 2534572.70200132
+    },
+    {
+      "geckoAddress": "0x160d7e9d948b16c163332a277b393c288408eb12",
+      "name": "cbBTC / USDC 0.05%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 5009184.1283,
+      "volume24hUsd": 29038385.2070582
     },
     {
       "geckoAddress": "0x7cb770d0513c30e0cb45e4899e4a2cbeed6f9830",
       "name": "VIRTUAL / USDC 0.05%",
       "dex": "pancakeswap-v3-base",
-      "reserveUsd": 259763.4819,
-      "volume24hUsd": 1392372.62571484
+      "reserveUsd": 260899.9716,
+      "volume24hUsd": 1356682.37251091
     },
     {
       "geckoAddress": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
       "name": "AERO / USDC 0.05%",
       "dex": "uniswap-v3-base",
-      "reserveUsd": 286647.1809,
-      "volume24hUsd": 1237355.64075407
+      "reserveUsd": 287634.939,
+      "volume24hUsd": 1190446.36366766
     },
     {
       "geckoAddress": "0x9c087eb773291e50cf6c6a90ef0f4500e349b903",
       "name": "VIRTUAL / WETH 0.05%",
       "dex": "uniswap-v3-base",
-      "reserveUsd": 469830.1549,
-      "volume24hUsd": 2205345.95403782
+      "reserveUsd": 476041.7403,
+      "volume24hUsd": 2173273.14833202
     },
     {
       "geckoAddress": "0x3fe04a59ebd38cf06080a6f60a98d124eb59392a",
       "name": "WETH / USDC 0.05%",
       "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 9358016.7904,
-      "volume24hUsd": 52543752.0027982
-    },
-    {
-      "geckoAddress": "0xa41bc0affba7fd420d186b84899d7ab2ac57fcd1",
-      "name": "USDT / USDC 0.01%",
-      "dex": "aerodrome-slipstream",
-      "reserveUsd": 1070052.7827,
-      "volume24hUsd": 10927497.7562543
-    },
-    {
-      "geckoAddress": "0x6b0f53cbd9272d8117e9535fe25371dedf39a1be",
-      "name": "VELVET / USDC 0.01%",
-      "dex": "aerodrome-slipstream",
-      "reserveUsd": 1025091.9853,
-      "volume24hUsd": 536997.156972601
+      "reserveUsd": 8037697.8525,
+      "volume24hUsd": 52253973.4478769
     },
     {
       "geckoAddress": "0x717e174d5dae280802d1a2c15c1c0976561a3f61",
       "name": "ZRO / WETH 0.043%",
       "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 163446.3999,
-      "volume24hUsd": 1459734.0671609
+      "reserveUsd": 165597.1384,
+      "volume24hUsd": 1557515.48677087
     },
     {
-      "geckoAddress": "0x1131db5977242a03ebead1acd18f80a9a29e5922",
-      "name": "SOL / USDC 0.005%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 683937.672,
-      "volume24hUsd": 8108164.55734019
+      "geckoAddress": "0xa41bc0affba7fd420d186b84899d7ab2ac57fcd1",
+      "name": "USDT / USDC 0.01%",
+      "dex": "aerodrome-slipstream",
+      "reserveUsd": 1069939.445,
+      "volume24hUsd": 10680274.5243908
+    },
+    {
+      "geckoAddress": "0x6b0f53cbd9272d8117e9535fe25371dedf39a1be",
+      "name": "VELVET / USDC 0.01%",
+      "dex": "aerodrome-slipstream",
+      "reserveUsd": 1034632.9266,
+      "volume24hUsd": 534186.788269302
+    },
+    {
+      "geckoAddress": "0xf0bac62dd4fd04dc26c9bc9ded68f16c515ab71c09bb87e8e546b7ce83c0ccb9",
+      "name": "CATALYST / USDC",
+      "dex": "uniswap-v4-base",
+      "reserveUsd": 1148126.1602,
+      "volume24hUsd": 8099947.95036357
     }
   ]
 }

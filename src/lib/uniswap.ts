@@ -52,17 +52,7 @@ export function poolKeyOf(market: Market) {
   } as const;
 }
 
-/** Which pool currency is the asset vs the quote, per this pool's sort order. */
-export function currenciesOf(market: Market) {
-  return market.assetIsCurrency0
-    ? { asset: market.pool.currency0, usdc: market.pool.currency1 }
-    : { asset: market.pool.currency1, usdc: market.pool.currency0 };
-}
-
-export function erc20Approve(
-  token: `0x${string}`,
-  spender: `0x${string}`,
-): Call {
+export function erc20Approve(token: `0x${string}`, spender: `0x${string}`): Call {
   return {
     to: token,
     value: 0n,
@@ -74,11 +64,7 @@ export function erc20Approve(
   };
 }
 
-export function permit2Approve(
-  token: `0x${string}`,
-  spender: `0x${string}`,
-  deadline: bigint,
-): Call {
+export function permit2Approve(token: `0x${string}`, spender: `0x${string}`, deadline: bigint): Call {
   return {
     to: PERMIT2,
     value: 0n,
@@ -90,23 +76,32 @@ export function permit2Approve(
   };
 }
 
+/** Approvals needed before `token` can be pulled by `spender` through
+ *  Permit2 (no-ops for native ETH). Idempotent — max allowances. */
+export function approvalsFor(token: `0x${string}`, spender: `0x${string}`, deadline: bigint): Call[] {
+  if (token === zeroAddress) return [];
+  return [erc20Approve(token, PERMIT2), permit2Approve(token, spender, deadline)];
+}
+
+export type SwapDirection = "quoteToBase" | "baseToQuote";
+
 /**
  * One exact-in swap through the Universal Router within the market's pool.
  * `direction` fixes zeroForOne and settle/take currencies for either sort
- * order. For native-ETH input, pass the input amount as `value`.
+ * order. A native-ETH input is passed as `value`.
  */
 export function buildSwapCall(params: {
   market: Market;
-  direction: "usdcToAsset" | "assetToUsdc";
+  direction: SwapDirection;
   amountIn: bigint;
   minAmountOut: bigint;
   deadline: bigint;
 }): Call {
   const { market, direction, amountIn, minAmountOut, deadline } = params;
-  const { asset, usdc } = currenciesOf(market);
-  const toAsset = direction === "usdcToAsset";
-  const zeroForOne = toAsset ? !market.assetIsCurrency0 : market.assetIsCurrency0;
-  const [settleCurrency, takeCurrency] = toAsset ? [usdc, asset] : [asset, usdc];
+  const toBase = direction === "quoteToBase";
+  const input = toBase ? market.quote.address : market.base.address;
+  const output = toBase ? market.base.address : market.quote.address;
+  const zeroForOne = input.toLowerCase() === market.pool.currency0.toLowerCase();
 
   const planner = new V4Planner();
   planner.addAction(Actions.SWAP_EXACT_IN_SINGLE, [
@@ -118,13 +113,12 @@ export function buildSwapCall(params: {
       hookData: "0x",
     },
   ]);
-  planner.addAction(Actions.SETTLE_ALL, [settleCurrency, amountIn.toString()]);
-  planner.addAction(Actions.TAKE_ALL, [takeCurrency, minAmountOut.toString()]);
+  planner.addAction(Actions.SETTLE_ALL, [input, amountIn.toString()]);
+  planner.addAction(Actions.TAKE_ALL, [output, minAmountOut.toString()]);
 
-  const nativeIn = !toAsset && market.token === zeroAddress ? amountIn : 0n;
   return {
     to: contractsOf(market).router,
-    value: nativeIn,
+    value: input === zeroAddress ? amountIn : 0n,
     data: encodeFunctionData({
       abi: routerAbi,
       functionName: "execute",
@@ -133,20 +127,17 @@ export function buildSwapCall(params: {
   };
 }
 
-async function quoteExactIn(market: Market, amountIn: bigint, zeroForOne: boolean) {
+async function quoteExactIn(market: Market, amountIn: bigint, direction: SwapDirection) {
+  const input = direction === "quoteToBase" ? market.quote.address : market.base.address;
+  const zeroForOne = input.toLowerCase() === market.pool.currency0.toLowerCase();
   const { result } = await publicClientFor(market.chainId).simulateContract({
     address: contractsOf(market).quoter,
     abi: quoterAbi,
     functionName: "quoteExactInputSingle",
-    args: [
-      { poolKey: poolKeyOf(market), zeroForOne, exactAmount: amountIn, hookData: "0x" },
-    ],
+    args: [{ poolKey: poolKeyOf(market), zeroForOne, exactAmount: amountIn, hookData: "0x" }],
   });
   return { amountOut: result[0], gasEstimate: result[1] };
 }
 
-export const quoteUsdcToAsset = (market: Market, amountIn: bigint) =>
-  quoteExactIn(market, amountIn, !market.assetIsCurrency0);
-
-export const quoteAssetToUsdc = (market: Market, amountIn: bigint) =>
-  quoteExactIn(market, amountIn, market.assetIsCurrency0);
+export const quoteQuoteToBase = (market: Market, amountIn: bigint) => quoteExactIn(market, amountIn, "quoteToBase");
+export const quoteBaseToQuote = (market: Market, amountIn: bigint) => quoteExactIn(market, amountIn, "baseToQuote");

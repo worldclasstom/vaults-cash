@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Position } from "@uniswap/v4-sdk";
-import { getPoolState, tickToUsdcPrice } from "@/lib/onchain";
+import { getMarketPricing } from "@/lib/onchain";
 import { fetchPositions, getUncollectedFees, type OwnedPosition } from "@/lib/positions";
 import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
 import { buildPool } from "@/lib/zap";
@@ -11,12 +11,20 @@ import { useSendCalls } from "./useSendCalls";
 
 export type PositionView = OwnedPosition & {
   inRange: boolean;
-  assetAmount: number;
-  usdcAmount: number;
-  valueUsd: number;
+  /** decimal-adjusted token amounts in the position */
+  baseAmount: number;
+  quoteAmount: number;
+  /** base in quote units */
   price: number;
+  /** quote in dollars (1 for the stablecoin) */
+  quoteUsd: number;
+  valueUsd: number;
   /** uncollected trading fees, in USD */
   feesUsd: number;
+  currentTick: number;
+  // aliases
+  assetAmount: number;
+  usdcAmount: number;
 };
 
 export function usePositions() {
@@ -31,8 +39,8 @@ export function usePositions() {
       const owned = await fetchPositions(owner!);
       return Promise.all(
         owned.map(async (p) => {
-          const [state, fees] = await Promise.all([
-            getPoolState(p.market),
+          const [{ state, price, quoteUsd }, fees] = await Promise.all([
+            getMarketPricing(p.market),
             getUncollectedFees(p).catch(() => ({ owed0: 0n, owed1: 0n })),
           ]);
           const pool = buildPool(p.market, state.sqrtPriceX96, state.tick, state.liquidity);
@@ -42,23 +50,23 @@ export function usePositions() {
             tickUpper: p.tickUpper,
             liquidity: p.liquidity.toString(),
           });
-          const price = tickToUsdcPrice(p.market, state.tick);
-          const c0 = p.market.assetIsCurrency0;
-          const assetAmount = Number((c0 ? sdkPos.amount0 : sdkPos.amount1).toExact());
-          const usdcAmount = Number((c0 ? sdkPos.amount1 : sdkPos.amount0).toExact());
-          const assetOwed = c0 ? fees.owed0 : fees.owed1;
-          const usdcOwed = c0 ? fees.owed1 : fees.owed0;
-          const feesUsd =
-            (Number(assetOwed) / 10 ** p.market.tokenDecimals) * price +
-            Number(usdcOwed) / 10 ** p.market.quote.decimals;
+          const c0 = p.market.baseIsCurrency0;
+          const baseAmount = Number((c0 ? sdkPos.amount0 : sdkPos.amount1).toExact());
+          const quoteAmount = Number((c0 ? sdkPos.amount1 : sdkPos.amount0).toExact());
+          const baseOwed = Number(c0 ? fees.owed0 : fees.owed1) / 10 ** p.market.base.decimals;
+          const quoteOwed = Number(c0 ? fees.owed1 : fees.owed0) / 10 ** p.market.quote.decimals;
           return {
             ...p,
             inRange: state.tick >= p.tickLower && state.tick < p.tickUpper,
-            assetAmount,
-            usdcAmount,
-            valueUsd: assetAmount * price + usdcAmount,
+            baseAmount,
+            quoteAmount,
             price,
-            feesUsd,
+            quoteUsd,
+            valueUsd: (baseAmount * price + quoteAmount) * quoteUsd,
+            feesUsd: (baseOwed * price + quoteOwed) * quoteUsd,
+            currentTick: state.tick,
+            assetAmount: baseAmount,
+            usdcAmount: quoteAmount,
           };
         }),
       );
@@ -72,7 +80,7 @@ export function useWithdraw() {
   return useMutation({
     mutationFn: async (position: OwnedPosition) => {
       // tight tolerance: the slippage buffer is exactly what comes back as
-      // non-USDC dust, and blocks are ~250ms — worst case a revert + retry
+      // dust, and blocks are ~250ms — worst case a revert + retry
       const plan = await buildWithdrawPlan({ position, slippageBps: 25 });
       return send(plan.calls, {
         description: `Withdraw position to ${position.market.quote.symbol}`,

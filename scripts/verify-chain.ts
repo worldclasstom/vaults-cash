@@ -233,6 +233,28 @@ async function main() {
   else if (tokens[QUOTE].address.toLowerCase() !== cfg.quote.address.toLowerCase())
     fail(`quote token ${QUOTE} address differs from chain.ts`, tokens[QUOTE].address);
 
+  console.log(`\n— 3b. Token logos (GeckoTerminal, network=${cfg.gecko}) —`);
+  const tokenAddrs = Object.values(tokens).map((t) => t.address);
+  const logos: Record<string, string> = {};
+  for (let i = 0; i < tokenAddrs.length; i += 30) {
+    try {
+      const res = await fetch(
+        `https://api.geckoterminal.com/api/v2/networks/${cfg.gecko}/tokens/multi/${tokenAddrs.slice(i, i + 30).join(",")}`,
+        { headers: { accept: "application/json" } },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const body = await res.json();
+      for (const t of body.data ?? []) {
+        const url = t.attributes?.image_url;
+        if (url && !String(url).includes("missing")) logos[String(t.attributes.address).toLowerCase()] = url;
+      }
+    } catch (e) {
+      console.log(`  ⚠️  logos batch ${i / 30 + 1}: ${(e as Error).message} (keeping monograms)`);
+    }
+  }
+  for (const t of Object.values(tokens)) (t as { logo?: string }).logo = logos[t.address.toLowerCase()];
+  ok(`${Object.keys(logos).length}/${tokenAddrs.length} token logos`);
+
   console.log(`\n— 4. Pool discovery (GeckoTerminal, network=${cfg.gecko}) —`);
   const discovered: Array<{
     geckoAddress: string;

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
 import { erc20Abi, formatUnits } from "viem";
 import { CHAIN_IDS, chainConfig } from "@/lib/chain";
-import { getPoolState, publicClientFor, tickToUsdcPrice } from "@/lib/onchain";
+import { getMarketPricing, getPricingMap, publicClientFor } from "@/lib/onchain";
 import { MARKETS, NATIVE_ETH, type Market } from "@/lib/markets";
 
 /** The address funds live at: the user's Privy SMART wallet (a linked
@@ -114,7 +114,7 @@ export function useAssetBalances() {
           return {
             symbol: m.symbol,
             chainId: m.chainId,
-            formatted: Number(formatUnits(raw, m.tokenDecimals)),
+            formatted: Number(formatUnits(raw, m.base.decimals)),
           };
         }),
       );
@@ -125,7 +125,12 @@ export function useAssetBalances() {
 
 export type MarketQuote = {
   market: Market;
+  /** base in quote units */
   price: number;
+  /** quote in dollars (1 for the stablecoin) */
+  quoteUsd: number;
+  /** base in dollars */
+  priceUsd: number;
   tick: number;
   liquidity: bigint;
 };
@@ -135,21 +140,16 @@ export function useMarketQuotes() {
     queryKey: ["market-quotes"],
     refetchInterval: 15_000,
     queryFn: async (): Promise<MarketQuote[]> => {
-      // one chain's RPC hiccup must not blank the other chain's markets
-      const results = await Promise.allSettled(
-        MARKETS.map(async (market) => {
-          const state = await getPoolState(market);
-          return {
-            market,
-            price: tickToUsdcPrice(market, state.tick),
-            tick: state.tick,
-            liquidity: state.liquidity,
-          };
-        }),
-      );
-      const ok = results.filter((r) => r.status === "fulfilled").map((r) => r.value);
-      if (ok.length === 0) throw (results[0] as PromiseRejectedResult).reason;
-      return ok;
+      // one read per pool across both chains; a chain's RPC hiccup only
+      // blanks that chain's markets
+      const pricing = await getPricingMap(MARKETS);
+      if (pricing.size === 0) throw new Error("no market data");
+      return MARKETS.flatMap((market) => {
+        const p = pricing.get(market.slug);
+        return p
+          ? [{ market, price: p.price, quoteUsd: p.quoteUsd, priceUsd: p.priceUsd, tick: p.state.tick, liquidity: p.state.liquidity }]
+          : [];
+      });
     },
   });
 }
@@ -160,10 +160,12 @@ export function useMarketQuote(market: Market | undefined) {
     enabled: !!market,
     refetchInterval: 15_000,
     queryFn: async () => {
-      const state = await getPoolState(market!);
+      const { state, price, quoteUsd, priceUsd } = await getMarketPricing(market!);
       return {
         market: market!,
-        price: tickToUsdcPrice(market!, state.tick),
+        price,
+        quoteUsd,
+        priceUsd,
         tick: state.tick,
         sqrtPriceX96: state.sqrtPriceX96,
         liquidity: state.liquidity,

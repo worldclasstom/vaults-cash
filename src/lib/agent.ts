@@ -6,8 +6,8 @@
  */
 import { isAddress } from "viem";
 import { CHAINS, CHAIN_IDS } from "./chain";
-import { MARKETS, marketBySymbol, type Market } from "./markets";
-import { getPoolState, tickToUsdcPrice } from "./onchain";
+import { MARKETS, marketBySlug, type Market } from "./markets";
+import { getMarketPricing } from "./onchain";
 import type { Call } from "./zap";
 
 export function serializeCalls(calls: Call[]) {
@@ -15,7 +15,7 @@ export function serializeCalls(calls: Call[]) {
 }
 
 export function requireMarket(symbol: string | null): Market {
-  const market = symbol ? marketBySymbol(symbol) : undefined;
+  const market = symbol ? marketBySlug(symbol) : undefined;
   if (!market) {
     throw new AgentError(
       404,
@@ -41,20 +41,28 @@ export class AgentError extends Error {
   }
 }
 
+const tokenJson = (t: Market["base"]) => ({
+  address: t.address,
+  symbol: t.symbol,
+  name: t.name,
+  decimals: t.decimals,
+  kind: t.kind,
+  uiMultiplier: t.uiMultiplier,
+});
+
 export async function marketSnapshot(market: Market) {
-  const state = await getPoolState(market);
+  const { state, price, quoteUsd, priceUsd } = await getMarketPricing(market);
   return {
     market: market.slug,
-    symbol: market.symbol,
-    name: market.name,
+    pair: market.name,
     chainId: market.chainId,
     kind: market.kind,
-    token: market.token,
-    tokenDecimals: market.tokenDecimals,
-    /** the stablecoin deposits are made in on this chain (USDC / USDG) */
-    quote: market.quote,
-    usdc: market.quote.address,
-    uiMultiplier: market.uiMultiplier,
+    lowIl: market.lowIl,
+    base: tokenJson(market.base),
+    quote: tokenJson(market.quote),
+    /** deposits/withdrawals are always in this stablecoin */
+    stablecoin: CHAINS[market.chainId].quote.symbol,
+    quoteIsStablecoin: market.quoteIsStable,
     pool: {
       poolId: market.pool.poolId,
       feeBps: market.pool.fee / 100,
@@ -62,7 +70,11 @@ export async function marketSnapshot(market: Market) {
       currency0: market.pool.currency0,
       currency1: market.pool.currency1,
     },
-    priceUsdc: tickToUsdcPrice(market, state.tick),
+    /** base in quote units */
+    price,
+    /** quote in dollars */
+    quoteUsd,
+    priceUsd,
     tick: state.tick,
     liquidity: state.liquidity.toString(),
   };
@@ -71,9 +83,9 @@ export async function marketSnapshot(market: Market) {
 export const AGENT_DOCS = {
   execution:
     "Calls MUST be executed in order from the `owner` address. Smart accounts (ERC-4337/EIP-7702) should batch them atomically; EOAs must send them as sequential transactions and stop on any revert.",
-  fees: `vaults.cash takes ${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of the deposit (and of the asset->USDC conversion on withdraw), included in the returned calls.`,
+  fees: `vaults.cash takes ${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of the deposit (and of the converted output on withdraw), included in the returned calls.`,
   markets:
-    `Every market is paired against its chain's dollar stablecoin: ${CHAIN_IDS.map((id) => `${CHAINS[id].label} (chain ${id}) uses ${CHAINS[id].quote.symbol}`).join("; ")}. Identify a market by its slug ("base/eth", "robinhood/tsla"; a bare symbol means Base); every plan reports the chainId its calls must run on. kind=stable are stablecoin-correlated pairs with minimal impermanent loss; kind=stock are Robinhood-issued tokens on Robinhood Chain tracking US equities/ETFs (availability depends on the party's jurisdiction; uiMultiplier converts raw units to displayed shares). Markets are listed automatically from every live pool in the registry; check liquidity before sizing a deposit.`,
+    `Markets are Uniswap v4 pools identified by pair slug: "<chain>/<base>-<quote>", e.g. "base/eth-usdc", "base/cbbtc-eth", "robinhood/tsla-eth". Deposits and withdrawals are always in the chain's stablecoin (${CHAIN_IDS.map((id) => `${CHAINS[id].label} chain ${id}: ${CHAINS[id].quote.symbol}`).join("; ")}); when a market's quote isn't the stablecoin the plan converts through the quote's own stablecoin pool. A bare token ("eth") means that token's stablecoin pair on Base. Every plan reports the chainId its calls must run on. kind=stable pairs and lowIl=true pairs track the same thing on both legs (minimal impermanent loss); kind=stock legs are Robinhood-issued tokens on Robinhood Chain tracking US equities/ETFs (availability depends on the party's jurisdiction; uiMultiplier converts raw units to displayed shares). Markets are listed automatically from every live pool in the registry; check liquidity before sizing a deposit.`,
   slippage:
-    "Plans embed amountOutMinimum and amountMax bounds; if the pool moves beyond slippageBps the batch reverts. Quotes expire — rebuild plans older than ~60s.",
+    "Plans embed amountOutMinimum and amountMax bounds; if a pool moves beyond slippageBps the batch reverts. Quotes expire — rebuild plans older than ~60s.",
 };

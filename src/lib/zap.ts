@@ -1,36 +1,33 @@
 /**
  * The vaults.cash zap engine.
  *
- * Turns N USDC into a Uniswap v4 LP position in one atomic batch of calls
- * (executed as a single ERC-4337 userOp from the user's smart wallet):
+ * Turns N of the chain's stablecoin into a Uniswap v4 LP position in one
+ * atomic batch of calls (executed as a single ERC-4337 userOp from the
+ * user's smart wallet):
  *
- *   1. skim platform fee (plain USDC transfer)
- *   2. approve USDC -> Permit2 -> UniversalRouter
- *   3. UniversalRouter V4_SWAP: swap the computed share of USDC into the asset
- *   4. approve both currencies -> Permit2 -> PositionManager
- *   5. PositionManager.modifyLiquidities: mint the position NFT
+ *   1. [quote ≠ stablecoin] swap ALL of it into the quote token through the
+ *      quote's own stablecoin pool (e.g. USDC → ETH for a cbBTC/ETH market)
+ *   2. swap the computed share of the quote budget into the base token
+ *      through the market's pool
+ *   3. approve both legs → Permit2 → PositionManager
+ *   4. PositionManager.modifyLiquidities: mint the position NFT
+ *   5. skim the platform fee (plain stablecoin transfer, last)
  *
- * All calls are built up-front from a quote; the swap's amountOutMinimum and
- * the mint's amountMax bounds make the whole batch revert atomically if the
- * pool moves beyond the slippage tolerance. Any dust stays in the user's own
- * wallet — there is no vaults.cash contract holding funds.
+ * All calls are built up-front from quotes; every swap's amountOutMinimum
+ * and the mint's amountMax bounds make the whole batch revert atomically if
+ * a pool moves beyond the slippage tolerance. Any dust stays in the user's
+ * own wallet — there is no vaults.cash contract holding funds.
  */
 import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
 import { Ether, Percent, Token, type Currency } from "@uniswap/sdk-core";
 import { Pool, Position, V4PositionManager } from "@uniswap/v4-sdk";
-import { NATIVE_ETH, type Market } from "./markets";
-import {
-  buildSwapCall,
-  contractsOf,
-  erc20Approve,
-  permit2Approve,
-  quoteUsdcToAsset,
-  PERMIT2,
-  type Call,
-} from "./uniswap";
+import { CHAINS } from "./chain";
+import { NATIVE_ETH, quoteUsdMarket, type Market, type TokenInfo } from "./markets";
+import type { PoolState } from "./onchain";
+import { getPoolState, tickToPrice } from "./onchain";
+import { approvalsFor, buildSwapCall, contractsOf, quoteQuoteToBase, type Call } from "./uniswap";
 
 export type { Call } from "./uniswap";
-export { quoteUsdcToAsset, quoteAssetToUsdc } from "./uniswap";
 
 export type RangePreset = "full" | "balanced" | "aggressive";
 /** half-width of the range as a fraction of price; full = entire curve */
@@ -42,23 +39,14 @@ export const PRESET_WIDTH: Record<Exclude<RangePreset, "full">, number> = {
 const MIN_TICK = -887272;
 const MAX_TICK = 887272;
 
-export function marketCurrency(market: Market): Currency {
-  return market.token === NATIVE_ETH
-    ? Ether.onChain(market.chainId)
-    : new Token(market.chainId, market.token, market.tokenDecimals, market.symbol);
+function currencyOf(chainId: number, t: TokenInfo): Currency {
+  return t.address === NATIVE_ETH ? Ether.onChain(chainId) : new Token(chainId, t.address, t.decimals, t.symbol);
 }
-const quoteToken = (market: Market) =>
-  new Token(market.chainId, market.quote.address, market.quote.decimals, market.quote.symbol);
 
-export function buildPool(
-  market: Market,
-  sqrtPriceX96: bigint,
-  tick: number,
-  liquidity: bigint,
-): Pool {
+export function buildPool(market: Market, sqrtPriceX96: bigint, tick: number, liquidity: bigint): Pool {
   return new Pool(
-    marketCurrency(market),
-    quoteToken(market),
+    currencyOf(market.chainId, market.base),
+    currencyOf(market.chainId, market.quote),
     market.pool.fee,
     market.pool.tickSpacing,
     zeroAddress,
@@ -98,7 +86,7 @@ export function presetTicks(
 }
 
 /**
- * Which share of the (post-fee) USDC must be swapped into the asset so the
+ * Which share of the quote budget must be swapped into the base token so the
  * two sides match the range's required ratio at the current price. Float
  * math is fine here: the result only seeds the quote, and the batch is
  * guarded by amountOutMinimum/amountMax.
@@ -107,11 +95,11 @@ export function swapShare(
   currentTick: number,
   tickLower: number,
   tickUpper: number,
-  assetIsCurrency0: boolean,
+  baseIsCurrency0: boolean,
 ): number {
   // out of range: position is single-sided in one currency
-  if (currentTick <= tickLower) return assetIsCurrency0 ? 1 : 0; // all c0
-  if (currentTick >= tickUpper) return assetIsCurrency0 ? 0 : 1; // all c1
+  if (currentTick <= tickLower) return baseIsCurrency0 ? 1 : 0; // all c0
+  if (currentTick >= tickUpper) return baseIsCurrency0 ? 0 : 1; // all c1
   const sp = Math.pow(1.0001, currentTick / 2);
   const sl = Math.pow(1.0001, tickLower / 2);
   const su = Math.pow(1.0001, tickUpper / 2);
@@ -120,102 +108,114 @@ export function swapShare(
   const price = sp * sp; // c1 per c0, raw
   const value0 = amount0PerL * price; // both sides valued in c1 units
   const share0 = value0 / (value0 + amount1PerL);
-  return assetIsCurrency0 ? share0 : 1 - share0;
+  return baseIsCurrency0 ? share0 : 1 - share0;
 }
 
 export type ZapPlan = {
   chainId: number;
   calls: Call[];
+  /** platform fee, stablecoin units */
   feeAmount: bigint;
+  /** stablecoin → quote leg (only when quote ≠ stablecoin): input and min out */
+  quoteLeg?: { stableIn: bigint; quoteOutMin: bigint };
+  /** quote units sent into the market pool for base */
   swapIn: bigint;
+  /** guaranteed base out of that swap */
   swapOutMin: bigint;
-  usdcToPosition: bigint;
+  /** quote units kept for the position */
+  quoteToPosition: bigint;
+  /** dollar price of one quote unit (1 for the stablecoin) at plan time */
+  quoteUsd: number;
+  /** base price in quote units at plan time */
+  price: number;
   tickLower: number;
   tickUpper: number;
 };
 
+const bpsMul = (x: bigint, bps: bigint) => (x * bps) / 10_000n;
+
 export async function buildZapPlan(params: {
   market: Market;
   owner: `0x${string}`;
+  /** stablecoin amount to deposit, raw units */
   usdcAmount: bigint;
   preset: RangePreset;
   customWidth?: number;
   slippageBps: number;
-  poolState: { sqrtPriceX96: bigint; tick: number; liquidity: bigint };
+  poolState: PoolState;
   /** add to this position (its range) instead of minting a new one */
   addTo?: { tokenId: bigint; tickLower: number; tickUpper: number };
 }): Promise<ZapPlan> {
-  const { market, owner, usdcAmount, preset, customWidth, slippageBps, poolState, addTo } =
-    params;
-  const quote = market.quote.address;
-  const { router, posm } = contractsOf(market);
-
+  const { market, owner, usdcAmount, preset, customWidth, slippageBps, poolState, addTo } = params;
+  const stable = CHAINS[market.chainId].quote.address;
+  const { posm, router } = contractsOf(market);
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 20 * 60);
+  const keep = BigInt(10_000 - slippageBps);
 
-  const feeAmount = (usdcAmount * feeBps) / 10_000n;
+  const feeAmount = bpsMul(usdcAmount, feeBps);
   const net = usdcAmount - feeAmount;
-
-  const { tickLower, tickUpper } =
-    addTo ?? presetTicks(market, poolState.tick, preset, customWidth);
-  const share = swapShare(poolState.tick, tickLower, tickUpper, market.assetIsCurrency0);
-  const swapIn = (net * BigInt(Math.round(share * 1_000_000))) / 1_000_000n;
-  const usdcToPosition = net - swapIn;
-
   const calls: Call[] = [];
 
+  // 1. stablecoin → quote token when the quote isn't the stablecoin
+  let budget = net; // quote units available for the position
+  let quoteLeg: ZapPlan["quoteLeg"];
+  let quoteUsd = 1;
+  const qm = quoteUsdMarket(market);
+  if (qm) {
+    const qState = await getPoolState(qm);
+    quoteUsd = tickToPrice(qm, qState.tick);
+    const { amountOut } = await quoteQuoteToBase(qm, net); // qm.base === market.quote
+    const quoteOutMin = bpsMul(amountOut, keep);
+    calls.push(...approvalsFor(stable, router, deadline));
+    calls.push(buildSwapCall({ market: qm, direction: "quoteToBase", amountIn: net, minAmountOut: quoteOutMin, deadline }));
+    budget = quoteOutMin;
+    quoteLeg = { stableIn: net, quoteOutMin };
+  }
+
+  // 2. quote → base for the range's required ratio
+  const { tickLower, tickUpper } = addTo ?? presetTicks(market, poolState.tick, preset, customWidth);
+  const share = swapShare(poolState.tick, tickLower, tickUpper, market.baseIsCurrency0);
+  const swapIn = (budget * BigInt(Math.round(share * 1_000_000))) / 1_000_000n;
+  const quoteToPosition = budget - swapIn;
+
   let swapOutMin = 0n;
-  const slippage = BigInt(10_000 - slippageBps);
-
   if (swapIn > 0n) {
-    const { amountOut } = await quoteUsdcToAsset(market, swapIn);
-    swapOutMin = (amountOut * slippage) / 10_000n;
-
-    // 2. USDC -> Permit2 -> UniversalRouter, then the swap itself
-    calls.push(erc20Approve(quote, PERMIT2));
-    calls.push(permit2Approve(quote, router, deadline));
-    calls.push(
-      buildSwapCall({
-        market,
-        direction: "usdcToAsset",
-        amountIn: swapIn,
-        minAmountOut: swapOutMin,
-        deadline,
-      }),
-    );
+    const { amountOut } = await quoteQuoteToBase(market, swapIn);
+    swapOutMin = bpsMul(amountOut, keep);
+    calls.push(...approvalsFor(market.quote.address, router, deadline));
+    calls.push(buildSwapCall({ market, direction: "quoteToBase", amountIn: swapIn, minAmountOut: swapOutMin, deadline }));
   }
 
-  // 4. approvals for PositionManager
-  if (usdcToPosition > 0n) calls.push(permit2Approve(quote, posm, deadline));
-  if (market.token !== NATIVE_ETH && swapOutMin > 0n) {
-    calls.push(erc20Approve(market.token, PERMIT2));
-    calls.push(permit2Approve(market.token, posm, deadline));
-  }
+  // 3. approvals for the PositionManager, both legs
+  if (swapOutMin > 0n) calls.push(...approvalsFor(market.base.address, posm, deadline));
+  if (quoteToPosition > 0n) calls.push(...approvalsFor(market.quote.address, posm, deadline));
 
-  // 5. mint — sized from guaranteed amounts (swapOutMin + kept USDC).
-  // Native ETH: the only ETH the wallet holds at this point is the swap
-  // output (≥ swapOutMin), but the SDK's `value` is amount0Max — the
-  // slippage-widened bound, several % above swapOutMin for a concentrated
-  // range — and sending it reverts. So send exactly the guaranteed amount
-  // and size the mint 1% under it, so a small adverse move between quote and
-  // inclusion still fits; the sliver left over stays in the wallet as ETH
-  // (a gas reserve on chains without a paymaster).
-  const nativeIn = market.token === NATIVE_ETH;
-  const assetForMint = nativeIn ? (swapOutMin * 99n) / 100n : swapOutMin;
+  // 4. mint — sized from guaranteed amounts. Native ETH: the only ETH the
+  // wallet holds at this point is a swap output, but the SDK's `value` is
+  // amountMax — the slippage-widened bound, several % above the minimum for
+  // a concentrated range — and sending it reverts. So send exactly the
+  // guaranteed amount and size the mint 1% under it, so a small adverse move
+  // between quote and inclusion still fits; the sliver left over stays in
+  // the wallet as ETH (a gas reserve on chains without a paymaster).
+  const nativeLeg: "base" | "quote" | null =
+    market.base.address === NATIVE_ETH ? "base" : market.quote.address === NATIVE_ETH ? "quote" : null;
+  const baseForMint = nativeLeg === "base" ? (swapOutMin * 99n) / 100n : swapOutMin;
+  const quoteForMint = nativeLeg === "quote" && qm ? (quoteToPosition * 99n) / 100n : quoteToPosition;
   const pool = buildPool(market, poolState.sqrtPriceX96, poolState.tick, poolState.liquidity);
   const position = Position.fromAmounts({
     pool,
     tickLower,
     tickUpper,
-    amount0: (market.assetIsCurrency0 ? assetForMint : usdcToPosition).toString(),
-    amount1: (market.assetIsCurrency0 ? usdcToPosition : assetForMint).toString(),
+    amount0: (market.baseIsCurrency0 ? baseForMint : quoteForMint).toString(),
+    amount1: (market.baseIsCurrency0 ? quoteForMint : baseForMint).toString(),
     useFullPrecision: true,
   });
   const common = {
     slippageTolerance: new Percent(slippageBps, 10_000),
     deadline: deadline.toString(),
-    useNative: market.token === NATIVE_ETH ? Ether.onChain(market.chainId) : undefined,
+    useNative: nativeLeg ? Ether.onChain(market.chainId) : undefined,
   };
   // with a tokenId the SDK encodes INCREASE_LIQUIDITY on that position
   // instead of minting a new NFT
@@ -223,21 +223,18 @@ export async function buildZapPlan(params: {
     position,
     addTo ? { ...common, tokenId: addTo.tokenId.toString() } : { ...common, recipient: owner },
   );
-  const mintValue = nativeIn && BigInt(value) > swapOutMin ? swapOutMin : BigInt(value);
+  const guaranteedNative = nativeLeg === "base" ? swapOutMin : nativeLeg === "quote" ? quoteToPosition : 0n;
+  const mintValue = BigInt(value) > guaranteedNative ? guaranteedNative : BigInt(value);
   calls.push({ to: posm, value: mintValue, data: calldata as `0x${string}` });
 
-  // platform fee LAST: in the atomic path order is irrelevant, and in the
+  // 5. platform fee LAST: in the atomic path order is irrelevant, and in a
   // sequential fallback the fee is only charged once the position exists
   // (an abandoned attempt costs the user nothing).
   if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
     calls.push({
-      to: quote,
+      to: stable,
       value: 0n,
-      data: encodeFunctionData({
-        abi: erc20Abi,
-        functionName: "transfer",
-        args: [feeRecipient, feeAmount],
-      }),
+      data: encodeFunctionData({ abi: erc20Abi, functionName: "transfer", args: [feeRecipient, feeAmount] }),
     });
   }
 
@@ -245,26 +242,30 @@ export async function buildZapPlan(params: {
     chainId: market.chainId,
     calls,
     feeAmount,
+    quoteLeg,
     swapIn,
     swapOutMin,
-    usdcToPosition,
+    quoteToPosition,
+    quoteUsd,
+    price: tickToPrice(market, poolState.tick),
     tickLower,
     tickUpper,
   };
 }
 
-/** Estimated dollar value of the planned position (for the confirm sheet). */
-export function planSummary(
-  plan: ZapPlan,
-  assetPrice: number,
-  assetDecimals: number,
-  quoteDecimals = 6,
-) {
-  const assetUsd = (Number(plan.swapOutMin) / 10 ** assetDecimals) * assetPrice;
-  const usdcUsd = Number(plan.usdcToPosition) / 10 ** quoteDecimals;
+/** Dollar breakdown of the planned position (for the confirm sheet). */
+export function planSummary(plan: ZapPlan, market: Market) {
+  const baseUnits = Number(plan.swapOutMin) / 10 ** market.base.decimals;
+  const quoteUnits = Number(plan.quoteToPosition) / 10 ** market.quote.decimals;
+  const stableDecimals = CHAINS[market.chainId].quote.decimals;
   return {
-    assetUsd,
-    usdcUsd,
-    feeUsd: Number(plan.feeAmount) / 10 ** quoteDecimals,
+    baseAmount: baseUnits,
+    baseUsd: baseUnits * plan.price * plan.quoteUsd,
+    quoteAmount: quoteUnits,
+    quoteUsd: quoteUnits * plan.quoteUsd,
+    feeUsd: Number(plan.feeAmount) / 10 ** stableDecimals,
+    // aliases for the older confirm sheet
+    assetUsd: baseUnits * plan.price * plan.quoteUsd,
+    usdcUsd: quoteUnits * plan.quoteUsd,
   };
 }

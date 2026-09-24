@@ -5,7 +5,7 @@
  */
 import { formatUnits } from "viem";
 import { MARKETS } from "../src/lib/markets";
-import { getPoolState, tickToUsdcPrice } from "../src/lib/onchain";
+import { getMarketPricing } from "../src/lib/onchain";
 import { buildZapPlan, planSummary } from "../src/lib/zap";
 import { buildWithdrawPlan } from "../src/lib/withdraw";
 
@@ -13,10 +13,9 @@ let failures = 0;
 
 async function main() {
   for (const market of MARKETS) {
-    const poolState = await getPoolState(market);
-    const price = tickToUsdcPrice(market, poolState.tick);
+    const { state: poolState, priceUsd: price } = await getMarketPricing(market);
     console.log(
-      `\n=== ${market.symbol} (${market.pool.fee / 10_000}% pool, asset=${market.assetIsCurrency0 ? "c0" : "c1"}) — $${price.toFixed(2)} ===`,
+      `\n=== ${market.slug} (${market.pool.fee / 10_000}% pool, base=${market.baseIsCurrency0 ? "c0" : "c1"}) — $${price.toFixed(2)} ===`,
     );
     for (const preset of ["full", "balanced"] as const) {
       try {
@@ -28,11 +27,11 @@ async function main() {
           slippageBps: 100,
           poolState,
         });
-        const s = planSummary(plan, price, market.tokenDecimals);
+        const s = planSummary(plan, market);
         console.log(
           `  ${preset.padEnd(9)} ticks [${plan.tickLower}, ${plan.tickUpper}] ` +
-            `swap ${formatUnits(plan.swapIn, market.quote.decimals)} ${market.quote.symbol} -> ≥${Number(formatUnits(plan.swapOutMin, market.tokenDecimals)).toFixed(6)} ${market.symbol} ` +
-            `| ~$${s.assetUsd.toFixed(2)} + $${s.usdcUsd.toFixed(2)} | ${plan.calls.length} calls`,
+            `${plan.quoteLeg ? `stable->${market.quote.symbol} ≥${formatUnits(plan.quoteLeg.quoteOutMin, market.quote.decimals)} | ` : ""}swap ${formatUnits(plan.swapIn, market.quote.decimals)} ${market.quote.symbol} -> ≥${Number(formatUnits(plan.swapOutMin, market.base.decimals)).toFixed(6)} ${market.base.symbol} ` +
+            `| ~$${s.baseUsd.toFixed(2)} + $${s.quoteUsd.toFixed(2)} | ${plan.calls.length} calls`,
         );
       } catch (e) {
         failures++;
@@ -53,8 +52,8 @@ async function main() {
         slippageBps: 100,
       });
       console.log(
-        `  withdraw  ${plan.calls.length} calls, assetOutMin ${Number(formatUnits(plan.assetOutMin, market.tokenDecimals)).toFixed(6)} ${market.symbol}, ` +
-          `usdcOutMin ${formatUnits(plan.usdcOutMin, 6)}, fee ${formatUnits(plan.feeAmount, 6)}`,
+        `  withdraw  ${plan.calls.length} calls, baseOutMin ${Number(formatUnits(plan.baseOutMin, market.base.decimals)).toFixed(6)} ${market.base.symbol}, ` +
+          `stableOutMin ${formatUnits(plan.stableOutMin, 6)}, fee ${formatUnits(plan.feeAmount, 6)}`,
       );
     } catch (e) {
       failures++;

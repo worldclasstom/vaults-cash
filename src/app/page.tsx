@@ -6,7 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { Landing } from "@/components/Landing";
-import { MarketList } from "@/components/MarketList";
+import { PoolList } from "@/components/PoolList";
 import { SendPanel } from "@/components/SendPanel";
 import {
   useActiveAddress,
@@ -143,8 +143,11 @@ function Dashboard() {
         )}
       </section>
       <section>
-        <h2 className="pb-3 text-lg font-semibold">Markets</h2>
-        <MarketList />
+        <h2 className="pb-1 text-lg font-semibold">Pools</h2>
+        <p className="pb-3 text-sm text-muted">
+          Pick a pair, choose a price range, and earn a share of every trade. Deposits are in dollars; we handle the rest.
+        </p>
+        <PoolList />
       </section>
       <InviteCard />
     </div>
