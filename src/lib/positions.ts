@@ -2,7 +2,6 @@ import { parseAbi } from "viem";
 import { UNISWAP } from "./chain";
 import { MARKETS, type Market } from "./markets";
 import { publicClient } from "./onchain";
-import { baseChain } from "./chain";
 
 export const POSM = UNISWAP.v4.positionManager as `0x${string}`;
 
@@ -74,23 +73,24 @@ export async function getUncollectedFees(position: OwnedPosition) {
   };
 }
 
-/** Enumerate the user's v4 position NFTs via Blockscout, then read live state. */
-export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPosition[]> {
-  const api = baseChain.blockExplorers.default.apiUrl;
-  const res = await fetch(`${api}/addresses/${owner}/nft?type=ERC-721`, {
-    headers: { accept: "application/json" },
-  });
-  if (!res.ok) {
-    if (res.status === 404) return []; // address unseen by the indexer yet
-    throw new Error(`Blockscout ${res.status}`);
+/** Candidate token ids: in the browser via our /api/positions/nfts route
+ *  (indexer keys stay server-side), on the server directly. */
+async function candidateTokenIds(owner: `0x${string}`): Promise<bigint[]> {
+  if (typeof window === "undefined") {
+    const { positionTokenIds } = await import("./nfts");
+    return positionTokenIds(owner);
   }
-  const body = await res.json();
-  const tokenIds: bigint[] = (body.items ?? [])
-    .filter((item: { token?: { address?: string; address_hash?: string } }) => {
-      const addr = item.token?.address ?? item.token?.address_hash ?? "";
-      return addr.toLowerCase() === POSM.toLowerCase();
-    })
-    .map((item: { id: string }) => BigInt(item.id));
+  const res = await fetch(`/api/positions/nfts?owner=${owner}`, {
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!res.ok) throw new Error(`positions lookup failed (${res.status})`);
+  const body = (await res.json()) as { tokenIds: string[] };
+  return body.tokenIds.map(BigInt);
+}
+
+/** Enumerate the user's v4 position NFTs, then read live state from the chain. */
+export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPosition[]> {
+  const tokenIds = await candidateTokenIds(owner);
 
   const positions = await Promise.all(
     tokenIds.map(async (tokenId) => {
