@@ -22,8 +22,9 @@ const csp = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  "child-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org",
-  "frame-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com",
+  "child-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://oauth.telegram.org",
+  // oauth.telegram.org: Privy's SDK frames the Telegram widget even when Telegram login is off
+  "frame-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org",
   [
     "connect-src 'self'",
     // Privy
