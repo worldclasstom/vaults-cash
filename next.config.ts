@@ -11,8 +11,10 @@ const isDev = process.env.NODE_ENV !== "production";
  */
 const csp = [
   "default-src 'self'",
-  // Next.js needs inline scripts; Turnstile is Privy's captcha. Dev needs eval for HMR.
-  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com`,
+  // Next.js needs inline scripts; Turnstile is Privy's captcha; Privy's SDK
+  // also loads helper scripts (e.g. telegram-login.js) from auth.privy.io
+  // even for login methods we don't use. Dev needs eval for HMR.
+  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com https://auth.privy.io`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
