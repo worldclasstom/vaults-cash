@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { MarketDetail } from "@/components/MarketDetail";
 import { MARKETS, marketBySlug } from "@/lib/markets";
 
@@ -20,6 +20,8 @@ export default async function MarketPage({
   const { chain, symbol } = await params;
   const slug = `${chain}/${symbol}`.toLowerCase();
   const market = marketBySlug(slug);
-  if (!market || market.slug !== slug) notFound();
+  if (!market) notFound();
+  // /market/base/eth (bare token) → its stablecoin pair's canonical URL
+  if (market.slug !== slug) permanentRedirect(`/market/${market.slug}`);
   return <MarketDetail slug={slug} />;
 }
