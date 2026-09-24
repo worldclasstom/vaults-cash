@@ -4,14 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { useMarketQuote, useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
-import { NATIVE_ETH } from "@/lib/markets";
+import { useMarketQuote, useQuoteBalance, useTokenBalance } from "@/hooks/useChainData";
+import { NATIVE_ETH, type Market } from "@/lib/markets";
 import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
 import { formatEther } from "viem";
-import { GAS_SPONSORED } from "@/lib/config";
 import { fmtUsd, fmtPct } from "@/lib/format";
-import { UNISWAP } from "@/lib/chain";
-import { marketBySymbol, USDC } from "@/lib/markets";
+import { chainConfig } from "@/lib/chain";
+import { marketBySymbol } from "@/lib/markets";
+import { PERMIT2, contractsOf } from "@/lib/uniswap";
 import { planSummary, PRESET_WIDTH, type RangePreset, type ZapPlan } from "@/lib/zap";
 import type { MarketStats } from "@/app/api/stats/route";
 
@@ -31,10 +31,11 @@ function useStats() {
 
 export function MarketDetail({ symbol }: { symbol: string }) {
   const market = marketBySymbol(symbol)!;
+  const chain = chainConfig(market.chainId);
   const router = useRouter();
   const { data: quote } = useMarketQuote(market);
   const { data: stats } = useStats();
-  const { data: balance } = useUsdcBalance();
+  const { data: balance } = useQuoteBalance(market.chainId);
 
   const [amount, setAmount] = useState("");
   const [preset, setPreset] = useState<RangePreset>("full");
@@ -46,9 +47,9 @@ export function MarketDetail({ symbol }: { symbol: string }) {
   const planMutation = usePlanDeposit();
   const sendMutation = useSendDeposit();
 
-  const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
+  const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18, market.chainId);
 
-  const s = stats?.[market.symbol];
+  const s = stats?.[market.slug];
   const amountNum = Number(amount) || 0;
   const insufficient = balance !== undefined && amountNum > (balance?.formatted ?? 0);
   const tooThin = s !== undefined && s.tvlUsd > 0 && amountNum > s.tvlUsd * 0.1;
@@ -71,7 +72,10 @@ export function MarketDetail({ symbol }: { symbol: string }) {
     router.push("/portfolio?deposited=1");
   };
 
-  const summary = plan && quote ? planSummary(plan, quote.price, market.tokenDecimals) : null;
+  const summary =
+    plan && quote
+      ? planSummary(plan, quote.price, market.tokenDecimals, market.quote.decimals)
+      : null;
 
   return (
     <AppShell>
@@ -80,6 +84,8 @@ export function MarketDetail({ symbol }: { symbol: string }) {
           <p className="text-sm text-muted">
             {market.name}
             {market.kind === "stable" && " · Stablecoin"}
+            {" · "}
+            {chain.label}
           </p>
           <p className="text-4xl font-bold tracking-tight">
             {quote ? fmtUsd(quote.price) : "—"}
@@ -96,7 +102,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
 
         <section className="rounded-3xl bg-surface p-5">
           <label className="text-sm text-muted" htmlFor="amount">
-            Deposit USDC
+            Deposit {market.quote.symbol}
           </label>
           <div className="flex items-baseline gap-2 py-1">
             <span className="text-3xl font-bold">$</span>
@@ -171,11 +177,11 @@ export function MarketDetail({ symbol }: { symbol: string }) {
             </div>
           )}
 
-          {!GAS_SPONSORED && noGas && amountNum > 0 && (
+          {!chain.gasSponsored && noGas && amountNum > 0 && (
             <p className="mt-3 text-xs text-negative">
-              Your wallet has no ETH for network fees. Send a small amount of
-              ETH on Base (about $1 covers many transactions) — see
-              Receive on the home screen.
+              Your wallet has no ETH on {chain.label} for network fees. Send a
+              small amount of ETH on {chain.chain.name} (about $1 covers many
+              transactions) — see Receive on the home screen.
             </p>
           )}
           {tooThin && (
@@ -192,7 +198,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
             className="mt-4 w-full rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-40"
           >
             {insufficient
-              ? "Insufficient USDC"
+              ? `Insufficient ${market.quote.symbol}`
               : planMutation.isPending
                 ? "Getting quote…"
                 : "Review deposit"}
@@ -217,7 +223,7 @@ export function MarketDetail({ symbol }: { symbol: string }) {
             <h3 className="text-lg font-semibold">Confirm deposit</h3>
             <dl className="space-y-2 py-4 text-sm">
               <Row k={`${market.symbol} side`} v={`~${fmtUsd(summary.assetUsd)}`} />
-              <Row k="USDC side" v={fmtUsd(summary.usdcUsd)} />
+              <Row k={`${market.quote.symbol} side`} v={fmtUsd(summary.usdcUsd)} />
               <Row k={`vaults.cash fee (${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}%)`} v={fmtUsd(summary.feeUsd)} />
               <Row
                 k="Range"
@@ -225,13 +231,13 @@ export function MarketDetail({ symbol }: { symbol: string }) {
               />
             </dl>
             <p className="pb-2 text-xs text-muted">
-              {GAS_SPONSORED
+              {chain.gasSponsored
                 ? "Network fees are covered by vaults.cash."
                 : "Network fee ~$0.01, paid in ETH from your wallet."}{" "}
               You&apos;ll earn {market.pool.fee / 10_000}% of every trade that
               crosses your range. Withdraw anytime.
             </p>
-            <TxDetails calls={plan.calls} />
+            <TxDetails market={market} calls={plan.calls} />
             <button
               onClick={confirm}
               disabled={sendMutation.isPending}
@@ -251,14 +257,18 @@ export function MarketDetail({ symbol }: { symbol: string }) {
   );
 }
 
-const CONTRACT_LABELS: Record<string, string> = {
-  [USDC.address.toLowerCase()]: "USDC token",
-  [UNISWAP.permit2.toLowerCase()]: "Permit2 (approvals)",
-  [UNISWAP.v4.universalRouter.toLowerCase()]: "Uniswap Universal Router (swap)",
-  [UNISWAP.v4.positionManager.toLowerCase()]: "Uniswap Position Manager (mint)",
-};
+function contractLabels(market: Market): Record<string, string> {
+  const { router, posm } = contractsOf(market);
+  return {
+    [market.quote.address.toLowerCase()]: `${market.quote.symbol} token`,
+    [PERMIT2.toLowerCase()]: "Permit2 (approvals)",
+    [router.toLowerCase()]: "Uniswap Universal Router (swap)",
+    [posm.toLowerCase()]: "Uniswap Position Manager (mint)",
+  };
+}
 
-function TxDetails({ calls }: { calls: ZapPlan["calls"] }) {
+function TxDetails({ market, calls }: { market: Market; calls: ZapPlan["calls"] }) {
+  const CONTRACT_LABELS = contractLabels(market);
   return (
     <details className="pb-4 text-xs text-muted">
       <summary className="cursor-pointer underline-offset-2 hover:underline">

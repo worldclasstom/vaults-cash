@@ -27,8 +27,9 @@ export async function POST(req: NextRequest) {
 
     const plan = await buildWithdrawPlan({ position, slippageBps });
     return NextResponse.json({
-      chainId: 8453,
-      market: position.market.symbol,
+      chainId: plan.chainId,
+      market: position.market.slug,
+      quote: position.market.quote.symbol,
       calls: serializeCalls(plan.calls),
       summary: {
         minAssetOut: plan.assetOutMin.toString(),

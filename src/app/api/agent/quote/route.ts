@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { parseUnits } from "viem";
 import { AgentError, requireMarket } from "@/lib/agent";
-import { USDC } from "@/lib/markets";
 import { getPoolState, tickToUsdcPrice } from "@/lib/onchain";
 import { presetTicks, quoteUsdcToAsset, swapShare, type RangePreset } from "@/lib/zap";
 
@@ -28,7 +27,7 @@ export async function GET(req: NextRequest) {
       preset,
       widthPct !== undefined ? widthPct / 100 : undefined,
     );
-    const amount = parseUnits(amountUsd.toFixed(USDC.decimals), USDC.decimals);
+    const amount = parseUnits(amountUsd.toFixed(market.quote.decimals), market.quote.decimals);
     const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
     const net = amount - (amount * feeBps) / 10_000n;
     const share = swapShare(state.tick, tickLower, tickUpper, market.assetIsCurrency0);
@@ -37,7 +36,9 @@ export async function GET(req: NextRequest) {
       swapIn > 0n ? await quoteUsdcToAsset(market, swapIn) : { amountOut: 0n };
 
     return NextResponse.json({
-      market: market.symbol,
+      market: market.slug,
+      chainId: market.chainId,
+      quote: market.quote.symbol,
       priceUsdc: tickToUsdcPrice(market, state.tick),
       tick: state.tick,
       tickLower,
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
       swapInUsdc: swapIn.toString(),
       estAssetOut: amountOut.toString(),
       usdcKept: (net - swapIn).toString(),
-      note: "Amounts are raw integer units (USDC 6 decimals). POST /api/agent/zap-plan to get executable calls.",
+      note: `Amounts are raw integer units (${market.quote.symbol} ${market.quote.decimals} decimals). POST /api/agent/zap-plan to get executable calls.`,
     });
   } catch (e) {
     if (e instanceof AgentError)

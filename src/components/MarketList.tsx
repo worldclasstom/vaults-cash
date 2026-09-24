@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useMarketQuotes } from "@/hooks/useChainData";
+import { chainConfig } from "@/lib/chain";
 import { fmtUsd } from "@/lib/format";
 import type { Market } from "@/lib/markets";
 
@@ -69,15 +70,15 @@ export function MarketList() {
         </div>
       ) : isError || !data ? (
         <p className="rounded-2xl bg-surface p-4 text-sm text-muted">
-          Couldn&apos;t reach Base. Check your connection and try again.
+          Couldn&apos;t reach the network. Check your connection and try again.
         </p>
       ) : (
         <>
           <ul className="space-y-2">
             {shown.map(({ market, price }) => (
-              <li key={market.symbol}>
+              <li key={market.slug}>
                 <Link
-                  href={`/market/${market.symbol.toLowerCase()}`}
+                  href={`/market/${market.slug}`}
                   className="flex items-center gap-3 rounded-2xl bg-surface p-4 transition-colors hover:bg-surface-raised"
                 >
                   <Monogram market={market} />
@@ -86,6 +87,7 @@ export function MarketList() {
                     <span className="text-sm text-muted">
                       {market.name}
                       {market.kind === "stable" && " · Stablecoin"}
+                      {market.chainId !== 8453 && ` · ${chainConfig(market.chainId).label}`}
                     </span>
                   </span>
                   <span className="flex flex-col items-end">

@@ -18,7 +18,7 @@ _Operational knowledge. If it bit us once, it lives here._
 Push to `main` → Vercel auto-deploys production (git integration).
 CLI alternative: `npx vercel deploy --prod --scope prosperity-labs`.
 Before deploying after any token/pool change: `npx tsx scripts/verify-chain.ts`
-(regenerates registry.json; everything reads from it) and
+(`--chain base` / `--chain robinhood`; regenerates that chain's registries/*.json, which everything reads from) and
 `npx tsx scripts/test-zap.ts` (dry-runs all markets against live pools).
 
 ## Gotchas that already bit us (do not relearn)

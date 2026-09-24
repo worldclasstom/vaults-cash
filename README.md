@@ -25,7 +25,7 @@ in the user's wallet.
 
 ## Ground truth
 
-All addresses come from [src/lib/registry.json](src/lib/registry.json), written
+All addresses come from [src/lib/registries/](src/lib/registries/) (one file per chain), written
 by `npx tsx scripts/verify-chain.ts`, which asserts against mainnet RPC:
 token metadata (USDG, stock tokens + ERC-8056 `uiMultiplier`), Uniswap v4/v3
 bytecode, and live v4 pool ids via StateView. **Re-run it before every deploy**

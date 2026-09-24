@@ -3,7 +3,7 @@ import { MarketDetail } from "@/components/MarketDetail";
 import { marketBySymbol, MARKETS } from "@/lib/markets";
 
 export function generateStaticParams() {
-  return MARKETS.map((m) => ({ symbol: m.symbol.toLowerCase() }));
+  return MARKETS.map((m) => ({ symbol: m.slug }));
 }
 
 export default async function MarketPage({

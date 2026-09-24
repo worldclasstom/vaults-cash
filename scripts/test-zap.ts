@@ -4,7 +4,7 @@
  * Run: npx tsx scripts/test-zap.ts
  */
 import { formatUnits } from "viem";
-import { MARKETS, USDC } from "../src/lib/markets";
+import { MARKETS } from "../src/lib/markets";
 import { getPoolState, tickToUsdcPrice } from "../src/lib/onchain";
 import { buildZapPlan, planSummary } from "../src/lib/zap";
 import { buildWithdrawPlan } from "../src/lib/withdraw";
@@ -31,7 +31,7 @@ async function main() {
         const s = planSummary(plan, price, market.tokenDecimals);
         console.log(
           `  ${preset.padEnd(9)} ticks [${plan.tickLower}, ${plan.tickUpper}] ` +
-            `swap ${formatUnits(plan.swapIn, USDC.decimals)} USDC -> ≥${Number(formatUnits(plan.swapOutMin, market.tokenDecimals)).toFixed(6)} ${market.symbol} ` +
+            `swap ${formatUnits(plan.swapIn, market.quote.decimals)} ${market.quote.symbol} -> ≥${Number(formatUnits(plan.swapOutMin, market.tokenDecimals)).toFixed(6)} ${market.symbol} ` +
             `| ~$${s.assetUsd.toFixed(2)} + $${s.usdcUsd.toFixed(2)} | ${plan.calls.length} calls`,
         );
       } catch (e) {

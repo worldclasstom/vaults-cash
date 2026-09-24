@@ -5,7 +5,8 @@
  * own wallet instead.
  */
 import { isAddress } from "viem";
-import { MARKETS, marketBySymbol, USDC, type Market } from "./markets";
+import { CHAINS, CHAIN_IDS } from "./chain";
+import { MARKETS, marketBySymbol, type Market } from "./markets";
 import { getPoolState, tickToUsdcPrice } from "./onchain";
 import type { Call } from "./zap";
 
@@ -18,7 +19,7 @@ export function requireMarket(symbol: string | null): Market {
   if (!market) {
     throw new AgentError(
       404,
-      `Unknown market "${symbol}". Available: ${MARKETS.map((m) => m.symbol).join(", ")}`,
+      `Unknown market "${symbol}". Available: ${MARKETS.map((m) => m.slug).join(", ")}`,
     );
   }
   return market;
@@ -43,12 +44,16 @@ export class AgentError extends Error {
 export async function marketSnapshot(market: Market) {
   const state = await getPoolState(market);
   return {
+    market: market.slug,
     symbol: market.symbol,
     name: market.name,
+    chainId: market.chainId,
     kind: market.kind,
     token: market.token,
     tokenDecimals: market.tokenDecimals,
-    usdc: USDC.address,
+    /** the stablecoin deposits are made in on this chain (USDC / USDG) */
+    quote: market.quote,
+    usdc: market.quote.address,
     pool: {
       poolId: market.pool.poolId,
       feeBps: market.pool.fee / 100,
@@ -67,7 +72,7 @@ export const AGENT_DOCS = {
     "Calls MUST be executed in order from the `owner` address. Smart accounts (ERC-4337/EIP-7702) should batch them atomically; EOAs must send them as sequential transactions and stop on any revert.",
   fees: `vaults.cash takes ${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of the deposit (and of the asset->USDC conversion on withdraw), included in the returned calls.`,
   markets:
-    "All markets are crypto on Base (chain 8453), paired against USDC. There are no tokenized securities here, so no market is geo-restricted. Markets with kind=stable are USDC-correlated pairs with minimal impermanent loss.",
+    `All markets are crypto, paired against the chain's dollar stablecoin: ${CHAIN_IDS.map((id) => `${CHAINS[id].label} (chain ${id}) uses ${CHAINS[id].quote.symbol}`).join("; ")}. Identify a market by its slug (e.g. "eth" on Base, "eth-robinhood" on Robinhood Chain); every plan reports the chainId its calls must run on. There are no tokenized securities here, so no market is geo-restricted. Markets with kind=stable are stablecoin-correlated pairs with minimal impermanent loss.`,
   slippage:
     "Plans embed amountOutMinimum and amountMax bounds; if the pool moves beyond slippageBps the batch reverts. Quotes expire — rebuild plans older than ~60s.",
 };

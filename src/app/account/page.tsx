@@ -7,6 +7,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { useActiveAddress, useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
+import { CHAINS, CHAIN_IDS, explorerUrl } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 
@@ -78,7 +79,9 @@ export default function AccountPage() {
           </section>
 
           <section className="rounded-3xl bg-surface p-5">
-            <p className="pb-1 text-sm text-muted">Your wallet on Base</p>
+            <p className="pb-1 text-sm text-muted">
+              Your wallet — same address on Base and Robinhood Chain
+            </p>
             {address && (
               <>
                 <button
@@ -103,14 +106,19 @@ export default function AccountPage() {
                     )}
                   </span>
                 </div>
-                <a
-                  href={`https://base.blockscout.com/address/${address}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-2 inline-block text-sm text-accent underline-offset-2 hover:underline"
-                >
-                  View on explorer →
-                </a>
+                <span className="mt-2 flex gap-4 text-sm">
+                  {CHAIN_IDS.map((id) => (
+                    <a
+                      key={id}
+                      href={explorerUrl(id, "address", address)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-accent underline-offset-2 hover:underline"
+                    >
+                      {CHAINS[id].label} explorer →
+                    </a>
+                  ))}
+                </span>
               </>
             )}
             <p className="pt-3 text-xs text-muted">

@@ -48,7 +48,7 @@ export function usePositions() {
           const usdcOwed = c0 ? fees.owed1 : fees.owed0;
           const feesUsd =
             (Number(assetOwed) / 10 ** p.market.tokenDecimals) * price +
-            Number(usdcOwed) / 1e6;
+            Number(usdcOwed) / 10 ** p.market.quote.decimals;
           return {
             ...p,
             inRange: state.tick >= p.tickLower && state.tick < p.tickUpper,
@@ -72,11 +72,15 @@ export function useWithdraw() {
       // tight tolerance: the slippage buffer is exactly what comes back as
       // non-USDC dust, and blocks are ~250ms — worst case a revert + retry
       const plan = await buildWithdrawPlan({ position, slippageBps: 25 });
-      return send(plan.calls, { description: "Withdraw position to USDC" });
+      return send(plan.calls, {
+        description: `Withdraw position to ${position.market.quote.symbol}`,
+        chainId: plan.chainId,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["positions"] });
       queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["cash-balances"] });
     },
   });
 }
@@ -90,11 +94,13 @@ export function useCollect() {
       if (!owner) throw new Error("Wallet not ready");
       return send(await buildCollectPlan(position, owner), {
         description: "Collect earned fees",
+        chainId: position.market.chainId,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["positions"] });
       queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["cash-balances"] });
     },
   });
 }

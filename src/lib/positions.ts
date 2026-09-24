@@ -1,10 +1,9 @@
 import { parseAbi } from "viem";
-import { UNISWAP } from "./chain";
-import { MARKETS, type Market } from "./markets";
-import { publicClient } from "./onchain";
-import { baseChain } from "./chain";
+import { CHAIN_IDS, chainConfig, type ChainId } from "./chain";
+import { marketsOnChain, type Market } from "./markets";
+import { publicClientFor } from "./onchain";
 
-export const POSM = UNISWAP.v4.positionManager as `0x${string}`;
+export const posmOf = (chainId: number) => chainConfig(chainId).uniswap.v4.positionManager;
 
 export const posmAbi = parseAbi([
   "struct PoolKey { address currency0; address currency1; uint24 fee; int24 tickSpacing; address hooks; }",
@@ -35,8 +34,10 @@ export function decodePositionInfo(info: bigint) {
   };
 }
 
-function marketForTruncatedPoolId(truncated: string): Market | undefined {
-  return MARKETS.find((m) => m.pool.poolId.slice(2, 52).toLowerCase() === truncated.toLowerCase());
+function marketForTruncatedPoolId(chainId: ChainId, truncated: string): Market | undefined {
+  return marketsOnChain(chainId).find(
+    (m) => m.pool.poolId.slice(2, 52).toLowerCase() === truncated.toLowerCase(),
+  );
 }
 
 const feeViewAbi = parseAbi([
@@ -52,20 +53,21 @@ const wrapSub = (a: bigint, b: bigint) => (a - b) & U256;
 /** Uncollected trading fees for a position, in raw token units. */
 export async function getUncollectedFees(position: OwnedPosition) {
   const { market, tokenId, tickLower, tickUpper } = position;
-  const stateView = UNISWAP.v4.stateView as `0x${string}`;
+  const client = publicClientFor(market.chainId);
+  const stateView = chainConfig(market.chainId).uniswap.v4.stateView;
   const salt = `0x${tokenId.toString(16).padStart(64, "0")}` as `0x${string}`;
   const [[fg0, fg1], [liquidity, fg0Last, fg1Last]] = await Promise.all([
-    publicClient.readContract({
+    client.readContract({
       address: stateView,
       abi: feeViewAbi,
       functionName: "getFeeGrowthInside",
       args: [market.pool.poolId, tickLower, tickUpper],
     }),
-    publicClient.readContract({
+    client.readContract({
       address: stateView,
       abi: feeViewAbi,
       functionName: "getPositionInfo",
-      args: [market.pool.poolId, POSM, tickLower, tickUpper, salt],
+      args: [market.pool.poolId, posmOf(market.chainId), tickLower, tickUpper, salt],
     }),
   ]);
   return {
@@ -74,9 +76,15 @@ export async function getUncollectedFees(position: OwnedPosition) {
   };
 }
 
-/** Enumerate the user's v4 position NFTs via Blockscout, then read live state. */
-export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPosition[]> {
-  const api = baseChain.blockExplorers.default.apiUrl;
+/** Enumerate the user's v4 position NFTs on one chain via Blockscout, then
+ *  read live state from the chain. */
+export async function fetchPositionsOnChain(
+  owner: `0x${string}`,
+  chainId: ChainId,
+): Promise<OwnedPosition[]> {
+  const client = publicClientFor(chainId);
+  const posm = posmOf(chainId);
+  const api = chainConfig(chainId).explorer.apiUrl;
   const res = await fetch(`${api}/addresses/${owner}/nft?type=ERC-721`, {
     headers: { accept: "application/json" },
   });
@@ -88,7 +96,7 @@ export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPositio
   const tokenIds: bigint[] = (body.items ?? [])
     .filter((item: { token?: { address?: string; address_hash?: string } }) => {
       const addr = item.token?.address ?? item.token?.address_hash ?? "";
-      return addr.toLowerCase() === POSM.toLowerCase();
+      return addr.toLowerCase() === posm.toLowerCase();
     })
     .map((item: { id: string }) => BigInt(item.id));
 
@@ -96,15 +104,15 @@ export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPositio
     tokenIds.map(async (tokenId) => {
       try {
         const [poolAndInfo, liquidity, currentOwner] = await Promise.all([
-          publicClient.readContract({ address: POSM, abi: posmAbi, functionName: "getPoolAndPositionInfo", args: [tokenId] }),
-          publicClient.readContract({ address: POSM, abi: posmAbi, functionName: "getPositionLiquidity", args: [tokenId] }),
-          publicClient.readContract({ address: POSM, abi: posmAbi, functionName: "ownerOf", args: [tokenId] }),
+          client.readContract({ address: posm, abi: posmAbi, functionName: "getPoolAndPositionInfo", args: [tokenId] }),
+          client.readContract({ address: posm, abi: posmAbi, functionName: "getPositionLiquidity", args: [tokenId] }),
+          client.readContract({ address: posm, abi: posmAbi, functionName: "ownerOf", args: [tokenId] }),
         ]);
         // Blockscout lags on transfers/burns — trust the chain
         if (currentOwner.toLowerCase() !== owner.toLowerCase()) return null;
         if (liquidity === 0n) return null;
         const { tickLower, tickUpper, truncatedPoolId } = decodePositionInfo(poolAndInfo[1]);
-        const market = marketForTruncatedPoolId(truncatedPoolId);
+        const market = marketForTruncatedPoolId(chainId, truncatedPoolId);
         if (!market) return null; // position in a pool we don't list
         return { tokenId, market, tickLower, tickUpper, liquidity };
       } catch {
@@ -113,4 +121,17 @@ export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPositio
     }),
   );
   return positions.filter((p): p is OwnedPosition => p !== null);
+}
+
+/** All of the user's positions across every supported chain. One chain's
+ *  explorer being down hides that chain's positions, not everyone's. */
+export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPosition[]> {
+  const results = await Promise.allSettled(
+    CHAIN_IDS.map((chainId) => fetchPositionsOnChain(owner, chainId)),
+  );
+  const ok = results.filter((r) => r.status === "fulfilled");
+  if (ok.length === 0 && results.length > 0) {
+    throw (results[0] as PromiseRejectedResult).reason;
+  }
+  return ok.flatMap((r) => r.value);
 }

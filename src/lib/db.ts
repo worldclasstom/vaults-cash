@@ -34,6 +34,9 @@ export function ensureSchema(): Promise<void> {
         UNIQUE (tx_hash, log_index)
       )`;
       await q`CREATE INDEX IF NOT EXISTS fee_events_referrer_idx ON fee_events (referrer_wallet)`;
+      // fees are paid in the chain's dollar stablecoin (USDC on Base, USDG on
+      // Robinhood); rows predating multi-chain are all Base
+      await q`ALTER TABLE fee_events ADD COLUMN IF NOT EXISTS chain_id int NOT NULL DEFAULT 8453`;
       await q`CREATE TABLE IF NOT EXISTS sync_state (
         k text PRIMARY KEY,
         v text NOT NULL

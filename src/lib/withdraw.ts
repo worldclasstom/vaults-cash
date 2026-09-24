@@ -6,22 +6,22 @@
 import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
 import { Percent } from "@uniswap/sdk-core";
 import { Position, V4PositionManager } from "@uniswap/v4-sdk";
-import { NATIVE_ETH, USDC } from "./markets";
+import { NATIVE_ETH } from "./markets";
 import { getPoolState } from "./onchain";
 import { buildPool } from "./zap";
 import {
   buildSwapCall,
+  contractsOf,
   erc20Approve,
   permit2Approve,
   quoteAssetToUsdc,
   PERMIT2,
-  POSM,
-  ROUTER,
   type Call,
 } from "./uniswap";
 import type { OwnedPosition } from "./positions";
 
 export type WithdrawPlan = {
+  chainId: number;
   calls: Call[];
   assetOutMin: bigint;
   usdcOutMin: bigint;
@@ -34,6 +34,7 @@ export async function buildWithdrawPlan(params: {
 }): Promise<WithdrawPlan> {
   const { position, slippageBps } = params;
   const market = position.market;
+  const { router, posm } = contractsOf(market);
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 20 * 60);
@@ -58,7 +59,7 @@ export async function buildWithdrawPlan(params: {
     deadline: deadline.toString(),
     burnToken: true,
   });
-  calls.push({ to: POSM, value: BigInt(value), data: calldata as `0x${string}` });
+  calls.push({ to: posm, value: BigInt(value), data: calldata as `0x${string}` });
 
   // guaranteed minimums out of the burn; the asset side depends on sort order
   const { amount0: min0, amount1: min1 } = sdkPosition.burnAmountsWithSlippage(slippage);
@@ -75,7 +76,7 @@ export async function buildWithdrawPlan(params: {
 
     if (market.token !== NATIVE_ETH) {
       calls.push(erc20Approve(market.token, PERMIT2));
-      calls.push(permit2Approve(market.token, ROUTER, deadline));
+      calls.push(permit2Approve(market.token, router, deadline));
     }
     calls.push(
       buildSwapCall({
@@ -91,7 +92,7 @@ export async function buildWithdrawPlan(params: {
     feeAmount = (usdcOutMin * feeBps) / 10_000n;
     if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
       calls.push({
-        to: USDC.address,
+        to: market.quote.address,
         value: 0n,
         data: encodeFunctionData({
           abi: erc20Abi,
@@ -102,7 +103,7 @@ export async function buildWithdrawPlan(params: {
     }
   }
 
-  return { calls, assetOutMin, usdcOutMin, feeAmount };
+  return { chainId: market.chainId, calls, assetOutMin, usdcOutMin, feeAmount };
 }
 
 /** Collect accrued fees without touching principal. */
@@ -122,5 +123,5 @@ export async function buildCollectPlan(position: OwnedPosition, owner: `0x${stri
     slippageTolerance: new Percent(100, 10_000),
     deadline: (Math.floor(Date.now() / 1000) + 20 * 60).toString(),
   });
-  return [{ to: POSM, value: BigInt(value), data: calldata as `0x${string}` }];
+  return [{ to: contractsOf(market).posm, value: BigInt(value), data: calldata as `0x${string}` }];
 }

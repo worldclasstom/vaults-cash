@@ -2,8 +2,8 @@ import { createRemoteJWKSet, jwtVerify } from "jose";
 import { customAlphabet } from "nanoid";
 import { parseAbiItem } from "viem";
 import { ensureSchema, sql } from "./db";
-import { USDC } from "./markets";
-import { publicClient } from "./onchain";
+import { CHAINS, CHAIN_IDS, type ChainId } from "./chain";
+import { publicClientFor } from "./onchain";
 
 /** Share of the platform fee earmarked for the referrer (50% of 60bps). */
 export const REFERRER_SHARE = 0.5;
@@ -80,14 +80,20 @@ export async function referralStats(privyDid: string, wallet: string) {
 const TRANSFER = parseAbiItem(
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 );
-const SCAN_START = 1_500_000n; // chain block before the first fee ever paid
+/** Chain block before the first fee ever paid on that chain — Robinhood
+ *  Chain went live for us 2026-09-23 around block 70.9M. */
+const SCAN_START: Record<ChainId, bigint> = { 8453: 1_500_000n, 4663: 70_900_000n };
 const MAX_CHUNK = 50_000n;
 const MAX_CHUNKS_PER_RUN = 12;
 
+/** sync_state key per chain; Base keeps the original key so its cursor
+ *  carries over. */
+const scanKey = (chainId: ChainId) => (chainId === 8453 ? "fee_scan_block" : `fee_scan_block_${chainId}`);
+
 /**
- * Scan USDC transfers into the fee wallet and ledger them, attributing each
- * to the payer's referrer (frozen at event time). Idempotent; resumes from
- * the last scanned block.
+ * Scan stablecoin transfers into the fee wallet on every chain and ledger
+ * them, attributing each to the payer's referrer (frozen at event time).
+ * Idempotent; resumes from the last scanned block per chain.
  */
 export async function syncFeeEvents() {
   await ensureSchema();
@@ -95,39 +101,48 @@ export async function syncFeeEvents() {
   if (!feeWallet) return { scanned: 0, inserted: 0, note: "no fee wallet set" };
   const q = sql();
 
-  const stateRows = await q`SELECT v FROM sync_state WHERE k = 'fee_scan_block'`;
-  let from = stateRows.length ? BigInt(stateRows[0].v as string) + 1n : SCAN_START;
-  const head = await publicClient.getBlockNumber();
-
   let inserted = 0;
   let chunks = 0;
-  while (from <= head && chunks < MAX_CHUNKS_PER_RUN) {
-    const to = from + MAX_CHUNK - 1n > head ? head : from + MAX_CHUNK - 1n;
-    const logs = await publicClient.getLogs({
-      address: USDC.address,
-      event: TRANSFER,
-      args: { to: feeWallet },
-      fromBlock: from,
-      toBlock: to,
-    });
-    for (const log of logs) {
-      const payer = (log.args.from as string).toLowerCase();
-      const referrerRows = await q`
-        SELECT r.wallet FROM users u JOIN users r ON u.referred_by = r.ref_code
-        WHERE u.wallet = ${payer}`;
-      const referrer = referrerRows.length ? (referrerRows[0].wallet as string) : null;
-      const res = await q`
-        INSERT INTO fee_events (tx_hash, log_index, payer, amount_usdc, block_number, referrer_wallet)
-        VALUES (${log.transactionHash}, ${log.logIndex}, ${payer}, ${(log.args.value as bigint).toString()}, ${log.blockNumber.toString()}, ${referrer})
-        ON CONFLICT (tx_hash, log_index) DO NOTHING
-        RETURNING id`;
-      inserted += res.length;
+  const upToBlock: Record<number, string> = {};
+  for (const chainId of CHAIN_IDS) {
+    const client = publicClientFor(chainId);
+    const key = scanKey(chainId);
+    const stateRows = await q`SELECT v FROM sync_state WHERE k = ${key}`;
+    let from = stateRows.length ? BigInt(stateRows[0].v as string) + 1n : SCAN_START[chainId];
+    const head = await client.getBlockNumber().catch(() => null);
+    if (head === null) continue; // one chain's RPC being down must not stall the other
+
+    let chainChunks = 0;
+    while (from <= head && chainChunks < MAX_CHUNKS_PER_RUN) {
+      const to = from + MAX_CHUNK - 1n > head ? head : from + MAX_CHUNK - 1n;
+      const logs = await client.getLogs({
+        address: CHAINS[chainId].quote.address,
+        event: TRANSFER,
+        args: { to: feeWallet },
+        fromBlock: from,
+        toBlock: to,
+      });
+      for (const log of logs) {
+        const payer = (log.args.from as string).toLowerCase();
+        const referrerRows = await q`
+          SELECT r.wallet FROM users u JOIN users r ON u.referred_by = r.ref_code
+          WHERE u.wallet = ${payer}`;
+        const referrer = referrerRows.length ? (referrerRows[0].wallet as string) : null;
+        const res = await q`
+          INSERT INTO fee_events (tx_hash, log_index, payer, amount_usdc, block_number, referrer_wallet, chain_id)
+          VALUES (${log.transactionHash}, ${log.logIndex}, ${payer}, ${(log.args.value as bigint).toString()}, ${log.blockNumber.toString()}, ${referrer}, ${chainId})
+          ON CONFLICT (tx_hash, log_index) DO NOTHING
+          RETURNING id`;
+        inserted += res.length;
+      }
+      await q`
+        INSERT INTO sync_state (k, v) VALUES (${key}, ${to.toString()})
+        ON CONFLICT (k) DO UPDATE SET v = EXCLUDED.v`;
+      from = to + 1n;
+      chainChunks++;
     }
-    await q`
-      INSERT INTO sync_state (k, v) VALUES ('fee_scan_block', ${to.toString()})
-      ON CONFLICT (k) DO UPDATE SET v = EXCLUDED.v`;
-    from = to + 1n;
-    chunks++;
+    chunks += chainChunks;
+    upToBlock[chainId] = (from - 1n).toString();
   }
   const [totals] = await q`
     SELECT count(*)::int AS events, COALESCE(sum(amount_usdc), 0)::float8 AS fees
@@ -135,7 +150,7 @@ export async function syncFeeEvents() {
   return {
     scanned: chunks,
     inserted,
-    upToBlock: (from - 1n).toString(),
+    upToBlock,
     ledger: { events: totals.events as number, feesUsd: (totals.fees as number) / 1e6 },
   };
 }

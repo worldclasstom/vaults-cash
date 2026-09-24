@@ -6,7 +6,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { usePlanAdd, useSendDeposit } from "@/hooks/useDeposit";
 import { useCollect, usePositions, useWithdraw, type PositionView } from "@/hooks/usePositions";
-import { useUsdcBalance } from "@/hooks/useChainData";
+import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { planSummary } from "@/lib/zap";
 
@@ -14,7 +14,7 @@ import { planSummary } from "@/lib/zap";
 const MIN_COLLECT_USD = 0.05;
 
 function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
-  const { data: balance } = useUsdcBalance();
+  const { data: balance } = useQuoteBalance(p.market.chainId);
   const [amount, setAmount] = useState("");
   const plan = usePlanAdd();
   const send = useSendDeposit();
@@ -97,7 +97,7 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
         </button>
       </div>
       <p className="pt-1 text-xs text-muted">
-        Available: {balance ? fmtUsd(balance.formatted) : "—"} USDC
+        Available: {balance ? fmtUsd(balance.formatted) : "—"} {p.market.quote.symbol}
         {insufficient && <span className="text-negative"> — not enough</span>}
       </p>
       <div className="mt-3 flex gap-2">
@@ -135,7 +135,7 @@ function PositionCard({ p }: { p: PositionView }) {
       <div className="flex items-center justify-between">
         <div>
           <p className="font-semibold">
-            {p.market.symbol} / USDC
+            {p.market.symbol} / {p.market.quote.symbol}
             <span
               className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
                 p.inRange ? "bg-accent/15 text-accent" : "bg-negative/15 text-negative"
@@ -168,7 +168,7 @@ function PositionCard({ p }: { p: PositionView }) {
           disabled={withdraw.isPending}
           className="grow rounded-full bg-surface-raised py-2 text-sm font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
         >
-          {withdraw.isPending ? "Withdrawing…" : "Withdraw to USDC"}
+          {withdraw.isPending ? "Withdrawing…" : `Withdraw to ${p.market.quote.symbol}`}
         </button>
         <button
           onClick={() => collect.mutate(p)}
@@ -192,7 +192,7 @@ function PositionCard({ p }: { p: PositionView }) {
 export default function PortfolioPage() {
   const { ready, authenticated, login } = useAuth();
   const { data: positions, isLoading, isError } = usePositions();
-  const { data: balance } = useUsdcBalance();
+  const { data: cash } = useCashBalances();
 
   const total = (positions ?? []).reduce((s, p) => s + p.valueUsd, 0);
 
@@ -214,7 +214,16 @@ export default function PortfolioPage() {
             <p className="text-sm text-muted">Total invested</p>
             <p className="py-1 text-5xl font-bold tracking-tight">{fmtUsd(total)}</p>
             <p className="text-sm text-muted">
-              + {balance ? fmtUsd(balance.formatted) : "—"} USDC available
+              + {cash ? fmtUsd(cash.totalUsd) : "—"} cash available
+              {cash && cash.perChain.filter((c) => c.formatted > 0).length > 1 && (
+                <span className="text-muted/60">
+                  {" "}
+                  ({cash.perChain
+                    .filter((c) => c.formatted > 0)
+                    .map((c) => `${fmtUsd(c.formatted)} ${c.symbol}`)
+                    .join(" · ")})
+                </span>
+              )}
             </p>
           </section>
           <section>

@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { parseUnits } from "viem";
 import { AGENT_DOCS, AgentError, requireMarket, requireOwner, serializeCalls } from "@/lib/agent";
-import { USDC } from "@/lib/markets";
 import { getPoolState } from "@/lib/onchain";
 import { buildZapPlan, type RangePreset } from "@/lib/zap";
 
@@ -32,7 +31,7 @@ export async function POST(req: NextRequest) {
     const plan = await buildZapPlan({
       market,
       owner,
-      usdcAmount: parseUnits(amountUsd.toFixed(USDC.decimals), USDC.decimals),
+      usdcAmount: parseUnits(amountUsd.toFixed(market.quote.decimals), market.quote.decimals),
       preset,
       customWidth: body.widthPct !== undefined ? Number(body.widthPct) / 100 : undefined,
       slippageBps,
@@ -40,8 +39,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      chainId: 8453,
-      market: market.symbol,
+      chainId: plan.chainId,
+      market: market.slug,
+      quote: market.quote.symbol,
       calls: serializeCalls(plan.calls),
       summary: {
         feeUsdc: plan.feeAmount.toString(),

@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseUnits } from "viem";
-import { USDC, type Market } from "@/lib/markets";
+import type { Market } from "@/lib/markets";
 import { getPoolState } from "@/lib/onchain";
 import { buildZapPlan, type RangePreset, type ZapPlan } from "@/lib/zap";
 import { useActiveAddress } from "./useChainData";
@@ -23,10 +23,11 @@ export function usePlanDeposit() {
     mutationFn: async (input: DepositInput): Promise<ZapPlan> => {
       if (!owner) throw new Error("Wallet not ready yet — try again in a second.");
       const poolState = await getPoolState(input.market);
+      const { decimals } = input.market.quote;
       return buildZapPlan({
         market: input.market,
         owner,
-        usdcAmount: parseUnits(input.amountUsd.toFixed(USDC.decimals), USDC.decimals),
+        usdcAmount: parseUnits(input.amountUsd.toFixed(decimals), decimals),
         preset: input.preset,
         customWidth: input.customWidth,
         slippageBps: input.slippageBps,
@@ -49,10 +50,11 @@ export function usePlanAdd() {
     }): Promise<ZapPlan> => {
       if (!owner) throw new Error("Wallet not ready yet — try again in a second.");
       const poolState = await getPoolState(input.position.market);
+      const { decimals } = input.position.market.quote;
       return buildZapPlan({
         market: input.position.market,
         owner,
-        usdcAmount: parseUnits(input.amountUsd.toFixed(USDC.decimals), USDC.decimals),
+        usdcAmount: parseUnits(input.amountUsd.toFixed(decimals), decimals),
         preset: "full", // ignored — addTo's ticks win
         slippageBps: input.slippageBps,
         poolState,
@@ -69,9 +71,13 @@ export function useSendDeposit() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (plan: ZapPlan) =>
-      sendCalls(plan.calls, { description: "Deposit into your liquidity position" }),
+      sendCalls(plan.calls, {
+        description: "Deposit into your liquidity position",
+        chainId: plan.chainId,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["cash-balances"] });
       queryClient.invalidateQueries({ queryKey: ["positions"] });
       // nudge the fee ledger so referral earnings show up immediately
       fetch("/api/referral/sync").catch(() => {});

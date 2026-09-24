@@ -8,7 +8,8 @@ export function FooterContent() {
       <p>
         <span className="text-muted">Self-custodial:</span> your funds stay in
         your own wallet and in positions you own — vaults.cash never takes
-        custody. Positions sit in official Uniswap v4 pools on Base.
+        custody. Positions sit in official Uniswap v4 pools on Base and
+        Robinhood Chain.
       </p>
       <p>
         LP positions carry market &amp; impermanent-loss risk and are not

@@ -11,10 +11,11 @@ import { SendPanel } from "@/components/SendPanel";
 import {
   useActiveAddress,
   useAssetBalances,
+  useCashBalances,
   useTokenBalance,
   useUsdcBalance,
 } from "@/hooks/useChainData";
-import { GAS_SPONSORED } from "@/lib/config";
+import { CHAINS } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 
@@ -30,7 +31,7 @@ function AddFundsPanel({
   const steps = [
     <>Buy <span className="text-foreground">USDC</span> in the Robinhood app (or on any exchange that supports it).</>,
     <>Send it on <span className="text-foreground">Base</span> to the address below — scan the code or paste it.</>,
-    <>It lands in your account here within seconds{GAS_SPONSORED ? "" : ", along with a little ETH for network fees"}.</>,
+    <>It lands in your account here within seconds{CHAINS[8453].gasSponsored ? "" : ", along with a little ETH for network fees"}.</>,
   ];
   return (
     <div className="mt-3 rounded-2xl bg-surface p-5 text-sm">
@@ -72,8 +73,10 @@ function AddFundsPanel({
 function Dashboard() {
   const address = useActiveAddress();
   const { data: balance, isLoading } = useUsdcBalance();
+  const { data: cash } = useCashBalances();
   const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
   const { data: assetBalances } = useAssetBalances();
+  const otherCash = (cash?.perChain ?? []).filter((c) => c.chainId !== 8453 && c.formatted > 0);
   const [showReceive, setShowReceive] = useState(false);
   const [showSend, setShowSend] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -85,6 +88,11 @@ function Dashboard() {
         <p className="py-1 text-5xl font-bold tracking-tight">
           {isLoading || !balance ? "—" : fmtUsd(balance.formatted)}
         </p>
+        {otherCash.length > 0 && (
+          <p className="text-sm text-muted">
+            + {otherCash.map((c) => `${fmtUsd(c.formatted)} ${c.symbol} on Robinhood Chain`).join(" · ")}
+          </p>
+        )}
         {ethBalance && ethBalance.raw > 0n && (
           <p className="text-sm text-muted">
             + {fmtAmount(ethBalance.formatted, 5)} ETH for network fees

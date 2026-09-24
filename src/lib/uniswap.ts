@@ -2,6 +2,7 @@
  * Shared Uniswap v4 plumbing used by both the deposit zap and the withdraw
  * flow: contract handles, ABIs, approval-call builders, the router swap-call
  * builder, and quoting. Single source of truth for swap direction logic.
+ * Every contract address is resolved from the market's chain.
  */
 import {
   encodeFunctionData,
@@ -12,16 +13,20 @@ import {
   zeroAddress,
 } from "viem";
 import { Actions, V4Planner } from "@uniswap/v4-sdk";
-import { UNISWAP } from "./chain";
+import { chainConfig } from "./chain";
 import type { Market } from "./markets";
-import { publicClient } from "./onchain";
+import { publicClientFor } from "./onchain";
 
 export type Call = { to: `0x${string}`; value: bigint; data: `0x${string}` };
 
-export const PERMIT2 = UNISWAP.permit2 as `0x${string}`;
-export const ROUTER = UNISWAP.v4.universalRouter as `0x${string}`;
-export const POSM = UNISWAP.v4.positionManager as `0x${string}`;
-export const QUOTER = UNISWAP.v4.quoter as `0x${string}`;
+/** Permit2 is the one canonical CREATE2 deployment, identical on every chain. */
+export const PERMIT2 = "0x000000000022D473030F116dDEE9F6B43aC78BA3" as const;
+
+/** Router / PositionManager / Quoter for the market's chain. */
+export function contractsOf(market: Pick<Market, "chainId">) {
+  const { v4 } = chainConfig(market.chainId).uniswap;
+  return { router: v4.universalRouter, posm: v4.positionManager, quoter: v4.quoter };
+}
 
 const UR_V4_SWAP_COMMAND = "0x10";
 
@@ -47,7 +52,7 @@ export function poolKeyOf(market: Market) {
   } as const;
 }
 
-/** Which pool currency is the asset vs USDC, per this pool's sort order. */
+/** Which pool currency is the asset vs the quote, per this pool's sort order. */
 export function currenciesOf(market: Market) {
   return market.assetIsCurrency0
     ? { asset: market.pool.currency0, usdc: market.pool.currency1 }
@@ -118,7 +123,7 @@ export function buildSwapCall(params: {
 
   const nativeIn = !toAsset && market.token === zeroAddress ? amountIn : 0n;
   return {
-    to: ROUTER,
+    to: contractsOf(market).router,
     value: nativeIn,
     data: encodeFunctionData({
       abi: routerAbi,
@@ -129,8 +134,8 @@ export function buildSwapCall(params: {
 }
 
 async function quoteExactIn(market: Market, amountIn: bigint, zeroForOne: boolean) {
-  const { result } = await publicClient.simulateContract({
-    address: QUOTER,
+  const { result } = await publicClientFor(market.chainId).simulateContract({
+    address: contractsOf(market).quoter,
     abi: quoterAbi,
     functionName: "quoteExactInputSingle",
     args: [

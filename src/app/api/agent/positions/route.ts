@@ -13,7 +13,8 @@ export async function GET(req: NextRequest) {
         const state = await getPoolState(p.market);
         return {
           tokenId: p.tokenId.toString(),
-          market: p.market.symbol,
+          market: p.market.slug,
+          chainId: p.market.chainId,
           tickLower: p.tickLower,
           tickUpper: p.tickUpper,
           liquidity: p.liquidity.toString(),

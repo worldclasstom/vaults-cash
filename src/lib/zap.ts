@@ -18,15 +18,14 @@
 import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
 import { Ether, Percent, Token, type Currency } from "@uniswap/sdk-core";
 import { Pool, Position, V4PositionManager } from "@uniswap/v4-sdk";
-import { NATIVE_ETH, USDC, type Market } from "./markets";
+import { NATIVE_ETH, type Market } from "./markets";
 import {
   buildSwapCall,
+  contractsOf,
   erc20Approve,
   permit2Approve,
   quoteUsdcToAsset,
   PERMIT2,
-  POSM,
-  ROUTER,
   type Call,
 } from "./uniswap";
 
@@ -40,16 +39,16 @@ export const PRESET_WIDTH: Record<Exclude<RangePreset, "full">, number> = {
   aggressive: 0.15,
 };
 
-const CHAIN_ID = 8453;
 const MIN_TICK = -887272;
 const MAX_TICK = 887272;
 
 export function marketCurrency(market: Market): Currency {
   return market.token === NATIVE_ETH
-    ? Ether.onChain(CHAIN_ID)
-    : new Token(CHAIN_ID, market.token, market.tokenDecimals, market.symbol);
+    ? Ether.onChain(market.chainId)
+    : new Token(market.chainId, market.token, market.tokenDecimals, market.symbol);
 }
-const usdcToken = new Token(CHAIN_ID, USDC.address, USDC.decimals, "USDC");
+const quoteToken = (market: Market) =>
+  new Token(market.chainId, market.quote.address, market.quote.decimals, market.quote.symbol);
 
 export function buildPool(
   market: Market,
@@ -59,7 +58,7 @@ export function buildPool(
 ): Pool {
   return new Pool(
     marketCurrency(market),
-    usdcToken,
+    quoteToken(market),
     market.pool.fee,
     market.pool.tickSpacing,
     zeroAddress,
@@ -125,6 +124,7 @@ export function swapShare(
 }
 
 export type ZapPlan = {
+  chainId: number;
   calls: Call[];
   feeAmount: bigint;
   swapIn: bigint;
@@ -147,6 +147,8 @@ export async function buildZapPlan(params: {
 }): Promise<ZapPlan> {
   const { market, owner, usdcAmount, preset, customWidth, slippageBps, poolState, addTo } =
     params;
+  const quote = market.quote.address;
+  const { router, posm } = contractsOf(market);
 
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
@@ -171,8 +173,8 @@ export async function buildZapPlan(params: {
     swapOutMin = (amountOut * slippage) / 10_000n;
 
     // 2. USDC -> Permit2 -> UniversalRouter, then the swap itself
-    calls.push(erc20Approve(USDC.address, PERMIT2));
-    calls.push(permit2Approve(USDC.address, ROUTER, deadline));
+    calls.push(erc20Approve(quote, PERMIT2));
+    calls.push(permit2Approve(quote, router, deadline));
     calls.push(
       buildSwapCall({
         market,
@@ -185,10 +187,10 @@ export async function buildZapPlan(params: {
   }
 
   // 4. approvals for PositionManager
-  if (usdcToPosition > 0n) calls.push(permit2Approve(USDC.address, POSM, deadline));
+  if (usdcToPosition > 0n) calls.push(permit2Approve(quote, posm, deadline));
   if (market.token !== NATIVE_ETH && swapOutMin > 0n) {
     calls.push(erc20Approve(market.token, PERMIT2));
-    calls.push(permit2Approve(market.token, POSM, deadline));
+    calls.push(permit2Approve(market.token, posm, deadline));
   }
 
   // 5. mint — sized from guaranteed amounts (swapOutMin + kept USDC)
@@ -204,7 +206,7 @@ export async function buildZapPlan(params: {
   const common = {
     slippageTolerance: new Percent(slippageBps, 10_000),
     deadline: deadline.toString(),
-    useNative: market.token === NATIVE_ETH ? Ether.onChain(CHAIN_ID) : undefined,
+    useNative: market.token === NATIVE_ETH ? Ether.onChain(market.chainId) : undefined,
   };
   // with a tokenId the SDK encodes INCREASE_LIQUIDITY on that position
   // instead of minting a new NFT
@@ -212,14 +214,14 @@ export async function buildZapPlan(params: {
     position,
     addTo ? { ...common, tokenId: addTo.tokenId.toString() } : { ...common, recipient: owner },
   );
-  calls.push({ to: POSM, value: BigInt(value), data: calldata as `0x${string}` });
+  calls.push({ to: posm, value: BigInt(value), data: calldata as `0x${string}` });
 
   // platform fee LAST: in the atomic path order is irrelevant, and in the
   // sequential fallback the fee is only charged once the position exists
   // (an abandoned attempt costs the user nothing).
   if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
     calls.push({
-      to: USDC.address,
+      to: quote,
       value: 0n,
       data: encodeFunctionData({
         abi: erc20Abi,
@@ -229,16 +231,30 @@ export async function buildZapPlan(params: {
     });
   }
 
-  return { calls, feeAmount, swapIn, swapOutMin, usdcToPosition, tickLower, tickUpper };
+  return {
+    chainId: market.chainId,
+    calls,
+    feeAmount,
+    swapIn,
+    swapOutMin,
+    usdcToPosition,
+    tickLower,
+    tickUpper,
+  };
 }
 
-/** Estimated USDC value of the planned position (for the confirm sheet). */
-export function planSummary(plan: ZapPlan, assetPrice: number, assetDecimals: number) {
+/** Estimated dollar value of the planned position (for the confirm sheet). */
+export function planSummary(
+  plan: ZapPlan,
+  assetPrice: number,
+  assetDecimals: number,
+  quoteDecimals = 6,
+) {
   const assetUsd = (Number(plan.swapOutMin) / 10 ** assetDecimals) * assetPrice;
-  const usdcUsd = Number(plan.usdcToPosition) / 1e6;
+  const usdcUsd = Number(plan.usdcToPosition) / 10 ** quoteDecimals;
   return {
     assetUsd,
     usdcUsd,
-    feeUsd: Number(plan.feeAmount) / 1e6,
+    feeUsd: Number(plan.feeAmount) / 10 ** quoteDecimals,
   };
 }

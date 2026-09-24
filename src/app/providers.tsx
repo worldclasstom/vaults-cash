@@ -5,7 +5,7 @@ import { SmartWalletsProvider } from "@privy-io/react-auth/smart-wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { AuthProvider } from "@/components/AuthProvider";
-import { baseChain } from "@/lib/chain";
+import { baseChain, robinhoodChain } from "@/lib/chain";
 
 /**
  * Privy embedded wallets + Privy smart wallets (back from CDP, 2026-09-23).
@@ -54,7 +54,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
           showWalletUIs: false,
         },
         defaultChain: baseChain,
-        supportedChains: [baseChain],
+        // both must also be configured under Smart wallets in the dashboard
+        // (Base: CDP bundler + paymaster; Robinhood: Alchemy bundler, no
+        // paymaster) or getClientForChain() has nothing to hand back
+        supportedChains: [baseChain, robinhoodChain],
       }}
     >
       <SmartWalletsProvider>
