@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isAddress } from "viem";
 import { isChainId } from "@/lib/chain";
 import { positionTokenIds } from "@/lib/nfts";
+import { isSameOriginRequest } from "@/lib/sameOrigin";
 
 /** GET /api/positions/nfts?chainId=8453&owner=0x… — candidate Uniswap v4
  *  position token ids for a wallet. The browser reads live ownership and
@@ -12,6 +13,8 @@ export async function GET(req: NextRequest) {
   const owner = req.nextUrl.searchParams.get("owner") ?? "";
   if (!isChainId(chainId)) return NextResponse.json({ error: "unsupported chainId" }, { status: 400 });
   if (!isAddress(owner)) return NextResponse.json({ error: "owner must be a 0x address" }, { status: 400 });
+  // keyed indexer lookups are for this site's users, not a public API
+  if (!isSameOriginRequest(req)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   try {
     const ids = await positionTokenIds(chainId, owner);
     return NextResponse.json(

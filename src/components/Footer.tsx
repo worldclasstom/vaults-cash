@@ -24,7 +24,7 @@ export function FooterContent() {
           Disclosures &amp; fees
         </Link>
         <Link href="/trust" className="text-muted underline-offset-2 hover:text-foreground hover:underline">
-          What we can&apos;t do
+          Your money, your wallet
         </Link>
         <a
           href="https://base.blockscout.com"

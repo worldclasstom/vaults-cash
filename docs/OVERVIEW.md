@@ -10,7 +10,7 @@ Uniswap v4 LP position. Robinhood-grade UX over vfat-style mechanics.
 Also fully usable by AI agents (MCP + REST).
 
 - Production: https://vaults.cash (Vercel, `prosperity-labs` team)
-- Repo: https://github.com/worldclasstom/vaults-cash (private)
+- Repo: https://github.com/worldclasstom/vaults-cash (public, MIT — see SECURITY.md)
 - Chain: Arbitrum-stack L2, ETH gas, ~250ms blocks, ArbOS 61 (EIP-7702 live)
 - Explorer: https://robinhoodchain.blockscout.com
 
