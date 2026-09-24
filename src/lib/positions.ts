@@ -88,7 +88,10 @@ async function candidateTokenIds(owner: `0x${string}`, chainId: ChainId): Promis
   });
   if (!res.ok) throw new Error(`positions lookup failed (${res.status})`);
   const body = (await res.json()) as { tokenIds: string[] };
-  return body.tokenIds.map(BigInt);
+  // indexers lag a freshly minted position by seconds — merge ids this
+  // browser saw minted so a deposit shows up the moment its receipt lands
+  const { knownPositions } = await import("./knownPositions");
+  return [...new Set([...body.tokenIds.map(BigInt), ...knownPositions(chainId, owner)])];
 }
 
 /** Enumerate the user's v4 position NFTs on one chain, then read live state

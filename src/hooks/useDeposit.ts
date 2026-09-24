@@ -1,10 +1,16 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { parseUnits } from "viem";
+import { parseAbiItem, parseEventLogs, parseUnits } from "viem";
+import { rememberPosition } from "@/lib/knownPositions";
 import type { Market } from "@/lib/markets";
-import { getPoolState } from "@/lib/onchain";
+import { getPoolState, publicClientFor } from "@/lib/onchain";
+import { posmOf } from "@/lib/positions";
 import { buildZapPlan, type RangePreset, type ZapPlan } from "@/lib/zap";
+
+const ERC721_TRANSFER = parseAbiItem(
+  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)",
+);
 import { useActiveAddress } from "./useChainData";
 import { useSendCalls } from "./useSendCalls";
 
@@ -68,13 +74,29 @@ export function usePlanAdd() {
  *  sequential embedded-EOA transactions otherwise. */
 export function useSendDeposit() {
   const sendCalls = useSendCalls();
+  const owner = useActiveAddress();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (plan: ZapPlan) =>
-      sendCalls(plan.calls, {
+    mutationFn: async (plan: ZapPlan) => {
+      const result = await sendCalls(plan.calls, {
         description: "Deposit into your liquidity position",
         chainId: plan.chainId,
-      }),
+      });
+      // remember the minted position id locally so Portfolio shows it before
+      // the NFT indexer has caught up (a fresh mint = Transfer from 0x0)
+      try {
+        const receipt = await publicClientFor(plan.chainId).getTransactionReceipt({ hash: result.hash });
+        const posm = posmOf(plan.chainId).toLowerCase();
+        for (const log of parseEventLogs({ abi: [ERC721_TRANSFER], logs: receipt.logs, eventName: "Transfer" })) {
+          if (log.address.toLowerCase() === posm && owner && log.args.to.toLowerCase() === owner.toLowerCase()) {
+            rememberPosition(plan.chainId, owner, log.args.tokenId);
+          }
+        }
+      } catch {
+        /* best effort — the indexer catches up within a minute regardless */
+      }
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
       queryClient.invalidateQueries({ queryKey: ["cash-balances"] });

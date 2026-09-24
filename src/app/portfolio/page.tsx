@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
@@ -190,10 +191,44 @@ function PositionCard({ p }: { p: PositionView }) {
   );
 }
 
+/** Arriving straight from a confirmed deposit (?deposited=1) with an empty
+ *  list means the NFT indexer hasn't caught up yet — not that the money
+ *  vanished. useSearchParams needs a Suspense boundary on a static page. */
+function EmptyPositions() {
+  const justDeposited = !!useSearchParams().get("deposited");
+  if (justDeposited) {
+    return (
+      <div className="rounded-3xl bg-surface p-8 text-center">
+        <p className="font-semibold text-accent">Deposit confirmed ✓</p>
+        <p className="pt-2 text-sm text-muted">
+          Your position is on-chain and will show here in a few seconds.
+        </p>
+        <div className="mx-auto mt-4 h-1.5 w-24 animate-pulse rounded-full bg-accent/40" />
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-3xl bg-surface p-8 text-center">
+      <p className="pb-3 text-muted">No positions yet.</p>
+      <Link href="/" className="font-semibold text-accent hover:underline">
+        Explore markets →
+      </Link>
+    </div>
+  );
+}
+
 export default function PortfolioPage() {
   const { ready, authenticated, login } = useAuth();
   const { data: positions, isLoading, isError } = usePositions();
   const { data: cash } = useCashBalances();
+  const router = useRouter();
+  // once the deposit shows up, drop ?deposited=1 so a later empty list (after
+  // withdrawing everything) reads as "no positions", not "still indexing"
+  useEffect(() => {
+    if (positions && positions.length > 0 && window.location.search.includes("deposited")) {
+      router.replace("/portfolio");
+    }
+  }, [positions, router]);
 
   const total = (positions ?? []).reduce((s, p) => s + p.valueUsd, 0);
 
@@ -242,12 +277,9 @@ export default function PortfolioPage() {
                 ))}
               </ul>
             ) : (
-              <div className="rounded-3xl bg-surface p-8 text-center">
-                <p className="pb-3 text-muted">No positions yet.</p>
-                <Link href="/" className="font-semibold text-accent hover:underline">
-                  Explore markets →
-                </Link>
-              </div>
+              <Suspense fallback={null}>
+                <EmptyPositions />
+              </Suspense>
             )}
           </section>
         </div>

@@ -24,7 +24,9 @@ export function usePositions() {
   return useQuery({
     queryKey: ["positions", owner],
     enabled: !!owner,
-    refetchInterval: 20_000,
+    // poll fast while empty — that's the window where a just-minted
+    // position is still being indexed
+    refetchInterval: (q) => (q.state.data && q.state.data.length === 0 ? 5_000 : 20_000),
     queryFn: async (): Promise<PositionView[]> => {
       const owned = await fetchPositions(owner!);
       return Promise.all(
