@@ -1,5 +1,7 @@
 # vaults.cash contracts
 
+> **Shelved (2026-09-24).** Undeployed pilot kept for reference; not part of the product and out of scope for SECURITY.md.
+
 Solidity for The Vault (see ../docs/VAULT_SPEC.md).
 
 - `src/VaultPair.sol` — Rialto propAMM liquidity source implementing the

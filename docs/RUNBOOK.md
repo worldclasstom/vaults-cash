@@ -1,120 +1,120 @@
 # Runbook
 
-_Operational knowledge. If it bit us once, it lives here._
+_Operational knowledge. If it bit us once, it lives here. Rewritten
+2026-09-24 for the Base + Robinhood Chain / Privy smart-wallet build; the
+July entries at the bottom are kept as history._
 
 ## Environments & secrets
 
+`NEXT_PUBLIC_*` values are baked in at build time — set them in Vercel
+**before** pushing.
+
 | Var | Where | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_PRIVY_APP_ID` | local + Vercel prod | Privy "VAULTS" app (Dev environment) |
-| `NEXT_PUBLIC_FEE_RECIPIENT` | local + Vercel prod | fee wallet `0x9704…1384` |
-| `NEXT_PUBLIC_FEE_BPS` | local + Vercel prod | `60` |
-| `NEXT_PUBLIC_RPC_URL` | local + Vercel prod | Alchemy `robinhood-mainnet` key — **browser only** (see gotchas) |
-| `DATABASE_URL` (+PG*) | Vercel all envs | Neon `neon-citron-coin`, injected by integration |
-| `NEXT_PUBLIC_SPONSOR_GAS` | unset | legacy Privy sponsorship flag; superseded by Alchemy plan |
+| `NEXT_PUBLIC_PRIVY_APP_ID` | local + Vercel | Privy app "VAULTS" (production mode since 2026-09-23) |
+| `PRIVY_APP_SECRET` | Vercel (server only) | lets `/api/referral/me` verify a claimed wallet belongs to the signed-in user; without it the API only blocks wallets already bound to another user (logs a warning) |
+| `NEXT_PUBLIC_FEE_RECIPIENT` | local + Vercel | fee wallet |
+| `NEXT_PUBLIC_FEE_BPS` | local + Vercel | `60` |
+| `NEXT_PUBLIC_GAS_SPONSORED` | Vercel | `1` when the CDP paymaster is live; only changes copy |
+| `NEXT_PUBLIC_SOURCE_URL` | Vercel | repo URL shown on `/trust`; unset hides the line |
+| `ALCHEMY_API_KEY` | Vercel prod/preview/dev | origin-allowlisted; server sends `Origin: https://vaults.cash` |
+| `BASE_RPC_URL`, `ROBINHOOD_RPC_URL` | optional | override the server RPC (else Alchemy, else public) |
+| `DATABASE_URL` (+`PG*`) | Vercel all envs | Neon, injected by the integration; referral ledger only |
+
+Privy dashboard: embedded wallets (Ethereum: users without wallets; Solana:
+all users — "SVM wallets" toggle on), smart wallets = Kernel; Base uses the
+CDP bundler + paymaster; Robinhood Chain is a custom chain on the Alchemy
+bundler with no paymaster. Funding: Stripe (card, USD/EUR) + MoonPay on.
+
+CDP (Base paymaster): the **contract allowlist must stay empty** and the
+$15/mo free credit is the sponsorship budget (~1,000 deposits at quiet gas).
 
 ## Deploys
 
-Push to `main` → Vercel auto-deploys production (git integration).
-CLI alternative: `npx vercel deploy --prod --scope prosperity-labs`.
-Before deploying after any token/pool change: `npx tsx scripts/verify-chain.ts`
-(`--chain base` / `--chain robinhood`; regenerates that chain's registries/*.json, which everything reads from) and
-`npx tsx scripts/test-zap.ts` (dry-runs all markets against live pools).
+Push to `main` → Vercel production. Before any token/pool change:
+`npx tsx scripts/verify-chain.ts --chain base` and `--chain robinhood`
+(rewrites the registries everything reads from), then
+`npx tsx scripts/test-zap.ts`. `scripts/check-referral-split.ts` and
+`scripts/check-mint-value.ts` re-verify the two on-chain invariants below.
 
 ## Gotchas that already bit us (do not relearn)
 
-- **Vercel env values read back EMPTY on this team** (masking). Empty
-  `vercel env pull` ≠ missing values. Verify via runtime behavior
-  (e.g. `feeUsdg` on `/api/agent/quote`). Reliable writes: REST API upsert.
-- **Alchemy domain allowlist blocks origin-less requests** — server-side
-  code, curl, and scripts must use the public RPC
-  (`https://rpc.mainnet.chain.robinhood.com`). Probing "is X deployed?"
-  through the Alchemy URL returns false negatives.
-- **Privy strips `authorizationList`** from `eth_sendTransaction` → silent
-  type-2 no-op self-call. Never send type-4 directly; use the bundler path.
-- **Privy auth field encodings are loose** (yParity arrived 32-byte padded);
-  normalize every numeric via `Number(BigInt(x))`.
-- **rundler rejects viem's compact 7702 factory marker** `0x7702` — the
-  transport shim rewrites to the padded 20-byte form (adaptive).
-- **`JSON.stringify` throws on BigInt** — userOp typed-data signing uses a
-  replacer. (Symptom: "Do not know how to serialize a BigInt" at signing.)
-- **v4 pool currency order varies per market** (`assetIsCurrency0`) — never
-  assume USDG is currency1. All direction logic lives in `lib/uniswap.ts`.
-- **Vercel CLI stdin quirks**: `vercel env rm` needs `--yes`; piped values
-  must be newline-terminated; commit author email must match a GitHub
-  account or team deploys are blocked (repo git config uses the
-  worldclasstom noreply address).
-- **Safari ignores SVG favicons** — keep `favicon.ico` real (generated from
-  `public/brand/vaults-mark.png` via `npx png-to-ico`).
+- **CDP paymaster "failed to trace calls" on every op** = a stale entry in
+  the CDP contract allowlist. Kernel factory deployments get rejected when
+  the allowlist is non-empty. Keep it empty.
+- **CDP needs `paymasterPostOpGasLimit` ≥ 27000** (error selector
+  `0x74e8188b` `PostOpGasLimitExceeded()`, misnamed).
+- **Native-ETH legs: mint value must be the swap's guaranteed output.** The
+  SDK's `amount0Max` exceeded the wallet's post-swap ETH → "Execution
+  reverted". `zap.ts` sends `swapOutMin` and sizes the mint 1% under.
+- **Robinhood public RPC sends `Access-Control-Allow-Origin: *,*`** —
+  browsers refuse it. All browser reads go through `/api/rpc/<chainId>`.
+  Base's public RPC rate-limits dev traffic; same fix.
+- **Robinhood Blockscout is Cloudflare-gated** — curl gets a challenge page.
+  Position enumeration falls back to RPC `Transfer` logs there.
+- **Alchemy key is origin-allowlisted** — server-side callers must send
+  `Origin: https://vaults.cash` or they get false negatives.
+- **GeckoTerminal is 30 req/min** — use the batch endpoints
+  (`/pools/multi/`, ≤ 30 ids) never per-pool calls.
+- **Dust floor sign**: `virtualQuoteUnits(..., quoteIsCurrency1 = baseIsCurrency0)`.
+  The flipped form listed drained pools and dropped cbBTC/ETH.
+- **Vercel env values read back empty** (masking) — verify by runtime
+  behaviour, not `vercel env pull`. `vercel env add X preview` needs
+  `--value … --yes` and a branch argument.
+- **Privy funding modal needs CSP for Stripe/MoonPay/Coinbase/Relay** and
+  `Permissions-Policy: payment=(…)`. "Something went wrong setting up
+  checkout" = a blocked origin. Current list lives in `next.config.ts`.
+- **Apple Pay on web**: Privy passes `wallets: {applePay: "auto"}` to
+  Stripe's `collectPaymentMethod` (verified in the 3.45 bundle, not docs).
+  Whether Apple Pay shows inside the Link sheet is Stripe-side. There is no
+  switch on our side; escalate to Privy.
+- **iPhone SMS login froze after the code was sent** (2026-09-24, once).
+  A fresh tab fixed it. Unreproduced.
+- **Next "cannot use different slug names"** — `/market/[chain]/page.tsx`
+  and `/market/[chain]/[symbol]/page.tsx` must share the `[chain]` name.
+- **React lint `set-state-in-effect`** — `useSearchParams` consumers go in
+  a Suspense child, not the page.
+- **Safari ignores SVG favicons** — keep `favicon.ico` real.
+- **`ssh`/heredoc and zsh quoting quirks** — see the ops memory; not app-specific.
 
-## Fee wallet & referral payouts
+## Referral invariants
 
-Fee wallet `0x9704…1384` accrues USDG. Referral ledger (Neon) must
-reconcile with the wallet balance **exactly**: `/api/referral/sync` response
-`ledger.feesUsd` vs on-chain `balanceOf`. Payouts: monthly, manual, from the
-fee wallet, per `fee_events` grouped by `referrer_wallet` × 50%.
+- Referrer share is paid **on-chain in the batch** (`feeCalls` in
+  `zap.ts`/`withdraw.ts`); self-referrals and a zero recipient collapse to
+  the plain fee transfer.
+- `fee_events.referrer_amount` = what the referrer actually received;
+  events before `SPLIT_FROM` (Base 51,720,000 / Robinhood 71,050,000) are
+  the pre-split era and were settled manually.
+- `users.wallet` = current smart wallet; `user_wallets` = every address a
+  user has paid from, so a wallet change never orphans attribution.
+- Schema bootstraps itself (`ensureSchema` in `src/lib/db.ts`); the fee
+  column is `amount` (raw 6-decimal units; `chain_id` says USDC vs USDG).
 
 ## Verification quick checks
 
-- App up: `curl https://vaults.cash/api/agent/markets` → 8 markets w/ prices
-- MCP up: POST initialize to `https://vaults.cash/api/mcp/mcp`
-- Fee math live: `/api/agent/quote?...amountUsd=100` → `feeUsdg: "600000"`
-- Ledger reconciles: `/api/referral/sync` → `ledger.feesUsd` == fee wallet balance
+- App up: `curl https://vaults.cash/api/agent/markets` → markets with prices
+- MCP up: POST `initialize` to `https://vaults.cash/api/mcp/mcp`
+- Fee math: `/api/agent/quote?…amountUsd=100` → fee `600000`
+- Proxy gate: POST to `/api/rpc/8453` without an `Origin` header → 403
+- Referral: `/api/referral/me` with a Privy token → 200, no ownership warning in logs
 
-## Test wallets (Tom's)
+## Wallets
 
-- Fee wallet / LLC login: `0x970481E181189411aD0A4A4f22C08f111C6E1384`
-- Test depositor (personal login): `0xFD03B83711B089D0Bc087B3381AAdDd92c204035`
-  (7702-delegated; holds test USDG/ETH + live position)
+- Fee wallet: `NEXT_PUBLIC_FEE_RECIPIENT` (public on `/trust`)
+- Tom's test smart wallet (both chains): `0x789224Be05F24A743D2aE1C1204Ff9701160Ff82`
 
 ## Incident log
 
-- **2026-07-04 — "lost $6" withdrawal scare (no loss).** Invalid Gas Manager
-  policy (testnet-scoped) made pm_getPaymasterData fail → atomic path broke
-  on EVERY op → sequential fallback → Privy nonce race ("nonce too low")
-  killed the ETH→USDG swap step after burns completed. Funds arrived as raw
-  ETH+USDG; nothing lost; no fee charged (fee rides the swap). Lessons:
-  (1) a configured-but-invalid paymaster is worse than none — validate a
-  policy with a test op before trusting env; (2) sequential sends must sync
-  confirmed nonce between steps (fixed in useSendCalls); (3) ETH landing
-  unswapped needs a UI conversion path (TODO).
-
-## Gas sponsorship policy (2026-07-07) — NOT YET ACTIVE
-
-Policy "VAULTS.cash Gas Sponsorship" id `8d512c49-f1e5-4a61-b1b5-2235df108afa`
-(Alchemy Gas Manager, review screen confirmed Robinhood Chain Mainnet).
-Rules: $1/op, $1 + 20 ops per address, $25 + 2000 ops policy-wide, 10-min
-sponsorship expiry, no end date, no custom rules.
-
-DO NOT set NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID until ALL of:
-1. Gas credits purchased in Alchemy (banner: sponsorship needs prepaid
-   credits — with env set but no credits, every atomic op fails its
-   paymaster step and degrades to sequential: the 200caf87 incident shape).
-2. Network verified programmatically (policies list tooltip ambiguity:
-   old testnet policy sits in the same list).
-3. One live test deposit validated end-to-end with sponsorship applied
-   (userOp receipt shows paymaster, user paid $0).
-
-Rialto onboarding: issue #3 filed by Tom on rialto-plds/rialto-api-docs
-(2026-07-07) + X DM channel. Monitor for reply; send contract address
-once deployed.
-
-## Gas sponsorship ACTIVATED (2026-07-08)
-
-NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID=8d512c49-... set in Vercel Production +
-.env.local. Validated non-destructively BEFORE enabling via paymaster probe:
-`pm_getPaymasterData` on the app RPC (Origin: https://vaults.cash header —
-Alchemy blocks origin-less calls) with a chain-4663 (0x1237) userOp returned
-signed paymaster data stamped {"sponsor":{"name":"VAULTS.cash Gas
-Sponsorship"}} — proving the policy exists, is mainnet-scoped, active, and
-funded, without moving funds. This is the definitive check for the
-"Policy ID(s) not found" failure that broke the atomic path last time.
-Deployment confirmed current via /market/mu = 307 (restricted, exists) vs
-/market/zzz = 404. GAS_SPONSORED messaging flips automatically off the env.
-
-Reusable probe: node script POST pm_getPaymasterData to $NEXT_PUBLIC_RPC_URL
-with Origin header; error "Policy ID(s) not found" = wrong network/app.
-
-REMAINING: the first real embedded-wallet deposit (USDG-funded, zero-ETH
-wallet) is the end-to-end smoke test — user pays $0, op shows paymaster.
-Do this before inviting friends & family en masse.
+- **2026-09-23 — every Base deposit rejected by the paymaster.** Root cause:
+  stale Moonwell/Aerodrome entries in the CDP contract allowlist. Cleared →
+  first live gasless deposit passed the same day.
+- **2026-09-23 — "Execution reverted" on the first ETH/USDC mint.** Mint
+  value exceeded the swap output. Fixed in `zap.ts` (see gotchas).
+- **2026-09-24 — `/api/referral/me` 500.** Column named `amount_usdg` from
+  the July schema vs code expecting `amount_usdc`. Migrated to `amount`;
+  invite card now shows a retry state instead of vanishing.
+- **2026-07-04 — "lost $6" withdrawal scare (no loss), Robinhood-only era.**
+  Invalid Alchemy Gas Manager policy broke the atomic path; sequential
+  fallback hit a nonce race. Lessons kept: validate a paymaster with a test
+  op before trusting env; never ship a money-spending feature without
+  sign-off.

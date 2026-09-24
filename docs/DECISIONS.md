@@ -2,6 +2,10 @@
 
 _Append-only. Date, decision, why. The "why" is the part that saves future-us._
 
+> Entries from July 2026 describe the Robinhood-only build (EIP-7702
+> accounts, Alchemy sponsorship, the Rialto propAMM vault). Where they
+> conflict with the September entries, September wins.
+
 - **2026-07-02 — Ride Uniswap v4; no LFJ/DLMM fork now.** Liquidity gravity
   (official deployment, routers, aggregators) beats owning the AMM at day-2
   TVL. DLMM mechanics later via v4 hooks (`BeforeSwapDelta` custom curves —
@@ -84,3 +88,47 @@ Remaining tight-spread cost is faster inventory build in downtrends
 divergence cap + $150 maxTrade makes pool-skew attacks unprofitable.
 Router pays fill gas, not us. Spread is a constructor param — redeploy to
 retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
+
+## September 2026 — the Base + Robinhood Chain build
+
+- **2026-07-16 → 2026-09-23 — Wallet layer: Privy → Coinbase CDP → Privy.**
+  CDP smart accounts + paymaster were adopted for the Base pivot, then
+  dropped because CDP has no Robinhood Chain. Privy smart wallets (Kernel)
+  give one address on both chains; Base keeps the CDP bundler + paymaster
+  through Privy's dashboard, Robinhood uses the Alchemy bundler with no
+  paymaster (Tom will not fund gas out of pocket there; it is sub-cent).
+- **2026-09-23 — Two chains, one wallet, chain in the URL.** Markets live
+  at `/market/<chain>/<base>-<quote>`, the way Uniswap and Aerodrome do it.
+  Every live v4 pool is auto-listed as a pair from the registries (dust
+  floor, thin-TVL hide) instead of a hand-curated list.
+- **2026-09-23 — Robinhood stock tokens listed.** Tom's product call, citing
+  the SEC/CFTC allowance for US stock tokens; the July geofence was removed.
+  Logos: Robinhood's official feather, as Uniswap and fomo do.
+- **2026-09-23 — Browser reads through `/api/rpc/<chainId>`.** Robinhood's
+  public RPC breaks CORS and the Alchemy key is origin-allowlisted; a proxy
+  keeps keys server-side. Hardened 2026-09-24 (same-site, read-only) when
+  the repo went public.
+- **2026-09-24 — Referrer share paid on-chain in the batch.** Tom asked
+  whether weekly batches would be better; the gas is a ~40k-gas transfer
+  inside a 700k op the depositor already sends, so the split costs nothing
+  and needs no payout process. The ledger only reports.
+- **2026-09-24 — Wallet ownership verified against Privy** (`PRIVY_APP_SECRET`)
+  before binding a referral, because "best practice is worth doing right".
+- **2026-09-24 — Add funds leads with Privy's funding modal**, the raw
+  address is the fallback, and every balance is labelled by chain.
+- **2026-09-24 — $5 minimum deposit; idle pools badged, not hidden.** A $1
+  deposit cost $0.013 in sponsored gas against a $0.006 fee. Pools with
+  real liquidity but < $100 traded in 24h stay listed with a red badge and
+  lose the Steady tag (a strict zero was defeated by the depositor's own
+  zap swap).
+- **2026-09-24 — Trust posture: no contracts of our own, prove it in the
+  product.** `/trust`, decoded signing steps, Uniswap/explorer links per
+  position, Privy key export. Dropped a "TVL through vaults.cash" metric
+  as irrelevant for a zap tool. Repo made public under MIT with SECURITY.md;
+  an audit is deferred until a contract exists (Targets auto-close).
+- **2026-09-24 — Next product direction: "Targets".** Single-sided range
+  orders (buy the asset, LP from today's price to a target, collect fees
+  as price walks through). Needs auto-close when the target is hit — the
+  first feature that justifies a small immutable contract.
+- **Shelved:** Rialto propAMM vault (`contracts/`, VAULT_SPEC.md) and the
+  1inch Aqua pilot (AQUA.md) — kept as reference, not on the roadmap.

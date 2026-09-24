@@ -1,5 +1,7 @@
 # Aqua (1inch) — grounded reference for vaults.cash
 
+> **Archived (2026-09-24).** Research for a shelved pilot. Nothing here is in the product.
+
 _Compiled 2026-07-17 from the whitepaper (Dev Preview 1.0), the full protocol
 source (lib/aqua, v1.0.0), and the TypeScript SDK (@1inch/aqua-sdk, updated
 2026-07-16). Everything address-shaped below was verified on-chain._

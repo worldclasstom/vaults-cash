@@ -40,37 +40,43 @@ All addresses come from [src/lib/registries/](src/lib/registries/) (one file per
 by `npx tsx scripts/verify-chain.ts`, which asserts against mainnet RPC:
 token metadata (USDG, stock tokens + ERC-8056 `uiMultiplier`), Uniswap v4/v3
 bytecode, and live v4 pool ids via StateView. **Re-run it before every deploy**
-(the chain is days old; facts move). `scripts/test-zap.ts` dry-runs deposit and
+(pools drain and new ones appear). `scripts/test-zap.ts` dry-runs deposit and
 withdraw plans against live pools without sending.
 
 ## Setup
 
 1. `npm install`
-2. Copy `.env.example` → `.env.local`:
-   - `NEXT_PUBLIC_PRIVY_APP_ID` — from dashboard.privy.io. Enable: embedded
-     wallets (create on login), **smart wallets** (Kernel or Safe), **gas
-     sponsorship** for chain 4663, login methods email/sms/google/apple/passkey.
-   - `NEXT_PUBLIC_FEE_RECIPIENT` — where platform fees accrue.
+2. Copy `.env.example` → `.env.local` and fill in:
+   - `NEXT_PUBLIC_PRIVY_APP_ID` — from dashboard.privy.io. Enable embedded
+     wallets and **smart wallets (Kernel)**; add Base (CDP bundler + paymaster)
+     and Robinhood Chain as a custom chain (Alchemy bundler); login methods
+     email / SMS / Google / passkey.
+   - `NEXT_PUBLIC_FEE_RECIPIENT` — where the platform fee goes (published on `/trust`).
+   - `ALCHEMY_API_KEY` — server-side RPC + NFT indexer (optional locally; public
+     RPCs work for reads).
+   - `DATABASE_URL` and `PRIVY_APP_SECRET` — only needed for the referral API.
 3. `npm run dev`
+
+Docs: [docs/OVERVIEW.md](docs/OVERVIEW.md) (architecture),
+[docs/RUNBOOK.md](docs/RUNBOOK.md) (ops + gotchas),
+[docs/DECISIONS.md](docs/DECISIONS.md) (why), [ROADMAP.md](ROADMAP.md).
 
 ## Compliance
 
-Stock-token markets are geofenced in [src/proxy.ts](src/proxy.ts) (US, CA, GB,
-CH, AE) per the RHJ issuer restrictions, with disclosures at `/disclosures`.
-Get legal review before public launch — a US operator facilitating LP on
-tokenized securities is untested ground.
+Robinhood stock tokens are listed as `stock` markets; disclosures at
+`/disclosures` cover both chains. There is no jurisdiction gate today. Get
+legal review before public marketing.
 
 ## Agent API
 
-Agents (MCP hosts, bots, LLM tools) can use the same engine without the UI —
+Agents (MCP hosts, bots, LLM tools) use the same engine without the UI —
 discovery at [/llms.txt](public/llms.txt):
 
+- MCP (Streamable HTTP): `https://vaults.cash/api/mcp/mcp`
 - `GET /api/agent/markets` · `GET /api/agent/quote` — read-only
 - `POST /api/agent/zap-plan` · `POST /api/agent/withdraw-plan` — executable,
   fee-inclusive call batches signed by the agent's own wallet
 - `GET /api/agent/positions?owner=0x…`
-
-An MCP server wrapper is planned once the API shape settles.
 
 
 ## Security

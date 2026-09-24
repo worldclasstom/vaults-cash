@@ -1,5 +1,7 @@
 # The Vault — strategy & contract spec (v0, pilot)
 
+> **Archived (2026-09-24).** Spec for the shelved Rialto propAMM pilot; the contract in `contracts/` was never deployed. vaults.cash ships no contracts today.
+
 _Status: parameters SIGNED OFF by Tom 2026-07-04. This document is the
 source of truth for what the pilot contract may and may not do with capital.
 Rialto confirmed supporting chain 4663. Remaining before deploy: Chainlink ETH/USD feed address + Rialto router/registration address._
