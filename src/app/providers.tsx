@@ -50,6 +50,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
         embeddedWallets: {
           ethereum: { createOnLogin: "users-without-wallets" },
+          // Every user gets a Solana key too, so a Solana venue can be added
+          // later without a migration. "all-users": "users-without-wallets"
+          // would skip anyone who already holds the EVM wallet above.
+          solana: { createOnLogin: "all-users" },
           // Our Confirm sheet is the single human-readable prompt.
           showWalletUIs: false,
         },

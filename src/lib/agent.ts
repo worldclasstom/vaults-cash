@@ -54,6 +54,7 @@ export async function marketSnapshot(market: Market) {
     /** the stablecoin deposits are made in on this chain (USDC / USDG) */
     quote: market.quote,
     usdc: market.quote.address,
+    uiMultiplier: market.uiMultiplier,
     pool: {
       poolId: market.pool.poolId,
       feeBps: market.pool.fee / 100,
@@ -72,7 +73,7 @@ export const AGENT_DOCS = {
     "Calls MUST be executed in order from the `owner` address. Smart accounts (ERC-4337/EIP-7702) should batch them atomically; EOAs must send them as sequential transactions and stop on any revert.",
   fees: `vaults.cash takes ${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of the deposit (and of the asset->USDC conversion on withdraw), included in the returned calls.`,
   markets:
-    `All markets are crypto, paired against the chain's dollar stablecoin: ${CHAIN_IDS.map((id) => `${CHAINS[id].label} (chain ${id}) uses ${CHAINS[id].quote.symbol}`).join("; ")}. Identify a market by its slug (e.g. "eth" on Base, "eth-robinhood" on Robinhood Chain); every plan reports the chainId its calls must run on. There are no tokenized securities here, so no market is geo-restricted. Markets with kind=stable are stablecoin-correlated pairs with minimal impermanent loss.`,
+    `Every market is paired against its chain's dollar stablecoin: ${CHAIN_IDS.map((id) => `${CHAINS[id].label} (chain ${id}) uses ${CHAINS[id].quote.symbol}`).join("; ")}. Identify a market by its slug ("base/eth", "robinhood/tsla"; a bare symbol means Base); every plan reports the chainId its calls must run on. kind=stable are stablecoin-correlated pairs with minimal impermanent loss; kind=stock are Robinhood-issued tokens on Robinhood Chain tracking US equities/ETFs (availability depends on the party's jurisdiction; uiMultiplier converts raw units to displayed shares). Markets are listed automatically from every live pool in the registry; check liquidity before sizing a deposit.`,
   slippage:
     "Plans embed amountOutMinimum and amountMax bounds; if the pool moves beyond slippageBps the batch reverts. Quotes expire — rebuild plans older than ~60s.",
 };

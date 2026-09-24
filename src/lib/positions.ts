@@ -76,29 +76,30 @@ export async function getUncollectedFees(position: OwnedPosition) {
   };
 }
 
-/** Enumerate the user's v4 position NFTs on one chain via Blockscout, then
- *  read live state from the chain. */
+/** Candidate token ids: in the browser via our /api/positions/nfts route
+ *  (indexer keys stay server-side), on the server directly. */
+async function candidateTokenIds(owner: `0x${string}`, chainId: ChainId): Promise<bigint[]> {
+  if (typeof window === "undefined") {
+    const { positionTokenIds } = await import("./nfts");
+    return positionTokenIds(chainId, owner);
+  }
+  const res = await fetch(`/api/positions/nfts?chainId=${chainId}&owner=${owner}`, {
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!res.ok) throw new Error(`positions lookup failed (${res.status})`);
+  const body = (await res.json()) as { tokenIds: string[] };
+  return body.tokenIds.map(BigInt);
+}
+
+/** Enumerate the user's v4 position NFTs on one chain, then read live state
+ *  (ownership + liquidity) from the chain itself. */
 export async function fetchPositionsOnChain(
   owner: `0x${string}`,
   chainId: ChainId,
 ): Promise<OwnedPosition[]> {
   const client = publicClientFor(chainId);
   const posm = posmOf(chainId);
-  const api = chainConfig(chainId).explorer.apiUrl;
-  const res = await fetch(`${api}/addresses/${owner}/nft?type=ERC-721`, {
-    headers: { accept: "application/json" },
-  });
-  if (!res.ok) {
-    if (res.status === 404) return []; // address unseen by the indexer yet
-    throw new Error(`Blockscout ${res.status}`);
-  }
-  const body = await res.json();
-  const tokenIds: bigint[] = (body.items ?? [])
-    .filter((item: { token?: { address?: string; address_hash?: string } }) => {
-      const addr = item.token?.address ?? item.token?.address_hash ?? "";
-      return addr.toLowerCase() === posm.toLowerCase();
-    })
-    .map((item: { id: string }) => BigInt(item.id));
+  const tokenIds = await candidateTokenIds(owner, chainId);
 
   const positions = await Promise.all(
     tokenIds.map(async (tokenId) => {

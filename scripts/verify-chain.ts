@@ -129,6 +129,10 @@ const client = createPublicClient({
   }),
 });
 
+/** ERC-8056 scaled-UI tokens (Robinhood stock tokens) expose the multiplier
+ *  that turns raw units into displayed shares; 1e18 = 1.0. */
+const uiMultiplierAbi = parseAbi(["function uiMultiplier() view returns (uint256)"]);
+
 const stateViewAbi = parseAbi([
   "function getSlot0(bytes32 poolId) view returns (uint160 sqrtPriceX96, int24 tick, uint24 protocolFee, uint24 lpFee)",
   "function getLiquidity(bytes32 poolId) view returns (uint128 liquidity)",
@@ -181,8 +185,16 @@ async function checkToken(label: string, address: string) {
     fail(label, `SYMBOL MISMATCH: expected ${label}, chain says ${symbol} @ ${addr}`);
     return null;
   }
-  ok(label, `${name} (${symbol}), ${decimals} dec`);
-  return { address: addr, name, symbol, decimals, totalSupply: totalSupply.toString() };
+  let uiMultiplier: string | null = null;
+  try {
+    uiMultiplier = (
+      await client.readContract({ address: addr, abi: uiMultiplierAbi, functionName: "uiMultiplier" })
+    ).toString();
+  } catch {
+    /* plain ERC-20 */
+  }
+  ok(label, `${name} (${symbol}), ${decimals} dec${uiMultiplier ? `, uiMultiplier ${uiMultiplier}` : ""}`);
+  return { address: addr, name, symbol, decimals, totalSupply: totalSupply.toString(), uiMultiplier };
 }
 
 async function main() {

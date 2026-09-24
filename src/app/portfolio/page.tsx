@@ -8,6 +8,7 @@ import { usePlanAdd, useSendDeposit } from "@/hooks/useDeposit";
 import { useCollect, usePositions, useWithdraw, type PositionView } from "@/hooks/usePositions";
 import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
 import { fmtAmount, fmtUsd } from "@/lib/format";
+import { shareAmount } from "@/lib/markets";
 import { planSummary } from "@/lib/zap";
 
 /** don't offer collection below this — it wouldn't meaningfully beat gas */
@@ -145,7 +146,7 @@ function PositionCard({ p }: { p: PositionView }) {
             </span>
           </p>
           <p className="text-sm text-muted">
-            {fmtAmount(p.assetAmount, 5)} {p.market.symbol} + {fmtUsd(p.usdcAmount)}
+            {fmtAmount(shareAmount(p.market, p.assetAmount), 5)} {p.market.symbol} + {fmtUsd(p.usdcAmount)}
           </p>
           <p className="text-sm">
             <span className="text-muted">Fees earned: </span>

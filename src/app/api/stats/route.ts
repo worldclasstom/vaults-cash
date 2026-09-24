@@ -9,7 +9,12 @@ export type MarketStats = {
   vol24hUsd: number;
   /** naive fee APR: 24h volume × fee tier ÷ TVL, annualized */
   estAprPct: number;
+  /** below MIN_TVL_USD — listed automatically from the registry but not
+   *  worth LPing into; the market list hides these */
+  thin: boolean;
 };
+
+const MIN_TVL_USD = 25_000;
 
 /** Keyed by market slug. */
 export async function GET() {
@@ -33,6 +38,7 @@ export async function GET() {
           tvlUsd,
           vol24hUsd,
           estAprPct: ((vol24hUsd * feeFrac) / tvlUsd) * 365 * 100,
+          thin: tvlUsd < MIN_TVL_USD,
         };
       } catch {
         /* stats are decorative — never fail the page over them */

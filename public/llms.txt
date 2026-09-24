@@ -26,10 +26,11 @@ Execute calls IN ORDER from `owner`; batch atomically if the wallet supports it
 
 ## Important
 
-- Chain: Base, id 8453, RPC https://mainnet.base.org, gas ETH.
-- USDC (6 decimals) is the deposit/withdraw currency.
-- Markets flagged restricted=true are tokenized stocks: not offerable to US
-  persons or in CA/GB/CH/AE. Only request plans for eligible parties.
+- Chains: Base (id 8453, deposits in USDC) and Robinhood Chain (id 4663,
+  deposits in USDG). Gas is ETH on both. Markets are identified by slug
+  ("base/eth", "robinhood/tsla"); every plan returns the chainId to execute on.
+- kind=stock markets are Robinhood-issued tokens tracking US equities/ETFs on
+  Robinhood Chain; availability depends on the party's jurisdiction.
 - LP positions carry impermanent-loss risk and can go out of range.
 
 ## Human app

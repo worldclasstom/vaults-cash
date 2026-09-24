@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { useMarketQuote, useQuoteBalance, useTokenBalance } from "@/hooks/useChainData";
-import { NATIVE_ETH, type Market } from "@/lib/markets";
+import { NATIVE_ETH, marketBySlug, sharePrice, type Market } from "@/lib/markets";
 import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
 import { formatEther } from "viem";
 import { fmtUsd, fmtPct } from "@/lib/format";
 import { chainConfig } from "@/lib/chain";
-import { marketBySymbol } from "@/lib/markets";
 import { PERMIT2, contractsOf } from "@/lib/uniswap";
 import { planSummary, PRESET_WIDTH, type RangePreset, type ZapPlan } from "@/lib/zap";
 import type { MarketStats } from "@/app/api/stats/route";
@@ -29,8 +28,8 @@ function useStats() {
   });
 }
 
-export function MarketDetail({ symbol }: { symbol: string }) {
-  const market = marketBySymbol(symbol)!;
+export function MarketDetail({ slug }: { slug: string }) {
+  const market = marketBySlug(slug)!;
   const chain = chainConfig(market.chainId);
   const router = useRouter();
   const { data: quote } = useMarketQuote(market);
@@ -84,11 +83,12 @@ export function MarketDetail({ symbol }: { symbol: string }) {
           <p className="text-sm text-muted">
             {market.name}
             {market.kind === "stable" && " · Stablecoin"}
+            {market.kind === "stock" && " · Stock token"}
             {" · "}
             {chain.label}
           </p>
           <p className="text-4xl font-bold tracking-tight">
-            {quote ? fmtUsd(quote.price) : "—"}
+            {quote ? fmtUsd(sharePrice(market, quote.price)) : "—"}
           </p>
           <div className="mt-2 flex gap-4 text-sm text-muted">
             <span>Pool {market.pool.fee / 10_000}%</span>

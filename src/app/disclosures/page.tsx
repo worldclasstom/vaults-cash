@@ -12,11 +12,15 @@ export default function DisclosuresPage() {
             <h2 className="pb-1 font-semibold text-foreground">What vaults.cash is</h2>
             <p>
               vaults.cash is a self-custodial interface for providing liquidity to
-              Uniswap pools on Base. Your funds sit in your own wallet
-              and in pool positions you own — vaults.cash never takes custody.
-              vaults.cash is not affiliated with, endorsed by, or sponsored by
-              Coinbase, Uniswap Labs, or Circle. Every market is crypto — we do
-              not offer tokenized stocks or any security.
+              Uniswap pools on Base and Robinhood Chain. Your funds sit in your own
+              wallet and in pool positions you own — vaults.cash never takes
+              custody. vaults.cash is not affiliated with, endorsed by, or
+              sponsored by Coinbase, Robinhood, Uniswap Labs, Circle, or Paxos.
+              Markets labeled &ldquo;stock token&rdquo; are Robinhood-issued tokens
+              on Robinhood Chain that track a US equity or ETF; they are not
+              the underlying shares, carry no shareholder rights, and their
+              availability depends on your jurisdiction. vaults.cash does not
+              issue them.
             </p>
           </section>
           <section>

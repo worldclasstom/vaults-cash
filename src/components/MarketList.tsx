@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { useMarketQuotes } from "@/hooks/useChainData";
 import { chainConfig } from "@/lib/chain";
 import { fmtUsd } from "@/lib/format";
-import type { Market } from "@/lib/markets";
+import { sharePrice, type Market } from "@/lib/markets";
+import type { MarketStats } from "@/app/api/stats/route";
 
 function Monogram({ market }: { market: Market }) {
   return (
@@ -25,10 +27,17 @@ const FILTERS = [
 ] as const;
 type FilterId = (typeof FILTERS)[number]["id"];
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 8;
 
 export function MarketList() {
   const { data, isLoading, isError } = useMarketQuotes();
+  // markets the indexer knows to be too thin to LP into sensibly are hidden;
+  // ones it hasn't indexed yet stay visible
+  const { data: stats } = useQuery<Record<string, MarketStats>>({
+    queryKey: ["stats"],
+    queryFn: async () => (await fetch("/api/stats")).json(),
+    staleTime: 60_000,
+  });
   const [filter, setFilter] = useState<FilterId>("all");
   const [page, setPage] = useState(0);
 
@@ -38,7 +47,7 @@ export function MarketList() {
   };
 
   const filtered = (data ?? []).filter(
-    (d) => filter === "all" || d.market.kind === filter,
+    (d) => (filter === "all" || d.market.kind === filter) && !stats?.[d.market.slug]?.thin,
   );
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const clampedPage = Math.min(page, totalPages - 1);
@@ -91,7 +100,7 @@ export function MarketList() {
                     </span>
                   </span>
                   <span className="flex flex-col items-end">
-                    <span className="font-semibold">{fmtUsd(price)}</span>
+                    <span className="font-semibold">{fmtUsd(sharePrice(market, price))}</span>
                     <span className="text-xs text-accent">
                       Earn · {market.pool.fee / 10_000}% pool
                     </span>

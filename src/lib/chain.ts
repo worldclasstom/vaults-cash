@@ -36,6 +36,10 @@ export type ChainConfig = {
   chain: Chain;
   /** short label for UI ("Base", "Robinhood") */
   label: string;
+  /** URL segment: /market/<slug>/<symbol> */
+  slug: "base" | "robinhood";
+  /** Alchemy network prefix for <network>.g.alchemy.com (NFT API) */
+  alchemy: string;
   /** the dollar stablecoin every market on this chain is quoted in */
   quote: QuoteToken;
   /** Uniswap v4 deployments per developers.uniswap.org/contracts/v4/deployments.
@@ -71,6 +75,8 @@ export const CHAINS: Record<ChainId, ChainConfig> = {
   8453: {
     chain: baseChain,
     label: "Base",
+    slug: "base",
+    alchemy: "base-mainnet",
     quote: { address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", symbol: "USDC", decimals: 6 },
     uniswap: {
       v4: {
@@ -90,6 +96,8 @@ export const CHAINS: Record<ChainId, ChainConfig> = {
   4663: {
     chain: robinhoodChain,
     label: "Robinhood",
+    slug: "robinhood",
+    alchemy: "robinhood-mainnet",
     quote: { address: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168", symbol: "USDG", decimals: 6 },
     uniswap: {
       v4: {
@@ -120,6 +128,10 @@ export function isChainId(id: number): id is ChainId {
 export function chainConfig(id: number): ChainConfig {
   if (!isChainId(id)) throw new Error(`unsupported chain ${id}`);
   return CHAINS[id];
+}
+
+export function chainBySlug(slug: string): ChainConfig | undefined {
+  return CHAIN_IDS.map((id) => CHAINS[id]).find((c) => c.slug === slug.toLowerCase());
 }
 
 /** Explorer link for a tx / address on a given chain. */
