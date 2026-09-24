@@ -35,6 +35,7 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
+    "/pools",
     "/market/:path*",
     "/portfolio",
     "/account",

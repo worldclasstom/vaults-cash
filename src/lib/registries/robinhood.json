@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T04:22:07.128Z",
+  "generatedAt": "2026-09-24T04:51:43.189Z",
   "chainId": 4663,
   "verified": true,
   "uniswap": {
@@ -18,7 +18,7 @@
       "name": "Global Dollar",
       "symbol": "USDG",
       "decimals": 6,
-      "totalSupply": "702140160631066",
+      "totalSupply": "701985474957632",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/51281/large/GDN_USDG_Token_200x200.png?1730484111"
     },
@@ -27,7 +27,7 @@
       "name": "WETH",
       "symbol": "WETH",
       "decimals": 18,
-      "totalSupply": "36902016789680232929509",
+      "totalSupply": "36937630679457131730993",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/102174283/large/weth-robinhood.jpeg?1782924507"
     },
@@ -38,7 +38,7 @@
       "decimals": 18,
       "totalSupply": "12315190380000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174112/large/0x322f0929c4625ed5bad873c95208d54e1c003b2d.png?1782444570"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x322f0929c4625ed5bad873c95208d54e1c003b2d.png"
     },
     "AAPL": {
       "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
@@ -47,7 +47,7 @@
       "decimals": 18,
       "totalSupply": "16029524855610000000000",
       "uiMultiplier": "1000566080061092436",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174123/large/0xaf3d76f1834a1d425780943c99ea8a608f8a93f9.png?1782444598"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xaf3d76f1834a1d425780943c99ea8a608f8a93f9.png"
     },
     "AMD": {
       "address": "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
@@ -56,7 +56,7 @@
       "decimals": 18,
       "totalSupply": "3347455900000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174114/large/0x86923f96303d656e4aa86d9d42d1e57ad2023fdc.png?1782444575"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x86923f96303d656e4aa86d9d42d1e57ad2023fdc.png"
     },
     "AMZN": {
       "address": "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
@@ -65,7 +65,7 @@
       "decimals": 18,
       "totalSupply": "14857123600000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174126/large/0x12f190a9f9d7d37a250758b26824b97ce941bf54.png?1782444606"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x12f190a9f9d7d37a250758b26824b97ce941bf54.png"
     },
     "BABA": {
       "address": "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4",
@@ -74,7 +74,7 @@
       "decimals": 18,
       "totalSupply": "4678897880000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174135/large/0xad25ac6c84d497db898fa1e8387bf6af3532a1c4.png?1782444629"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xad25ac6c84d497db898fa1e8387bf6af3532a1c4.png"
     },
     "BE": {
       "address": "0x822CC93fFD030293E9842c30BBD678F530701867",
@@ -83,7 +83,7 @@
       "decimals": 18,
       "totalSupply": "2952233240000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174131/large/0x822cc93ffd030293e9842c30bbd678f530701867.png?1782444619"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x822cc93ffd030293e9842c30bbd678f530701867.png"
     },
     "COIN": {
       "address": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b",
@@ -92,7 +92,7 @@
       "decimals": 18,
       "totalSupply": "11223761980000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174136/large/0x6330d8c3178a418788df01a47479c0ce7ccf450b.png?1782444632"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x6330d8c3178a418788df01a47479c0ce7ccf450b.png"
     },
     "CRCL": {
       "address": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5",
@@ -101,7 +101,7 @@
       "decimals": 18,
       "totalSupply": "43078777700000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174121/large/0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5.png?1782444593"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5.png"
     },
     "CRWV": {
       "address": "0x5f10A1C971B69e47e059e1dC91901B59b3fB49C3",
@@ -110,7 +110,7 @@
       "decimals": 18,
       "totalSupply": "6560727330000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174127/large/0x5f10a1c971b69e47e059e1dc91901b59b3fb49c3.png?1782444608"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x5f10a1c971b69e47e059e1dc91901b59b3fb49c3.png"
     },
     "GOOGL": {
       "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
@@ -119,7 +119,7 @@
       "decimals": 18,
       "totalSupply": "18295846878580000000000",
       "uiMultiplier": "1000193924414112587",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174124/large/0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3.png?1782444601"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3.png"
     },
     "INTC": {
       "address": "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681",
@@ -128,16 +128,16 @@
       "decimals": 18,
       "totalSupply": "15774022400000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174118/large/0xc72b96e0e48ecd4dc75e1e45396e26300bc39681.png?1782444585"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xc72b96e0e48ecd4dc75e1e45396e26300bc39681.png"
     },
     "META": {
       "address": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
       "name": "Meta Platforms • Robinhood Token",
       "symbol": "META",
       "decimals": 18,
-      "totalSupply": "8851893924580000000000",
+      "totalSupply": "8972952806050000000000",
       "uiMultiplier": "1000541459879451635",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174122/large/0xc0d6457c16cc70d6790dd43521c899c87ce02f35.png?1782444595"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xc0d6457c16cc70d6790dd43521c899c87ce02f35.png"
     },
     "MSFT": {
       "address": "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
@@ -146,7 +146,7 @@
       "decimals": 18,
       "totalSupply": "5688804843390000000000",
       "uiMultiplier": "1000412952576205964",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174116/large/0xe93237c50d904957cf27e7b1133b510c669c2e74.png?1782444580"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xe93237c50d904957cf27e7b1133b510c669c2e74.png"
     },
     "MU": {
       "address": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
@@ -155,7 +155,7 @@
       "decimals": 18,
       "totalSupply": "4132926231220000000000",
       "uiMultiplier": "1000074823219171086",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174111/large/0xff080c8ce2e5feadaca0da81314ae59d232d4afd.png?1782444567"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xff080c8ce2e5feadaca0da81314ae59d232d4afd.png"
     },
     "NVDA": {
       "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
@@ -164,7 +164,7 @@
       "decimals": 18,
       "totalSupply": "90530799870790000000000",
       "uiMultiplier": "1000775159164630595",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174110/large/0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec.png?1782444565"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec.png"
     },
     "ORCL": {
       "address": "0xb0992820E760d836549ba69BC7598b4af75dEE03",
@@ -173,7 +173,7 @@
       "decimals": 18,
       "totalSupply": "6308196992900000000000",
       "uiMultiplier": "1002210914971013375",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174128/large/0xb0992820e760d836549ba69bc7598b4af75dee03.png?1782444611"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xb0992820e760d836549ba69bc7598b4af75dee03.png"
     },
     "PLTR": {
       "address": "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
@@ -182,7 +182,7 @@
       "decimals": 18,
       "totalSupply": "14921703470000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174117/large/0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a.png?1782444583"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a.png"
     },
     "SNDK": {
       "address": "0xB90A19fF0Af67f7779afF50A882A9CfF42446400",
@@ -191,7 +191,7 @@
       "decimals": 18,
       "totalSupply": "910082490000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174113/large/0xb90a19ff0af67f7779aff50a882a9cff42446400.png?1782444573"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xb90a19ff0af67f7779aff50a882a9cff42446400.png"
     },
     "SPCX": {
       "address": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
@@ -200,7 +200,7 @@
       "decimals": 18,
       "totalSupply": "79220001360000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174129/large/0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea.png?1782444614"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea.png"
     },
     "USAR": {
       "address": "0xd917B029C761D264c6A312BBbcDA868658eF86a6",
@@ -209,7 +209,7 @@
       "decimals": 18,
       "totalSupply": "37403703010000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174132/large/0xd917b029c761d264c6a312bbbcda868658ef86a6.png?1782444621"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xd917b029c761d264c6a312bbbcda868658ef86a6.png"
     },
     "QQQ": {
       "address": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
@@ -218,7 +218,7 @@
       "decimals": 18,
       "totalSupply": "7207010759990000000000",
       "uiMultiplier": "1000700791241405425",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174119/large/0xd5f3879160bc7c32ebb4dc785f8a4f505888de68.png?1782444588"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xd5f3879160bc7c32ebb4dc785f8a4f505888de68.png"
     },
     "SGOV": {
       "address": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
@@ -227,7 +227,7 @@
       "decimals": 18,
       "totalSupply": "31750816845120000000000",
       "uiMultiplier": "1005101770003214918",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174130/large/0x92fd66527192e3e61d4ddd13322aa222de86f9b5.png?1782444616"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x92fd66527192e3e61d4ddd13322aa222de86f9b5.png"
     },
     "SLV": {
       "address": "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
@@ -236,16 +236,16 @@
       "decimals": 18,
       "totalSupply": "25325134530000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174120/large/0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f.png?1782444590"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f.png"
     },
     "SPY": {
       "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
       "name": "SPDR S&P 500 ETF Trust • Robinhood Token",
       "symbol": "SPY",
       "decimals": 18,
-      "totalSupply": "29940929437120000000000",
+      "totalSupply": "29988236833430000000000",
       "uiMultiplier": "1001717991187472003",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174115/large/0x117cc2133c37b721f49de2a7a74833232b3b4c0c.png?1782444578"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x117cc2133c37b721f49de2a7a74833232b3b4c0c.png"
     },
     "USO": {
       "address": "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344",
@@ -254,7 +254,7 @@
       "decimals": 18,
       "totalSupply": "16700109960000000000000",
       "uiMultiplier": "1000000000000000000",
-      "logo": "https://coin-images.coingecko.com/coins/images/102174125/large/0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344.png?1782444603"
+      "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344.png"
     }
   },
   "v4Pools": [
@@ -263,7 +263,7 @@
       "pair": "ETH/USDG",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -197417,
+      "tick": -197406,
       "liquidity": "70845594626547515"
     },
     {
@@ -271,8 +271,8 @@
       "pair": "ETH/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197419,
-      "liquidity": "2477624332881716"
+      "tick": -197404,
+      "liquidity": "2456425445278794"
     },
     {
       "poolId": "0xd313d79d9d6a714e7bdf02fc42a2c27ede7e51928ffd605126fe9e1192630cf8",
@@ -303,7 +303,7 @@
       "pair": "WETH/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197419,
+      "tick": -197405,
       "liquidity": "49599553624916733"
     },
     {
@@ -343,7 +343,7 @@
       "pair": "TSLA/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -216942,
+      "tick": -216944,
       "liquidity": "480267525564005543"
     },
     {
@@ -375,7 +375,7 @@
       "pair": "AAPL/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 218126,
+      "tick": 218135,
       "liquidity": "601930760853092941"
     },
     {
@@ -639,8 +639,8 @@
       "pair": "META/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 210277,
-      "liquidity": "3958536577128823982"
+      "tick": 210289,
+      "liquidity": "5090183766250325008"
     },
     {
       "poolId": "0x2a862e4b43c6a9a494a94f79eb920caf87be597bacba06567bfd67139f41ad16",
@@ -671,7 +671,7 @@
       "pair": "MSFT/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 214171,
+      "tick": 214174,
       "liquidity": "287615330655323674"
     },
     {
@@ -687,7 +687,7 @@
       "pair": "MU/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 9132,
+      "tick": 9140,
       "liquidity": "105082932568306696694"
     },
     {
@@ -719,7 +719,7 @@
       "pair": "NVDA/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 24761,
+      "tick": 24739,
       "liquidity": "41511431769470417"
     },
     {
@@ -727,7 +727,7 @@
       "pair": "NVDA/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 24744,
+      "tick": 24747,
       "liquidity": "411794220504676125872"
     },
     {
@@ -751,7 +751,7 @@
       "pair": "NVDA/USDG",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 222161,
+      "tick": 222149,
       "liquidity": "2271953838828055"
     },
     {
@@ -815,8 +815,8 @@
       "pair": "PLTR/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 223810,
-      "liquidity": "831917544721147345"
+      "tick": 223811,
+      "liquidity": "832280687924657505"
     },
     {
       "poolId": "0x0f6951750c817d6ba3555d267bb9b0cdbfcae805b87164a8103def7bf05eb848",
@@ -839,7 +839,7 @@
       "pair": "SNDK/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 201344,
+      "tick": 201355,
       "liquidity": "38830398811420314"
     },
     {
@@ -880,7 +880,7 @@
       "fee": 10000,
       "tickSpacing": 200,
       "tick": -226234,
-      "liquidity": "784108971284054640"
+      "liquidity": "779809949420575178"
     },
     {
       "poolId": "0x92437558c044cd5ca6da1c67b383369bb34b46bc4c6ce3e3d682297d720ad48f",
@@ -911,7 +911,7 @@
       "pair": "QQQ/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 210216,
+      "tick": 210226,
       "liquidity": "365295266107527"
     },
     {
@@ -992,176 +992,176 @@
       "geckoAddress": "0x52e65b17fb6e5ba00ed806f37afcd2daa50271ca",
       "name": "USDG / WETH 0.01%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 19021791.0119,
-      "volume24hUsd": 392325094.993927
+      "reserveUsd": 19060729.4135,
+      "volume24hUsd": 389627401.281857
     },
     {
       "geckoAddress": "0x24107d152f14a76d292123265ae3f3c71f863fc2f4ef7ba49d64e78d28ea379e",
       "name": "WETH / USDG 0.01%",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 380819.7984,
-      "volume24hUsd": 7567208.91679399
+      "reserveUsd": 381585.136,
+      "volume24hUsd": 7552576.00292804
     },
     {
       "geckoAddress": "0x5875d407a42965b0e768c8925cea290e06fa50603ef34fc99eb92a1050e6ae36",
       "name": "META / USDG 0.3%",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 4683923.5187,
-      "volume24hUsd": 9785262.14315269
+      "reserveUsd": 4705164.1231,
+      "volume24hUsd": 9825394.83088071
     },
     {
       "geckoAddress": "0x16679e2ac1a798865ecf1c1639e67693ddb1c220",
       "name": "WETH / USDG 0.05%",
       "dex": "up-v3",
-      "reserveUsd": 586458.9874,
-      "volume24hUsd": 11634902.5923188
+      "reserveUsd": 587459.3096,
+      "volume24hUsd": 11525481.3567339
     },
     {
       "geckoAddress": "0xf4d0171f995d576b972aa982080eaf4da456cf9e",
       "name": "WETH / USDG 0.005%",
       "dex": "giga-v3",
-      "reserveUsd": 192716.7688,
-      "volume24hUsd": 3284601.69341416
+      "reserveUsd": 193056.7024,
+      "volume24hUsd": 3297577.83832425
     },
     {
       "geckoAddress": "0x7a35168956f129c032ec035cc47383a605a71df0",
       "name": "WETH / USDG 0.004%",
       "dex": "alandale-cl",
-      "reserveUsd": 209216.6786,
-      "volume24hUsd": 9008298.76002174
+      "reserveUsd": 209949.6598,
+      "volume24hUsd": 8927404.38110892
     },
     {
       "geckoAddress": "0x69bfaf19c9f377bb306a89aed9f6b07e2c1a8d9a",
       "name": "USDG / WETH 0.05%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 4725091.0767,
-      "volume24hUsd": 19095863.3062354
+      "reserveUsd": 4733474.7025,
+      "volume24hUsd": 18373444.8363308
     },
     {
       "geckoAddress": "0x8068ab043efd411b87506c41be1add38faaf18c0af0016c663ca92feff0b8159",
       "name": "WETH / USDG",
       "dex": "orvex-v4",
-      "reserveUsd": 56653.9081,
-      "volume24hUsd": 1890665.85129975
+      "reserveUsd": 56776.6599,
+      "volume24hUsd": 1881003.88571507
     },
     {
       "geckoAddress": "0xf2a0be59ab76b96f957bd5e5b967f2b75e8db269",
       "name": "PONS / USDG 0.3%",
       "dex": "ramses-v3-robinhood",
-      "reserveUsd": 1480090.3888,
-      "volume24hUsd": 22640596.3248386
+      "reserveUsd": 1493592.7523,
+      "volume24hUsd": 22488886.6524767
     },
     {
       "geckoAddress": "0xfae65eaa11943f45e83d5b45dc7a7c801c51bfb0",
       "name": "WETH / USDG 0.01%",
       "dex": "ramses-v3-robinhood",
-      "reserveUsd": 541002.8195,
-      "volume24hUsd": 9927803.76210041
+      "reserveUsd": 542253.2286,
+      "volume24hUsd": 9665751.61713051
     },
     {
       "geckoAddress": "0xe2b46c905e12ab8e2f864e4821a4325884c1b126",
       "name": "GME / USDG 0.05%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 374585.4848,
-      "volume24hUsd": 5660205.54608488
+      "reserveUsd": 375213.0677,
+      "volume24hUsd": 5372567.77094531
     },
     {
       "geckoAddress": "0x5eac4195930d5ff8b7a34a347f2bde951c42eb730d6e26075bea3dd7c66feb40",
       "name": "ROBIN / USDG",
       "dex": "pons-v2-dex",
-      "reserveUsd": 193340.8675,
-      "volume24hUsd": 1161271.616742
-    },
-    {
-      "geckoAddress": "0x1e3ba04aa20ecccfb9a174a5b2cb15c81f2c9c2c20cf40e895fadfdf33367c4f",
-      "name": "SI / WETH",
-      "dex": "pons-v2-dex",
-      "reserveUsd": 7332.4914,
-      "volume24hUsd": 1621467.1732025
+      "reserveUsd": 189234.4785,
+      "volume24hUsd": 1133403.36404403
     },
     {
       "geckoAddress": "0x40a433930370f6cdf0a78debc2c6dd599c23bd428c0d67dd8b5373e4f101557f",
       "name": "musebook / META",
       "dex": "bankr-robinhood",
-      "reserveUsd": 5320963.9836,
-      "volume24hUsd": 3961686.63183626
+      "reserveUsd": 5333465.6395,
+      "volume24hUsd": 3941490.82436055
     },
     {
       "geckoAddress": "0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
       "name": "NVDA / USDG 0.05%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 5688541.719,
-      "volume24hUsd": 14073744.9794328
+      "reserveUsd": 5699090.8962,
+      "volume24hUsd": 14119252.230591
     },
     {
       "geckoAddress": "0xa6e013da812a4f2e151e2c08aa05d53a67ad84487e35d60a0b5b7456066fad78",
       "name": "LILY / META",
       "dex": "bankr-robinhood",
-      "reserveUsd": 68685.2636,
-      "volume24hUsd": 921264.326085651
+      "reserveUsd": 68613.8112,
+      "volume24hUsd": 923687.733644234
     },
     {
       "geckoAddress": "0x90691314f1bca335cf43fa9444a314ec15b2a0d82d644a9ace7e3acde70e1cd5",
       "name": "CDS / USDG",
       "dex": "pons-v2-dex",
-      "reserveUsd": 4176.3314,
-      "volume24hUsd": 845994.82330093
+      "reserveUsd": 4151.2205,
+      "volume24hUsd": 846059.706119946
     },
     {
       "geckoAddress": "0x93cc54eb4e1928e841cb8b2e488bd82e8d97d56e0aab16cf078ef71c576dcded",
       "name": "musebook / USDG 0.75%",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 540282.6235,
-      "volume24hUsd": 5280170.51648738
+      "reserveUsd": 537119.8725,
+      "volume24hUsd": 5230662.09941567
     },
     {
       "geckoAddress": "0xc58bb68060bcb7b3ea0f6d4a4afef1e57f628722e808db12afb6d1733552872f",
       "name": "META / USDG 0.031%",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 271794.2011,
-      "volume24hUsd": 5713070.289767
-    },
-    {
-      "geckoAddress": "0xbac3aa3b91584a53a579b3c999a56756e954e59247e497bad1d25a4334bde551",
-      "name": "WETH / USDG",
-      "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 30519695.7419,
-      "volume24hUsd": 77930033.6928174
+      "reserveUsd": 271536.6143,
+      "volume24hUsd": 5662647.38769583
     },
     {
       "geckoAddress": "0x5d8910badaa313e4f945a6993d95b40a7e1562dd29750c6437271eb6140c30a1",
       "name": "HITBUY / WETH 0.3%",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 57522.502,
+      "reserveUsd": 57568.7735,
       "volume24hUsd": 18690588.7939769
+    },
+    {
+      "geckoAddress": "0xbac3aa3b91584a53a579b3c999a56756e954e59247e497bad1d25a4334bde551",
+      "name": "WETH / USDG",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 30325124.3851,
+      "volume24hUsd": 77852176.8061759
     },
     {
       "geckoAddress": "0x541bedd98337d22c46ff8196494f14e7d9922ddedf07b74df44c7020487e5fdf",
       "name": "Agrippa / musebook",
       "dex": "bankr-robinhood",
-      "reserveUsd": 1209637.6505,
-      "volume24hUsd": 3928422.31616785
+      "reserveUsd": 1212565.1567,
+      "volume24hUsd": 3850586.04104401
     },
     {
       "geckoAddress": "0xf5f99b04d32f7fa3ae37f6a6753eb434981e997da17b10b665fbe1b9bc0cddde",
       "name": "BLISS / WETH",
       "dex": "pons-v2-dex",
-      "reserveUsd": 12224.6469,
-      "volume24hUsd": 2734236.15572304
-    },
-    {
-      "geckoAddress": "0xaf69d9d9d0dbeaaa2e03eddbd7971d5b536627ba",
-      "name": "Euler / WETH 0.01%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 3781.8689,
-      "volume24hUsd": 13397944.7527237
+      "reserveUsd": 11766.9685,
+      "volume24hUsd": 2734790.14246387
     },
     {
       "geckoAddress": "0xc61284332117c3fb23a2a56cceffd07f7af60029",
       "name": "SPCX / USDG 0.05%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 2580405.2366,
-      "volume24hUsd": 10283346.4680321
+      "reserveUsd": 2582338.5512,
+      "volume24hUsd": 10284441.6609763
+    },
+    {
+      "geckoAddress": "0x54f7883914619af9105355bf83ed678bcf9f63560218ac61c9963b9503d0ba32",
+      "name": "WETH / USDG 0.046%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 1555042.4191,
+      "volume24hUsd": 2562656.93269015
+    },
+    {
+      "geckoAddress": "0xe972dfc9032d148f4b1618fb914fbbd2fc41d6dc",
+      "name": "musebook / WETH 1%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 440821.712,
+      "volume24hUsd": 5097913.35274844
     }
   ]
 }

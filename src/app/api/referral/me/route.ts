@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { bindReferrer, referralStats, verifyPrivyToken } from "@/lib/referral";
+import { ReferralError, bindReferrer, referralStats, verifyPrivyToken } from "@/lib/referral";
 import { REF_COOKIE } from "@/proxy";
 
 /**
@@ -33,6 +33,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(await referralStats(did, wallet));
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    const status = e instanceof ReferralError ? e.status : 500;
+    if (status === 500) console.error("referral/me", e);
+    return NextResponse.json({ error: (e as Error).message }, { status });
   }
 }

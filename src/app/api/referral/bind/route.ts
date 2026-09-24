@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { bindReferrer, verifyPrivyToken } from "@/lib/referral";
+import { ReferralError, bindReferrer, verifyPrivyToken } from "@/lib/referral";
 
 /** POST { wallet, refCode } with a Privy access token — first-touch bind. */
 export async function POST(req: NextRequest) {
@@ -13,6 +13,6 @@ export async function POST(req: NextRequest) {
     const bound = await bindReferrer(did, wallet, refCode);
     return NextResponse.json({ bound });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    return NextResponse.json({ error: (e as Error).message }, { status: e instanceof ReferralError ? e.status : 500 });
   }
 }

@@ -5,13 +5,13 @@
  * platform fee skimmed from the final stablecoin output. Built as one atomic
  * batch like the deposit zap; the user ends up all-stablecoin.
  */
-import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { Percent } from "@uniswap/sdk-core";
 import { Position, V4PositionManager } from "@uniswap/v4-sdk";
 import { CHAINS } from "./chain";
 import { quoteUsdMarket } from "./markets";
 import { getPoolState } from "./onchain";
-import { buildPool } from "./zap";
+import { buildPool, feeCalls } from "./zap";
 import { approvalsFor, buildSwapCall, contractsOf, quoteBaseToQuote, type Call } from "./uniswap";
 import type { OwnedPosition } from "./positions";
 
@@ -35,8 +35,11 @@ const bpsMul = (x: bigint, bps: bigint) => (x * bps) / 10_000n;
 export async function buildWithdrawPlan(params: {
   position: OwnedPosition;
   slippageBps: number;
+  /** the position owner (fee payer) and their referrer, for the on-chain split */
+  owner?: `0x${string}`;
+  referrer?: `0x${string}` | null;
 }): Promise<WithdrawPlan> {
-  const { position, slippageBps } = params;
+  const { position, slippageBps, owner, referrer } = params;
   const market = position.market;
   const stable = CHAINS[market.chainId].quote.address;
   const { router, posm } = contractsOf(market);
@@ -96,13 +99,7 @@ export async function buildWithdrawPlan(params: {
   const converted = qm ? stableOutMin : stableOutMin - (market.baseIsCurrency0 ? BigInt(min1.toString()) : BigInt(min0.toString()));
   if (converted > 0n) {
     feeAmount = bpsMul(converted, feeBps);
-    if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
-      calls.push({
-        to: stable,
-        value: 0n,
-        data: encodeFunctionData({ abi: erc20Abi, functionName: "transfer", args: [feeRecipient, feeAmount] }),
-      });
-    }
+    calls.push(...feeCalls(stable, feeAmount, feeRecipient, referrer, owner ?? zeroAddress));
   }
 
   return {

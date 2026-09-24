@@ -8,6 +8,7 @@ import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
 import { buildPool } from "@/lib/zap";
 import { useActiveAddress } from "./useChainData";
 import { useSendCalls } from "./useSendCalls";
+import { useReferral } from "./useReferral";
 
 export type PositionView = OwnedPosition & {
   inRange: boolean;
@@ -76,12 +77,14 @@ export function usePositions() {
 
 export function useWithdraw() {
   const send = useSendCalls();
+  const owner = useActiveAddress();
+  const { data: referral } = useReferral();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (position: OwnedPosition) => {
       // tight tolerance: the slippage buffer is exactly what comes back as
       // dust, and blocks are ~250ms — worst case a revert + retry
-      const plan = await buildWithdrawPlan({ position, slippageBps: 25 });
+      const plan = await buildWithdrawPlan({ position, slippageBps: 25, owner, referrer: referral?.referrerWallet });
       return send(plan.calls, {
         description: `Withdraw position to ${position.market.quote.symbol}`,
         chainId: plan.chainId,

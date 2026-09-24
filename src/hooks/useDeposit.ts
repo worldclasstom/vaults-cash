@@ -13,6 +13,7 @@ const ERC721_TRANSFER = parseAbiItem(
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)",
 );
 import { useActiveAddress } from "./useChainData";
+import { useReferral } from "./useReferral";
 import { useSendCalls } from "./useSendCalls";
 
 export type DepositInput = {
@@ -26,6 +27,7 @@ export type DepositInput = {
 /** Step 1: build + quote the plan (shown on the confirm sheet). */
 export function usePlanDeposit() {
   const owner = useActiveAddress();
+  const { data: referral } = useReferral();
   return useMutation({
     mutationFn: async (input: DepositInput): Promise<ZapPlan> => {
       if (!owner) throw new Error("Wallet not ready yet — try again in a second.");
@@ -39,6 +41,7 @@ export function usePlanDeposit() {
         customWidth: input.customWidth,
         slippageBps: input.slippageBps,
         poolState,
+        referrer: referral?.referrerWallet,
       });
     },
   });
@@ -49,6 +52,7 @@ export function usePlanDeposit() {
  *  price, so out-of-center — even fully out-of-range — adds split correctly. */
 export function usePlanAdd() {
   const owner = useActiveAddress();
+  const { data: referral } = useReferral();
   return useMutation({
     mutationFn: async (input: {
       position: { tokenId: bigint; tickLower: number; tickUpper: number; market: Market };
@@ -66,6 +70,7 @@ export function usePlanAdd() {
         slippageBps: input.slippageBps,
         poolState,
         addTo: input.position,
+        referrer: referral?.referrerWallet,
       });
     },
   });

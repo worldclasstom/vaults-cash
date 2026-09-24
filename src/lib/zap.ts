@@ -22,6 +22,7 @@ import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
 import { Ether, Percent, Token, type Currency } from "@uniswap/sdk-core";
 import { Pool, Position, V4PositionManager } from "@uniswap/v4-sdk";
 import { CHAINS } from "./chain";
+import { REFERRER_SHARE } from "./referral-share";
 import { NATIVE_ETH, quoteUsdMarket, type Market, type TokenInfo } from "./markets";
 import type { PoolState } from "./onchain";
 import { getPoolState, tickToPrice } from "./onchain";
@@ -134,6 +135,33 @@ export type ZapPlan = {
 
 const bpsMul = (x: bigint, bps: bigint) => (x * bps) / 10_000n;
 
+/** Fee transfer(s): the whole fee to the fee wallet, or split with the
+ *  referrer (REFERRER_SHARE to them, the rest to us). Self-referrals and a
+ *  zero recipient collapse to the plain transfer. */
+export function feeCalls(
+  stable: `0x${string}`,
+  feeAmount: bigint,
+  feeRecipient: `0x${string}` | undefined,
+  referrer: `0x${string}` | null | undefined,
+  payer: `0x${string}`,
+): Call[] {
+  if (feeAmount <= 0n || !feeRecipient || feeRecipient === zeroAddress) return [];
+  const transfer = (to: `0x${string}`, amount: bigint): Call => ({
+    to: stable,
+    value: 0n,
+    data: encodeFunctionData({ abi: erc20Abi, functionName: "transfer", args: [to, amount] }),
+  });
+  const validReferrer =
+    referrer && referrer !== zeroAddress && referrer.toLowerCase() !== payer.toLowerCase() && referrer.toLowerCase() !== feeRecipient.toLowerCase();
+  if (!validReferrer) return [transfer(feeRecipient, feeAmount)];
+  const referrerAmount = (feeAmount * BigInt(Math.round(REFERRER_SHARE * 10_000))) / 10_000n;
+  const ours = feeAmount - referrerAmount;
+  const out: Call[] = [];
+  if (referrerAmount > 0n) out.push(transfer(referrer, referrerAmount));
+  if (ours > 0n) out.push(transfer(feeRecipient, ours));
+  return out;
+}
+
 export async function buildZapPlan(params: {
   market: Market;
   owner: `0x${string}`;
@@ -145,8 +173,11 @@ export async function buildZapPlan(params: {
   poolState: PoolState;
   /** add to this position (its range) instead of minting a new one */
   addTo?: { tokenId: bigint; tickLower: number; tickUpper: number };
+  /** wallet of whoever referred `owner`: gets REFERRER_SHARE of the fee
+   *  on-chain in this same batch */
+  referrer?: `0x${string}` | null;
 }): Promise<ZapPlan> {
-  const { market, owner, usdcAmount, preset, customWidth, slippageBps, poolState, addTo } = params;
+  const { market, owner, usdcAmount, preset, customWidth, slippageBps, poolState, addTo, referrer } = params;
   const stable = CHAINS[market.chainId].quote.address;
   const { posm, router } = contractsOf(market);
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
@@ -229,14 +260,9 @@ export async function buildZapPlan(params: {
 
   // 5. platform fee LAST: in the atomic path order is irrelevant, and in a
   // sequential fallback the fee is only charged once the position exists
-  // (an abandoned attempt costs the user nothing).
-  if (feeAmount > 0n && feeRecipient && feeRecipient !== zeroAddress) {
-    calls.push({
-      to: stable,
-      value: 0n,
-      data: encodeFunctionData({ abi: erc20Abi, functionName: "transfer", args: [feeRecipient, feeAmount] }),
-    });
-  }
+  // (an abandoned attempt costs the user nothing). A referrer is paid their
+  // share here, on-chain — no payout process, nothing held on their behalf.
+  calls.push(...feeCalls(stable, feeAmount, feeRecipient, referrer, owner));
 
   return {
     chainId: market.chainId,

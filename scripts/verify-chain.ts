@@ -252,8 +252,32 @@ async function main() {
       console.log(`  ⚠️  logos batch ${i / 30 + 1}: ${(e as Error).message} (keeping monograms)`);
     }
   }
+  // Robinhood publishes official per-token logos (and the ERC-8056 multiplier)
+  // through its Stock Token API — the source every Robinhood Chain app uses.
+  // GeckoTerminal's images for these are all the same generic Robinhood mark.
+  if (spec.chainId === 4663) {
+    try {
+      const res = await fetch("https://api.robinhood.com/rhj/assets", { headers: { accept: "application/json" } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const body = (await res.json()) as {
+        assets: Array<{ tokenSymbol: string; logoUrl?: string; currentMultiplier?: string; deployments: Array<{ contractAddress: string; chainId: number }> }>;
+      };
+      let n = 0;
+      for (const a of body.assets ?? []) {
+        for (const d of a.deployments ?? []) {
+          if (d.chainId === 4663 && a.logoUrl) {
+            logos[d.contractAddress.toLowerCase()] = a.logoUrl;
+            n++;
+          }
+        }
+      }
+      ok(`Robinhood Stock Token API: ${n} official logos`);
+    } catch (e) {
+      console.log(`  ⚠️  Robinhood assets API: ${(e as Error).message} (keeping GeckoTerminal images)`);
+    }
+  }
   for (const t of Object.values(tokens)) (t as { logo?: string }).logo = logos[t.address.toLowerCase()];
-  ok(`${Object.keys(logos).length}/${tokenAddrs.length} token logos`);
+  ok(`${Object.values(tokens).filter((t) => (t as { logo?: string }).logo).length}/${tokenAddrs.length} token logos`);
 
   console.log(`\n— 4. Pool discovery (GeckoTerminal, network=${cfg.gecko}) —`);
   const discovered: Array<{

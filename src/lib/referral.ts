@@ -5,8 +5,7 @@ import { ensureSchema, sql } from "./db";
 import { CHAINS, CHAIN_IDS, type ChainId } from "./chain";
 import { publicClientFor } from "./onchain";
 
-/** Share of the platform fee earmarked for the referrer (50% of 60bps). */
-export const REFERRER_SHARE = 0.5;
+export { REFERRER_SHARE } from "./referral-share";
 
 // no-lookalike alphabet for codes users will read aloud
 const makeCode = customAlphabet("23456789ABCDEFGHJKMNPQRSTUVWXYZ", 8);
@@ -16,33 +15,66 @@ let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
 /** Verify a Privy access token via the app's public JWKS; returns the DID. */
 export async function verifyPrivyToken(token: string): Promise<string> {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
-  jwks ??= createRemoteJWKSet(
-    new URL(`https://auth.privy.io/api/v1/apps/${appId}/jwks.json`),
-  );
-  const { payload } = await jwtVerify(token, jwks, {
-    issuer: "privy.io",
-    audience: appId,
-  });
+  jwks ??= createRemoteJWKSet(new URL(`https://auth.privy.io/api/v1/apps/${appId}/jwks.json`));
+  const { payload } = await jwtVerify(token, jwks, { issuer: "privy.io", audience: appId });
   if (!payload.sub) throw new Error("token has no subject");
   return payload.sub;
 }
 
+export class ReferralError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+/**
+ * The wallet a client claims must actually belong to the authenticated Privy
+ * user — otherwise anyone could register a victim's address and collect that
+ * address's referral attribution. Verified against Privy's server API when
+ * PRIVY_APP_SECRET is set (App settings → Basics in the Privy dashboard);
+ * without it we can only enforce that the wallet isn't already someone
+ * else's, which is logged so it isn't forgotten.
+ */
+async function verifyWalletOwnership(privyDid: string, wallet: string): Promise<void> {
+  const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
+  const secret = process.env.PRIVY_APP_SECRET;
+  if (!secret) {
+    console.warn("PRIVY_APP_SECRET not set — wallet ownership not verified against Privy");
+    return;
+  }
+  const res = await fetch(`https://auth.privy.io/api/v1/users/${encodeURIComponent(privyDid)}`, {
+    headers: {
+      authorization: `Basic ${Buffer.from(`${appId}:${secret}`).toString("base64")}`,
+      "privy-app-id": appId,
+    },
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!res.ok) throw new ReferralError(502, `Privy user lookup failed (${res.status})`);
+  const user = (await res.json()) as { linked_accounts?: Array<{ type: string; address?: string }> };
+  const owned = new Set((user.linked_accounts ?? []).map((a) => a.address?.toLowerCase()).filter(Boolean));
+  if (!owned.has(wallet.toLowerCase())) throw new ReferralError(403, "wallet does not belong to this user");
+}
+
 export async function getOrCreateUser(privyDid: string, wallet: string) {
   await ensureSchema();
+  await verifyWalletOwnership(privyDid, wallet);
   const q = sql();
   const lower = wallet.toLowerCase();
+  // the wallet another DID already registered can't be claimed
+  const owner = await q`SELECT privy_did FROM user_wallets WHERE wallet = ${lower}`;
+  if (owner.length && owner[0].privy_did !== privyDid) throw new ReferralError(409, "wallet already registered to another account");
+  // users.wallet tracks the CURRENT address (it moved from the embedded EOA
+  // to the smart wallet); user_wallets keeps every address ever seen
   const rows = await q`
     INSERT INTO users (privy_did, wallet, ref_code)
     VALUES (${privyDid}, ${lower}, ${makeCode()})
-    ON CONFLICT (privy_did) DO UPDATE SET privy_did = EXCLUDED.privy_did
+    ON CONFLICT (privy_did) DO UPDATE SET wallet = EXCLUDED.wallet
     RETURNING id, privy_did, wallet, ref_code, referred_by`;
-  return rows[0] as {
-    id: number;
-    privy_did: string;
-    wallet: string;
-    ref_code: string;
-    referred_by: string | null;
-  };
+  await q`INSERT INTO user_wallets (wallet, privy_did) VALUES (${lower}, ${privyDid}) ON CONFLICT DO NOTHING`;
+  return rows[0] as { id: number; privy_did: string; wallet: string; ref_code: string; referred_by: string | null };
 }
 
 /** First-touch, immutable, no self-referral. Returns whether it bound. */
@@ -55,34 +87,48 @@ export async function bindReferrer(privyDid: string, wallet: string, refCode: st
     UPDATE users SET referred_by = ${code}
     WHERE privy_did = ${privyDid}
       AND referred_by IS NULL
-      AND EXISTS (SELECT 1 FROM users r WHERE r.ref_code = ${code})
+      AND EXISTS (SELECT 1 FROM users r WHERE r.ref_code = ${code} AND r.privy_did <> ${privyDid})
     RETURNING referred_by`;
   return rows.length > 0;
 }
 
-export async function referralStats(privyDid: string, wallet: string) {
+export type ReferralView = {
+  refCode: string;
+  referredBy: string | null;
+  /** current wallet of whoever referred this user — the zap sends the
+   *  referrer's fee share straight there */
+  referrerWallet: `0x${string}` | null;
+  referredCount: number;
+  earnedUsd: number;
+};
+
+export async function referralStats(privyDid: string, wallet: string): Promise<ReferralView> {
   const user = await getOrCreateUser(privyDid, wallet);
   const q = sql();
-  const [{ count }] = await q`
-    SELECT count(*)::int AS count FROM users WHERE referred_by = ${user.ref_code}`;
+  const [{ count }] = await q`SELECT count(*)::int AS count FROM users WHERE referred_by = ${user.ref_code}`;
   const [{ earned }] = await q`
-    SELECT COALESCE(sum(amount_usdc), 0)::float8 AS earned
-    FROM fee_events WHERE referrer_wallet = ${user.wallet}`;
+    SELECT COALESCE(sum(referrer_amount), 0)::float8 AS earned
+    FROM fee_events WHERE referrer_did = ${privyDid}`;
+  const ref = user.referred_by
+    ? await q`SELECT wallet FROM users WHERE ref_code = ${user.referred_by}`
+    : [];
   return {
     refCode: user.ref_code,
     referredBy: user.referred_by,
+    referrerWallet: ref.length ? (ref[0].wallet as `0x${string}`) : null,
     referredCount: count as number,
-    // ledger stores raw 6-decimal units; referrer earns half the fee
-    earnedUsd: ((earned as number) / 1e6) * REFERRER_SHARE,
+    earnedUsd: (earned as number) / 1e6, // raw 6-decimal stablecoin units
   };
 }
 
-const TRANSFER = parseAbiItem(
-  "event Transfer(address indexed from, address indexed to, uint256 value)",
-);
+const TRANSFER = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
 /** Chain block before the first fee ever paid on that chain — Robinhood
  *  Chain went live for us 2026-09-23 around block 70.9M. */
 const SCAN_START: Record<ChainId, bigint> = { 8453: 1_500_000n, 4663: 70_900_000n };
+/** From these blocks on, a referred deposit pays the referrer on-chain in the
+ *  same batch (the fee wallet receives only its own half). Earlier events
+ *  never had a referrer share paid. */
+const SPLIT_FROM: Record<ChainId, bigint> = { 8453: 51_720_000n, 4663: 71_050_000n };
 const MAX_CHUNK = 50_000n;
 const MAX_CHUNKS_PER_RUN = 12;
 
@@ -91,9 +137,10 @@ const MAX_CHUNKS_PER_RUN = 12;
 const scanKey = (chainId: ChainId) => (chainId === 8453 ? "fee_scan_block" : `fee_scan_block_${chainId}`);
 
 /**
- * Scan stablecoin transfers into the fee wallet on every chain and ledger
- * them, attributing each to the payer's referrer (frozen at event time).
- * Idempotent; resumes from the last scanned block per chain.
+ * Ledger stablecoin transfers into the fee wallet on every chain, attributing
+ * each to the payer's referrer (looked up across every wallet the payer has
+ * used; frozen at event time). Idempotent; resumes from the last scanned
+ * block per chain.
  */
 export async function syncFeeEvents() {
   await ensureSchema();
@@ -124,13 +171,20 @@ export async function syncFeeEvents() {
       });
       for (const log of logs) {
         const payer = (log.args.from as string).toLowerCase();
+        const amount = log.args.value as bigint;
         const referrerRows = await q`
-          SELECT r.wallet FROM users u JOIN users r ON u.referred_by = r.ref_code
-          WHERE u.wallet = ${payer}`;
-        const referrer = referrerRows.length ? (referrerRows[0].wallet as string) : null;
+          SELECT r.privy_did, r.wallet
+          FROM user_wallets w
+          JOIN users u ON u.privy_did = w.privy_did
+          JOIN users r ON r.ref_code = u.referred_by
+          WHERE w.wallet = ${payer}`;
+        const referrer = referrerRows.length ? referrerRows[0] : null;
+        const paidOnChain = referrer !== null && log.blockNumber >= SPLIT_FROM[chainId];
         const res = await q`
-          INSERT INTO fee_events (tx_hash, log_index, payer, amount_usdc, block_number, referrer_wallet, chain_id)
-          VALUES (${log.transactionHash}, ${log.logIndex}, ${payer}, ${(log.args.value as bigint).toString()}, ${log.blockNumber.toString()}, ${referrer}, ${chainId})
+          INSERT INTO fee_events (tx_hash, log_index, payer, amount_usdc, block_number, referrer_wallet, referrer_did, referrer_amount, chain_id)
+          VALUES (${log.transactionHash}, ${log.logIndex}, ${payer}, ${amount.toString()}, ${log.blockNumber.toString()},
+                  ${referrer ? (referrer.wallet as string) : null}, ${referrer ? (referrer.privy_did as string) : null},
+                  ${paidOnChain ? amount.toString() : "0"}, ${chainId})
           ON CONFLICT (tx_hash, log_index) DO NOTHING
           RETURNING id`;
         inserted += res.length;

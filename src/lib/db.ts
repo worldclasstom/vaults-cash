@@ -48,6 +48,19 @@ export function ensureSchema(): Promise<void> {
         k text PRIMARY KEY,
         v text NOT NULL
       )`;
+      // every address a user has paid from (embedded EOA in the CDP era,
+      // Privy smart wallet now) — fee attribution matches payers here, so a
+      // wallet change never orphans a referral
+      await q`CREATE TABLE IF NOT EXISTS user_wallets (
+        wallet text PRIMARY KEY,
+        privy_did text NOT NULL,
+        created_at timestamptz NOT NULL DEFAULT now()
+      )`;
+      await q`INSERT INTO user_wallets (wallet, privy_did) SELECT wallet, privy_did FROM users ON CONFLICT DO NOTHING`;
+      // referrer share: paid on-chain in the same batch as the fee since the
+      // fee split shipped (referrer_amount = what the referrer received)
+      await q`ALTER TABLE fee_events ADD COLUMN IF NOT EXISTS referrer_did text`;
+      await q`ALTER TABLE fee_events ADD COLUMN IF NOT EXISTS referrer_amount numeric NOT NULL DEFAULT 0`;
     })();
   }
   return schemaReady;

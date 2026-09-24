@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { usePrivy } from "@privy-io/react-auth";
-import { useQuery } from "@tanstack/react-query";
-import { useActiveAddress } from "@/hooks/useChainData";
+import { useReferral } from "@/hooks/useReferral";
 import { fmtUsd } from "@/lib/format";
 
 const REF_KEY = "vaults.ref";
@@ -17,40 +15,18 @@ const REF_KEY = "vaults.ref";
  */
 export function captureRefFromUrl() {
   if (typeof window === "undefined") return;
-  const ref = new URLSearchParams(window.location.search).get("ref");
-  if (ref && !localStorage.getItem(REF_KEY)) localStorage.setItem(REF_KEY, ref);
+  try {
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref && !localStorage.getItem(REF_KEY)) localStorage.setItem(REF_KEY, ref);
+  } catch {
+    /* storage blocked — the cookie path still works */
+  }
 }
 
 export function InviteCard() {
   const { authenticated } = useAuth();
-  const { getAccessToken } = usePrivy();
-  const address = useActiveAddress();
+  const { data, isError, refetch } = useReferral();
   const [copied, setCopied] = useState(false);
-
-  const { data, isError, refetch } = useQuery({
-    queryKey: ["referral-me", address],
-    enabled: authenticated && !!address,
-    staleTime: 60_000,
-    retry: 2,
-    queryFn: async () => {
-      const token = await getAccessToken();
-      // cookie rides along automatically (same-origin); localStorage code
-      // goes as an explicit fallback param
-      const pending = localStorage.getItem(REF_KEY);
-      const url = `/api/referral/me?wallet=${address}${
-        pending ? `&pendingRef=${encodeURIComponent(pending)}` : ""
-      }`;
-      const res = await fetch(url, {
-        headers: { authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(`referral fetch failed (${res.status})`);
-      return res.json() as Promise<{
-        refCode: string;
-        referredCount: number;
-        earnedUsd: number;
-      }>;
-    },
-  });
 
   if (!authenticated) return null;
   // a failed lookup used to hide the card entirely, which read as "there is
@@ -78,8 +54,8 @@ export function InviteCard() {
     <section className="mt-6 rounded-3xl bg-surface p-5">
       <h2 className="font-semibold">Invite friends, earn together</h2>
       <p className="pt-1 text-sm text-muted">
-        You earn <span className="text-accent">50% of vaults.cash fees</span>{" "}
-        from every deposit your invites make. Paid in USDC.
+        You earn <span className="text-accent">50% of vaults.cash fees</span> from every deposit your invites make —
+        paid to your wallet on-chain, in the same transaction as their deposit.
       </p>
       <button
         onClick={() => {
@@ -90,9 +66,7 @@ export function InviteCard() {
         className="mt-3 w-full rounded-xl bg-surface-raised p-3 text-left font-mono text-sm transition-colors hover:bg-borderline"
       >
         {link}
-        <span className="mt-1 block text-xs text-accent">
-          {copied ? "Copied ✓" : "Tap to copy your link"}
-        </span>
+        <span className="mt-1 block text-xs text-accent">{copied ? "Copied ✓" : "Tap to copy your link"}</span>
       </button>
       <div className="mt-3 flex gap-6 text-sm">
         <span>
