@@ -107,7 +107,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl grow flex-col px-4 pb-24 md:pb-12">
-      <header className="flex items-center justify-between py-5">
+      <header className="sticky top-0 z-30 -mx-4 flex items-center justify-between bg-background/85 px-4 py-4 backdrop-blur-md md:py-5">
         <Link href="/" aria-label="vaults.cash home">
           <Wordmark />
         </Link>

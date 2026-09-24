@@ -199,9 +199,15 @@ function buildMarkets(chainId: ChainId, registry: Registry): Market[] {
       uiMultiplier: reg?.uiMultiplier ? Number(BigInt(reg.uiMultiplier)) / 1e18 : 1,
       color: known?.color ?? hashColor(sym),
       // GeckoTerminal's images for the Robinhood stock tokens are all the same
-      // generic Robinhood mark — the brand-colored ticker monogram reads better.
+      // generic Robinhood mark, so stock tokens use the company logo by ticker
+      // (TokenIcon falls back to the brand-colored monogram if one is missing).
       // Native ETH isn't a registry token (WETH's image is branded "WETH").
-      logo: known?.kind === "stock" ? undefined : isEth ? ETH_LOGO : (reg?.logo ?? undefined),
+      logo:
+        known?.kind === "stock"
+          ? `https://images.financialmodelingprep.com/symbol/${sym}.png`
+          : isEth
+            ? ETH_LOGO
+            : (reg?.logo ?? undefined),
     };
   };
   tokens.set("ETH", toInfo("ETH"));

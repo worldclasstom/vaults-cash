@@ -27,10 +27,11 @@ export function InviteCard() {
   const address = useActiveAddress();
   const [copied, setCopied] = useState(false);
 
-  const { data } = useQuery({
+  const { data, isError, refetch } = useQuery({
     queryKey: ["referral-me", address],
     enabled: authenticated && !!address,
     staleTime: 60_000,
+    retry: 2,
     queryFn: async () => {
       const token = await getAccessToken();
       // cookie rides along automatically (same-origin); localStorage code
@@ -42,7 +43,7 @@ export function InviteCard() {
       const res = await fetch(url, {
         headers: { authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("referral fetch failed");
+      if (!res.ok) throw new Error(`referral fetch failed (${res.status})`);
       return res.json() as Promise<{
         refCode: string;
         referredCount: number;
@@ -51,7 +52,26 @@ export function InviteCard() {
     },
   });
 
-  if (!authenticated || !data) return null;
+  if (!authenticated) return null;
+  // a failed lookup used to hide the card entirely, which read as "there is
+  // no referral program" — show the card with a retry instead
+  if (!data) {
+    return (
+      <section className="mt-6 rounded-3xl bg-surface p-5">
+        <h2 className="font-semibold">Invite friends, earn together</h2>
+        <p className="pt-1 text-sm text-muted">
+          You earn <span className="text-accent">50% of vaults.cash fees</span> from every deposit your invites make.
+        </p>
+        {isError ? (
+          <button onClick={() => refetch()} className="mt-3 text-sm text-accent underline-offset-2 hover:underline">
+            Couldn&apos;t load your invite link — tap to retry
+          </button>
+        ) : (
+          <div className="mt-3 h-12 animate-pulse rounded-xl bg-surface-raised" />
+        )}
+      </section>
+    );
+  }
   const link = `https://vaults.cash?ref=${data.refCode}`;
 
   return (

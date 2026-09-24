@@ -43,6 +43,16 @@ function BaseMark({ className }: { className?: string }) {
   );
 }
 
+/* Robinhood feather — backdrop on the opposite edge of the chains section. */
+function RobinhoodMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" fill="currentColor" className={className} aria-hidden>
+      <path d="M78 8c-9 0-19 5-27 13-9 9-15 21-19 33-3 9-5 19-6 29-.3 3 3 5 5 2 6-8 13-15 21-21 9-6 18-11 26-19 8-9 10-21 6-32-1-3-3-5-6-5Zm-8 12c2 0 3 2 2 4-4 10-11 18-19 25-6 5-13 10-19 15 3-9 7-18 13-26 6-8 14-15 23-18Z" />
+      <path d="M31 62c-4 8-7 17-9 26-.5 2 2 3 3 1 4-8 8-16 13-23-2-1-5-3-7-4Z" opacity={0.7} />
+    </svg>
+  );
+}
+
 /* ------------------------------------------------------------ calculator */
 
 function EarningsCalculator() {
@@ -52,7 +62,7 @@ function EarningsCalculator() {
     queryFn: async () => (await fetch("/api/stats")).json(),
     staleTime: 60_000,
   });
-  const eth = stats?.ETH;
+  const eth = stats?.["base/eth-usdc"];
   const monthly = eth ? (amount * eth.estAprPct) / 100 / 12 : undefined;
 
   return (
@@ -111,7 +121,7 @@ export function Landing() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-16 sm:pt-24 lg:grid-cols-2 lg:gap-16 lg:pb-28">
           <div className="flex flex-col items-start gap-6">
             <p className="rounded-full bg-accent/10 px-4 py-1.5 text-xs font-semibold text-accent">
-              Now live on Base
+              Live on Base and Robinhood Chain
             </p>
             <h1 className="text-balance text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl xl:text-7xl">
               Every trade pays a fee. Be the one{" "}
@@ -119,8 +129,8 @@ export function Landing() {
             </h1>
             <p className="max-w-md text-balance text-lg text-muted">
               vaults.cash puts your cash on the earning side of the market:
-              hold blue-chip crypto like ETH and Bitcoin, and collect a slice
-              of every trade — without trading.
+              hold ETH, Bitcoin or tokenized stocks, and collect a slice of
+              every trade — without trading.
             </p>
             <div className="flex items-center gap-5 pt-2">
               <button
@@ -249,7 +259,7 @@ export function Landing() {
               },
               {
                 n: "2",
-                t: "Pick a market, deposit cash",
+                t: "Pick a pool, deposit cash",
                 d: "One tap turns USDC into an earning position — atomically, all or nothing.",
               },
               {
@@ -280,21 +290,24 @@ export function Landing() {
 
       {/* chain */}
       <section className="relative isolate overflow-hidden">
+        <RobinhoodMark className="pointer-events-none absolute -left-10 top-8 -z-10 h-[300px] w-[300px] text-[#7cd44a] opacity-[0.12] sm:-left-6 sm:top-1/2 sm:h-[520px] sm:w-[520px] sm:-translate-y-1/2 sm:opacity-[0.14]" />
         <BaseMark className="pointer-events-none absolute -right-16 -top-16 -z-10 h-[380px] w-[380px] text-[#0052ff] opacity-[0.16] sm:-right-12 sm:h-[620px] sm:w-[620px] sm:opacity-20" />
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
           <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-            Built on Base
+            Built on Base and Robinhood Chain
           </h2>
           <p className="max-w-2xl pt-4 text-lg leading-relaxed text-muted">
             Base is Coinbase&apos;s Ethereum layer-2 — one of the most active
-            chains in crypto, with billions in real trading. That depth is what
-            makes the fees worth collecting:
+            chains in crypto, with billions in real trading. Robinhood Chain
+            brings tokenized stocks and ETFs on-chain, trading around the clock.
+            One wallet, one address, both chains. That depth is what makes the
+            fees worth collecting:
           </p>
           <ul className="grid gap-5 pt-10 md:grid-cols-3">
             {[
-              ["Markets never close", "Crypto trades around the clock — your position earns while you sleep, weekends included."],
-              ["Real depth", "ETH, Bitcoin, and blue-chip DeFi, with the trading volume to actually generate fees."],
-              ["Fully public", "Every position, fee, and trade is verifiable on the public explorer. Nothing happens behind a curtain."],
+              ["Markets never close", "Crypto and stock tokens trade around the clock — your position earns while you sleep, weekends included."],
+              ["Real depth", "ETH, Bitcoin, blue-chip DeFi and Robinhood stock tokens, with the trading volume to actually generate fees."],
+              ["Fully public", "Every position, fee, and trade is verifiable on the public explorers. Nothing happens behind a curtain."],
             ].map(([t, d]) => (
               <li key={t} className="rounded-3xl border border-borderline bg-surface p-7">
                 <p className="text-lg font-semibold">{t}</p>
@@ -303,9 +316,9 @@ export function Landing() {
             ))}
           </ul>
           <p className="pt-6 text-xs text-muted/70">
-            vaults.cash is an independent app built on Base. It is not
-            affiliated with, endorsed by, or sponsored by Coinbase or Uniswap
-            Labs.
+            vaults.cash is an independent app built on Base and Robinhood Chain.
+            It is not affiliated with, endorsed by, or sponsored by Coinbase,
+            Robinhood, or Uniswap Labs.
           </p>
         </div>
       </section>

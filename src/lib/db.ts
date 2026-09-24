@@ -34,6 +34,13 @@ export function ensureSchema(): Promise<void> {
         UNIQUE (tx_hash, log_index)
       )`;
       await q`CREATE INDEX IF NOT EXISTS fee_events_referrer_idx ON fee_events (referrer_wallet)`;
+      // the table was first created in the Robinhood/USDG era as amount_usdg;
+      // CREATE IF NOT EXISTS never renamed it, so every stats query 500'd
+      await q`DO $$ BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'fee_events' AND column_name = 'amount_usdg') THEN
+          ALTER TABLE fee_events RENAME COLUMN amount_usdg TO amount_usdc;
+        END IF;
+      END $$`;
       // fees are paid in the chain's dollar stablecoin (USDC on Base, USDG on
       // Robinhood); rows predating multi-chain are all Base
       await q`ALTER TABLE fee_events ADD COLUMN IF NOT EXISTS chain_id int NOT NULL DEFAULT 8453`;
