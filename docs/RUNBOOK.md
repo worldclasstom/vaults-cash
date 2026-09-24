@@ -98,10 +98,9 @@ Push to `main` → Vercel production. Before any token/pool change:
 - Proxy gate: POST to `/api/rpc/8453` without an `Origin` header → 403
 - Referral: `/api/referral/me` with a Privy token → 200, no ownership warning in logs
 
-## Wallets
+## Fee wallet
 
-- Fee wallet: `NEXT_PUBLIC_FEE_RECIPIENT` (public on `/trust`)
-- Tom's test smart wallet (both chains): `0x789224Be05F24A743D2aE1C1204Ff9701160Ff82`
+- `NEXT_PUBLIC_FEE_RECIPIENT` (public on `/trust`)
 
 ## Incident log
 
@@ -113,8 +112,3 @@ Push to `main` → Vercel production. Before any token/pool change:
 - **2026-09-24 — `/api/referral/me` 500.** Column named `amount_usdg` from
   the July schema vs code expecting `amount_usdc`. Migrated to `amount`;
   invite card now shows a retry state instead of vanishing.
-- **2026-07-04 — "lost $6" withdrawal scare (no loss), Robinhood-only era.**
-  Invalid Alchemy Gas Manager policy broke the atomic path; sequential
-  fallback hit a nonce race. Lessons kept: validate a paymaster with a test
-  op before trusting env; never ship a money-spending feature without
-  sign-off.

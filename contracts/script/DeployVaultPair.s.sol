@@ -28,7 +28,7 @@ contract DeployVaultPair is Script {
         0x387bf619da4d3fb62bb276482693dba1b9b3520f573cabdfe033384a24125982;
 
     // spec params (docs/VAULT_SPEC.md v0.2: pool-mid pricing, CL guardrail)
-    // 15bps: ladder-first quoting (Tom 2026-07-07) — fills ARE the product;
+    // 15bps: ladder-first quoting (2026-07-07) — fills ARE the product;
     // live pool-mid pricing removed the stale-oracle reason to quote wide.
     // Round-trip capture ~2x spread; redeploying at another width is cheap.
     uint256 constant SPREAD_BPS = 15;

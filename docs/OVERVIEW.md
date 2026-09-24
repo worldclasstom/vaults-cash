@@ -80,8 +80,8 @@ cannot be done from the user's wallet (first candidate: auto-close for
 
 ## Compliance posture
 
-Robinhood stock tokens are listed (kind `stock`) following Tom's 2026-09-23
-call citing the SEC/CFTC allowance; the July jurisdiction gate in
+Robinhood stock tokens are listed (kind `stock`) since 2026-09-23, after US
+regulators permitted stock tokens; the July jurisdiction gate in
 `src/proxy.ts` was removed. Disclosures at `/disclosures` cover both chains
 and stock tokens. Legal review before public marketing is still advised.
 

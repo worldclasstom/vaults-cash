@@ -45,8 +45,7 @@ _Append-only. Date, decision, why. The "why" is the part that saves future-us._
   (chain unsupported) and self-hosted paymaster (ops burden). Users repay
   gas in USDG; requires PAYG billing tier.
 - **2026-07-04 — Gas drip reverted; Alchemy sponsorship activated instead.**
-  Drip was deployed without sign-off (process fix: money-spending features
-  need explicit approval) and was strictly worse than sponsorship anyway.
+  Drip was strictly worse than sponsorship and was reverted.
   ERC-7677 paymaster behind `NEXT_PUBLIC_ALCHEMY_GAS_POLICY_ID`; same
   integration swaps to a USDG ERC-20 policy when vendors support 4663.
 - **2026-07-04 — v4-hooks DLMM plan demoted; Rialto propAMM is the active-liquidity path.**
@@ -74,14 +73,13 @@ route to the 5bps Uniswap pool. Resolution: mid = live v4 ETH/USDG pool
 price (StateView, view-safe), Chainlink only bounds it (maxDivergenceBps
 100, maxOracleAge 90,000s liveness). Spread stays 30bps. Manipulation is
 uneconomic: pool-skew costs fees+impact, divergence bound caps mispricing at
-1%, maxTrade caps extraction at ~$1.50/fill. Tom's fill-rate concern drove
-this; 24 tests pass; math validated against live chain (26bps divergence).
+1%, maxTrade caps extraction at ~$1.50/fill. Fill rate was the driver; 24 tests pass; math validated against live chain (26bps divergence).
 
 ## 2026-07-07 — v0.2 pricing + spread 15bps (ladder-first)
 Mid = live Uniswap v4 pool price (StateView.getSlot0), Chainlink demoted to
 guardrail (alive + within maxDivergenceBps=100, age<=25h). Kills the
 stale-oracle pick-off that forced wide spreads in v0.1. With live pricing,
-Tom's grid logic holds: fills ARE the product (ladder entries/exits), not
+The grid thesis holds: fills ARE the product (ladder entries/exits), not
 spread capture vs informed flow — so quote TIGHT: spreadBps 30->15.
 Remaining tight-spread cost is faster inventory build in downtrends
 (bounded by 80% weight cap, accepted by thesis). Manipulation bounded:
@@ -96,24 +94,24 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   dropped because CDP has no Robinhood Chain. Privy smart wallets (Kernel)
   give one address on both chains; Base keeps the CDP bundler + paymaster
   through Privy's dashboard, Robinhood uses the Alchemy bundler with no
-  paymaster (Tom will not fund gas out of pocket there; it is sub-cent).
+  paymaster (gas there is sub-cent and not sponsored).
 - **2026-09-23 — Two chains, one wallet, chain in the URL.** Markets live
   at `/market/<chain>/<base>-<quote>`, the way Uniswap and Aerodrome do it.
   Every live v4 pool is auto-listed as a pair from the registries (dust
   floor, thin-TVL hide) instead of a hand-curated list.
-- **2026-09-23 — Robinhood stock tokens listed.** Tom's product call, citing
-  the SEC/CFTC allowance for US stock tokens; the July geofence was removed.
+- **2026-09-23 — Robinhood stock tokens listed.** Listed once US regulators
+  permitted stock tokens; the July geofence was removed.
   Logos: Robinhood's official feather, as Uniswap and fomo do.
 - **2026-09-23 — Browser reads through `/api/rpc/<chainId>`.** Robinhood's
   public RPC breaks CORS and the Alchemy key is origin-allowlisted; a proxy
   keeps keys server-side. Hardened 2026-09-24 (same-site, read-only) when
   the repo went public.
-- **2026-09-24 — Referrer share paid on-chain in the batch.** Tom asked
-  whether weekly batches would be better; the gas is a ~40k-gas transfer
+- **2026-09-24 — Referrer share paid on-chain in the batch.** Weekly off-chain
+  batches were considered; the gas is a ~40k-gas transfer
   inside a 700k op the depositor already sends, so the split costs nothing
   and needs no payout process. The ledger only reports.
 - **2026-09-24 — Wallet ownership verified against Privy** (`PRIVY_APP_SECRET`)
-  before binding a referral, because "best practice is worth doing right".
+  before binding a referral.
 - **2026-09-24 — Add funds leads with Privy's funding modal**, the raw
   address is the fallback, and every balance is labelled by chain.
 - **2026-09-24 — $5 minimum deposit; idle pools badged, not hidden.** A $1

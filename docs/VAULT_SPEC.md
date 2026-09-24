@@ -2,7 +2,7 @@
 
 > **Archived (2026-09-24).** Spec for the shelved Rialto propAMM pilot; the contract in `contracts/` was never deployed. vaults.cash ships no contracts today.
 
-_Status: parameters SIGNED OFF by Tom 2026-07-04. This document is the
+_Status: parameters frozen 2026-07-04. This document is the
 source of truth for what the pilot contract may and may not do with capital.
 Rialto confirmed supporting chain 4663. Remaining before deploy: Chainlink ETH/USD feed address + Rialto router/registration address._
 
@@ -66,7 +66,7 @@ State: a stack of **lots** `{ amountEth, entryPriceX18 }`.
 
 | Param | Pilot value (proposed) | Note |
 |---|---|---|
-| spreadBps | 15 | each side vs live pool mid; ladder-first, Tom 2026-07-07 |
+| spreadBps | 15 | each side vs live pool mid; ladder-first, 2026-07-07 |
 | minProfitBps | 25 | per-lot realized profit floor |
 | maxOracleAge | 90,000s (25h) | Chainlink GUARDRAIL liveness: heartbeat 24h + buffer |
 | maxDivergenceBps | 100 (1%) | pool mid vs Chainlink; else quote 0 |

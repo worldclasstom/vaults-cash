@@ -17,4 +17,4 @@ Solidity for The Vault (see ../docs/VAULT_SPEC.md).
 
 - Rialto onboarding confirmed for Robinhood Chain (4663)
 - External security audit
-- Securities counsel sign-off before any pooled/user deposits
+- Securities counsel review before any pooled/user deposits
