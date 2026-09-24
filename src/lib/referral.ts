@@ -181,7 +181,7 @@ export async function syncFeeEvents() {
         const referrer = referrerRows.length ? referrerRows[0] : null;
         const paidOnChain = referrer !== null && log.blockNumber >= SPLIT_FROM[chainId];
         const res = await q`
-          INSERT INTO fee_events (tx_hash, log_index, payer, amount_usdc, block_number, referrer_wallet, referrer_did, referrer_amount, chain_id)
+          INSERT INTO fee_events (tx_hash, log_index, payer, amount, block_number, referrer_wallet, referrer_did, referrer_amount, chain_id)
           VALUES (${log.transactionHash}, ${log.logIndex}, ${payer}, ${amount.toString()}, ${log.blockNumber.toString()},
                   ${referrer ? (referrer.wallet as string) : null}, ${referrer ? (referrer.privy_did as string) : null},
                   ${paidOnChain ? amount.toString() : "0"}, ${chainId})
@@ -199,7 +199,7 @@ export async function syncFeeEvents() {
     upToBlock[chainId] = (from - 1n).toString();
   }
   const [totals] = await q`
-    SELECT count(*)::int AS events, COALESCE(sum(amount_usdc), 0)::float8 AS fees
+    SELECT count(*)::int AS events, COALESCE(sum(amount), 0)::float8 AS fees
     FROM fee_events`;
   return {
     scanned: chunks,
