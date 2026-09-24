@@ -10,7 +10,7 @@ import { Chip, MarketChips, PairIcons } from "@/components/TokenIcon";
 import { usePlanAdd, useSendDeposit } from "@/hooks/useDeposit";
 import { useCollect, usePositions, useWithdraw, type PositionView } from "@/hooks/usePositions";
 import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
-import { CHAINS } from "@/lib/chain";
+import { CHAINS, explorerNftUrl, uniswapPositionUrl } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { shareAmount, sharePrice } from "@/lib/markets";
 import { tickToPrice } from "@/lib/onchain";
@@ -169,6 +169,16 @@ function PositionCard({ p }: { p: PositionView }) {
         Holding {fmtAmount(shareAmount(m, p.baseAmount), 5)} {m.base.symbol} + {fmtAmount(p.quoteAmount, m.quoteIsStable ? 2 : 5)}{" "}
         {m.quote.symbol}
         {!p.inRange && ` · price ${priceUsd < lower ? "below" : "above"} your range`}
+      </p>
+      <p className="pt-1 text-xs text-muted">
+        Position NFT #{p.tokenId.toString()} in your wallet ·{" "}
+        <a href={uniswapPositionUrl(m.chainId, p.tokenId)} target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-foreground hover:underline">
+          Open in Uniswap ↗
+        </a>{" "}
+        ·{" "}
+        <a href={explorerNftUrl(m.chainId, p.tokenId)} target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-foreground hover:underline">
+          Explorer ↗
+        </a>
       </p>
 
       <div className="mt-4 flex gap-2">

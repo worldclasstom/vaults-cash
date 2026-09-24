@@ -47,7 +47,7 @@ function LogoutConfirm({ onCancel, onConfirm }: { onCancel: () => void; onConfir
 
 export default function AccountPage() {
   const { ready, authenticated, login, logout } = useAuth();
-  const { user } = usePrivy();
+  const { user, exportWallet } = usePrivy();
   const address = useActiveAddress();
   const { data: usdc } = useUsdcBalance();
   const { data: eth } = useTokenBalance(NATIVE_ETH, 18);
@@ -125,6 +125,16 @@ export default function AccountPage() {
               Self-custodial: this wallet and its positions belong to you.
               vaults.cash can never move your funds.
             </p>
+            <button
+              onClick={() => exportWallet()}
+              className="mt-3 rounded-full bg-surface-raised px-4 py-2 text-xs text-muted transition-colors hover:bg-borderline hover:text-foreground"
+            >
+              Export wallet key
+            </button>
+            <p className="pt-2 text-[11px] text-muted/70">
+              Shows the private key of the signer behind this wallet, in Privy&apos;s own screen. vaults.cash never sees it.
+              Keep it secret — anyone with it controls the wallet.
+            </p>
           </section>
 
           <InviteCard />
@@ -141,6 +151,12 @@ export default function AccountPage() {
               className="block py-1 text-sm text-muted transition-colors hover:text-foreground"
             >
               Disclosures &amp; fees →
+            </Link>
+            <Link
+              href="/trust"
+              className="block py-1 text-sm text-muted transition-colors hover:text-foreground"
+            >
+              What vaults.cash can and can&apos;t do →
             </Link>
           </section>
 

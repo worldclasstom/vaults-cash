@@ -132,6 +132,8 @@ export type ZapPlan = {
   price: number;
   tickLower: number;
   tickUpper: number;
+  /** set when the plan adds to an existing position instead of minting */
+  addToTokenId?: bigint;
 };
 
 const bpsMul = (x: bigint, bps: bigint) => (x * bps) / 10_000n;
@@ -281,6 +283,7 @@ export async function buildZapPlan(params: {
     price: tickToPrice(market, poolState.tick),
     tickLower,
     tickUpper,
+    addToTokenId: addTo?.tokenId,
   };
 }
 

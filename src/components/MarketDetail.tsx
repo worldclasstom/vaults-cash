@@ -7,13 +7,12 @@ import { AppShell } from "@/components/AppShell";
 import { useMarketQuote, useQuoteBalance, useTokenBalance } from "@/hooks/useChainData";
 import { NATIVE_ETH, marketBySlug, sharePrice, type Market } from "@/lib/markets";
 import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
-import { formatEther } from "viem";
 import { fmtPct, fmtPrice, fmtUsd } from "@/lib/format";
 import { CHAINS, chainConfig } from "@/lib/chain";
-import { PERMIT2, contractsOf } from "@/lib/uniswap";
 import { planSummary, presetTicks, PRESET_WIDTH, type RangePreset, type ZapPlan } from "@/lib/zap";
 import { tickToPrice } from "@/lib/onchain";
 import { MarketChips, PairIcons } from "./TokenIcon";
+import { describeCalls } from "@/lib/describeCalls";
 import { MIN_DEPOSIT_USD, poolIdle } from "@/lib/limits";
 import { RangeBar } from "./RangeBar";
 import { useStats } from "./PoolList";
@@ -265,9 +264,13 @@ export function MarketDetail({ slug }: { slug: string }) {
             <p className="pb-2 text-xs text-muted">
               {plan.quoteLeg && `Your ${stable.symbol} is converted to ${market.quote.symbol} first. `}
               {chain.gasSponsored ? "Network fees are covered by vaults.cash." : "Network fee well under a cent, paid in ETH from your wallet."}{" "}
-              You&apos;ll earn {market.pool.fee / 10_000}% of every trade that crosses your range. Withdraw anytime.
+              You&apos;ll earn {market.pool.fee / 10_000}% of every trade that crosses your range. Withdraw anytime.{" "}
+              <Link href="/trust" className="underline underline-offset-2">
+                What vaults.cash can and can&apos;t do
+              </Link>
+              .
             </p>
-            <TxDetails market={market} calls={plan.calls} />
+            <TxDetails market={market} plan={plan} />
             <button
               onClick={confirm}
               disabled={sendMutation.isPending}
@@ -334,38 +337,33 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
   );
 }
 
-function contractLabels(market: Market): Record<string, string> {
-  const { router, posm } = contractsOf(market);
-  const stable = CHAINS[market.chainId].quote;
-  return {
-    [stable.address.toLowerCase()]: `${stable.symbol} token`,
-    [market.base.address.toLowerCase()]: `${market.base.symbol} token`,
-    [market.quote.address.toLowerCase()]: `${market.quote.symbol} token`,
-    [PERMIT2.toLowerCase()]: "Permit2 (approvals)",
-    [router.toLowerCase()]: "Uniswap Universal Router (swap)",
-    [posm.toLowerCase()]: "Uniswap Position Manager (mint)",
-  };
-}
-
-function TxDetails({ market, calls }: { market: Market; calls: ZapPlan["calls"] }) {
-  const CONTRACT_LABELS = contractLabels(market);
+function TxDetails({ market, plan }: { market: Market; plan: ZapPlan }) {
+  const steps = describeCalls(plan, market);
   return (
     <details className="pb-4 text-xs text-muted">
-      <summary className="cursor-pointer underline-offset-2 hover:underline">Transaction details (advanced)</summary>
-      <div className="mt-2 max-h-44 space-y-2 overflow-y-auto rounded-xl bg-background p-3 font-mono">
-        {calls.map((c, i) => (
-          <div key={i}>
+      <summary className="cursor-pointer underline-offset-2 hover:underline">
+        What you&apos;re signing ({steps.length} steps, one transaction)
+      </summary>
+      <ol className="mt-2 max-h-56 space-y-2 overflow-y-auto rounded-xl bg-background p-3">
+        {steps.map((st, i) => (
+          <li key={i}>
             <p className="text-foreground">
-              {i + 1}. {CONTRACT_LABELS[c.to.toLowerCase()] ?? c.to}
-              {c.value > 0n ? ` · ${formatEther(c.value)} ETH` : ""}
+              {i + 1}. {st.title}
             </p>
-            <p className="break-all text-muted/60">{c.data}</p>
-          </div>
+            {st.detail && <p className="text-muted">{st.detail}</p>}
+            <details className="font-mono text-muted/60">
+              <summary className="cursor-pointer">
+                → {st.contract} {st.call.to.slice(0, 6)}…{st.call.to.slice(-4)}
+              </summary>
+              <p className="break-all">{st.call.data}</p>
+            </details>
+          </li>
         ))}
-        <p className="pt-1 text-muted/60">
-          Executed atomically from your wallet as one ERC-4337 user operation. All-or-nothing: if any step fails, everything reverts.
-        </p>
-      </div>
+        <li className="pt-1 text-muted/60">
+          Executed atomically from your wallet as one ERC-4337 user operation. All-or-nothing: if any step fails,
+          everything reverts and nothing leaves your wallet.
+        </li>
+      </ol>
     </details>
   );
 }

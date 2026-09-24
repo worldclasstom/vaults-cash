@@ -23,6 +23,9 @@ export function FooterContent() {
         <Link href="/disclosures" className="text-muted underline-offset-2 hover:text-foreground hover:underline">
           Disclosures &amp; fees
         </Link>
+        <Link href="/trust" className="text-muted underline-offset-2 hover:text-foreground hover:underline">
+          What we can&apos;t do
+        </Link>
         <a
           href="https://base.blockscout.com"
           target="_blank"

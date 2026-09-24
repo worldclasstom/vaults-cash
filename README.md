@@ -4,24 +4,35 @@
 > [DECISIONS](docs/DECISIONS.md) (why things are the way they are) ·
 > [RUNBOOK](docs/RUNBOOK.md) (ops + gotchas) · [ROADMAP](ROADMAP.md)
 
-Robinhood-simple liquidity positions on **Robinhood Chain** (chain id 4663).
-Log in with email, pick a market (tokenized stocks or blue-chip crypto), and one
-tap converts USDG into a Uniswap v4 LP position. Self-custodial via Privy
-embedded + ERC-4337 smart wallets; gas fully sponsored.
+Dead-simple Uniswap v4 liquidity positions on **Base** (8453) and **Robinhood
+Chain** (4663), for people new to DeFi. Log in with email, pick a pair (blue-chip
+crypto, ETH-quoted pairs, or Robinhood stock tokens), type a dollar amount, and
+one tap turns the chain's stablecoin (USDC / USDG) into a Uniswap v4 LP position
+in your own wallet. Self-custodial via Privy embedded + ERC-4337 smart wallets;
+gas sponsored on Base.
+
+**vaults.cash has no contracts of its own.** It is a zap layer: the app builds a
+batch of calls to Uniswap's official contracts, shows every step in words, and
+the user's wallet signs it. See [/trust](https://vaults.cash/trust) for what
+that does and doesn't let us do.
 
 ## How money flows
 
 Deposit (one atomic userOp, built in [src/lib/zap.ts](src/lib/zap.ts)):
 
-1. 0.30% platform fee → fee wallet (plain USDG transfer)
-2. USDG → Permit2 → UniversalRouter approvals
-3. `V4_SWAP` exact-in: swap the range-ratio share of USDG into the asset
+1. Platform fee (`NEXT_PUBLIC_FEE_BPS`, 0.6% in prod) → fee wallet, split
+   50/50 with the referrer's wallet when there is one (plain ERC-20 transfers)
+2. Stablecoin → Permit2 → UniversalRouter approvals
+3. `V4_SWAP` exact-in: stablecoin → quote token when the pair isn't
+   stablecoin-quoted (e.g. cbBTC/ETH), then quote → base for the range ratio
 4. Permit2 approvals for the PositionManager
-5. `modifyLiquidities` mint — slippage-bounded; the whole batch reverts together
+5. `modifyLiquidities` mint (or add to an existing tokenId) — slippage-bounded;
+   the whole batch reverts together
 
-Withdraw ([src/lib/withdraw.ts](src/lib/withdraw.ts)) burns the position, swaps
-the asset side back to USDG (fee on the swap output only), and leaves everything
-in the user's wallet.
+Withdraw ([src/lib/withdraw.ts](src/lib/withdraw.ts)) burns the position,
+unwinds both legs back to the stablecoin (fee on the converted output only),
+and leaves everything in the user's wallet. Minimum deposit: $5
+([src/lib/limits.ts](src/lib/limits.ts)).
 
 ## Ground truth
 
@@ -60,3 +71,13 @@ discovery at [/llms.txt](public/llms.txt):
 - `GET /api/agent/positions?owner=0x…`
 
 An MCP server wrapper is planned once the API shape settles.
+
+
+## Security
+
+No contracts, no custody, no admin keys. See [SECURITY.md](SECURITY.md) for
+what's in scope and how to report privately.
+
+## License
+
+[MIT](LICENSE).

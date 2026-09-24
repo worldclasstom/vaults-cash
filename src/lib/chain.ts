@@ -138,3 +138,16 @@ export function chainBySlug(slug: string): ChainConfig | undefined {
 export function explorerUrl(chainId: number, kind: "tx" | "address", value: string) {
   return `${chainConfig(chainId).explorer.url}/${kind}/${value}`;
 }
+
+/** The position NFT on the chain's Blockscout explorer. */
+export function explorerNftUrl(chainId: number, tokenId: bigint) {
+  const c = chainConfig(chainId);
+  return `${c.explorer.url}/token/${c.uniswap.v4.positionManager}/instance/${tokenId}`;
+}
+
+/** The same position inside Uniswap's own app — the strongest "you don't
+ *  need us" proof there is. Our chain slugs match Uniswap's URL slugs
+ *  (checked 2026-09-24: /positions/v4/base/… and /positions/v4/robinhood/…). */
+export function uniswapPositionUrl(chainId: number, tokenId: bigint) {
+  return `https://app.uniswap.org/positions/v4/${chainConfig(chainId).slug}/${tokenId}`;
+}
