@@ -117,8 +117,10 @@ function AddFundsPanel({
       {cardError && <p className="pt-2 text-xs text-negative">{cardError}</p>}
 
       <p className="pt-3 text-xs text-muted">
-        <span className="text-foreground">{chain.chain.name} only for this address.</span> Same address on both
-        networks, but funds sent on any other network won&apos;t arrive here.
+        <span className="text-foreground">Direct and free of middlemen:</span> {chain.quote.symbol} sent on{" "}
+        {chain.chain.name} to this address lands in your wallet as-is — no conversion, no routing fee. Same address on
+        both networks, but funds sent on any other network won&apos;t arrive here; for those, use Add funds above and let
+        Relay route them.
       </p>
     </div>
   );
@@ -209,7 +211,7 @@ function Dashboard() {
           }}
           className="mt-3 block text-xs text-muted underline-offset-2 hover:text-foreground hover:underline"
         >
-          {showReceive ? "Hide my wallet address" : "Or send directly to my wallet address →"}
+          {showReceive ? "Hide my wallet address" : "Already have USDC on Base? Send it straight to your address →"}
         </button>
         {showSend && <SendPanel onClose={() => setShowSend(false)} />}
         {showReceive && address && (
