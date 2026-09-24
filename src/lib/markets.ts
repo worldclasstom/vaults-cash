@@ -198,11 +198,19 @@ function buildMarkets(chainId: ChainId, registry: Registry): Market[] {
       correlates: known?.correlates ?? null,
       uiMultiplier: reg?.uiMultiplier ? Number(BigInt(reg.uiMultiplier)) / 1e18 : 1,
       color: known?.color ?? hashColor(sym),
-      // logos come from the registry (Robinhood's Stock Token API for stock
-      // tokens, GeckoTerminal for the rest); TokenIcon falls back to the
-      // brand-colored monogram. Native ETH isn't a registry token (WETH's
-      // image is branded "WETH").
-      logo: isEth ? ETH_LOGO : (reg?.logo ?? undefined),
+      // Stock tokens: neither Robinhood's Stock Token API nor the community
+      // token lists carry company marks — every one is the generic feather —
+      // so, like other Robinhood Chain apps, use a stock-logo provider keyed
+      // by ticker; TokenIcon falls back to the brand-colored monogram if the
+      // image is missing. Everything else comes from the registry
+      // (GeckoTerminal). Native ETH isn't a registry token (WETH's image is
+      // branded "WETH").
+      logo:
+        known?.kind === "stock"
+          ? `https://images.financialmodelingprep.com/symbol/${sym}.png`
+          : isEth
+            ? ETH_LOGO
+            : (reg?.logo ?? undefined),
     };
   };
   tokens.set("ETH", toInfo("ETH"));
