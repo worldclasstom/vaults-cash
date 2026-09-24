@@ -57,6 +57,13 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy", value: csp },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
+          // Apple Pay / Google Pay inside Stripe's onramp iframe need the
+          // Payment Request API delegated to those origins; without this
+          // Safari reports "can't make payments" and Stripe hides Apple Pay
+          {
+            key: "Permissions-Policy",
+            value: 'payment=(self "https://crypto.link.com" "https://js.stripe.com" "https://hooks.stripe.com" "https://buy.moonpay.com" "https://pay.coinbase.com"), camera=(self "https://crypto.link.com" "https://buy.moonpay.com"), geolocation=()',
+          },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
