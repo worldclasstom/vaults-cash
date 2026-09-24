@@ -14,7 +14,10 @@ const csp = [
   // Next.js needs inline scripts; Turnstile is Privy's captcha; Privy's SDK
   // also loads helper scripts (e.g. telegram-login.js) from auth.privy.io
   // even for login methods we don't use. Dev needs eval for HMR.
-  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com https://auth.privy.io`,
+  // Stripe's embedded crypto onramp (Privy's card / Apple Pay / bank method)
+  // must load crypto-onramp-outer.js from crypto-js.stripe.com — it can't be
+  // self-hosted — plus Stripe.js.
+  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com https://auth.privy.io https://js.stripe.com https://*.js.stripe.com https://crypto-js.stripe.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
@@ -22,9 +25,12 @@ const csp = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  "child-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://oauth.telegram.org",
-  // oauth.telegram.org: Privy's SDK frames the Telegram widget even when Telegram login is off
-  "frame-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org",
+  // Funding modal frames: Stripe onramp UI (crypto.link.com), Stripe.js
+  // frames (3DS via hooks.stripe.com), MoonPay, Coinbase Onramp.
+  // oauth.telegram.org: Privy's SDK frames the Telegram widget even when
+  // Telegram login is off.
+  "child-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://oauth.telegram.org https://crypto.link.com https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://buy.moonpay.com https://pay.coinbase.com",
+  "frame-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org https://crypto.link.com https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://buy.moonpay.com https://pay.coinbase.com",
   [
     "connect-src 'self'",
     // Privy
@@ -35,6 +41,8 @@ const csp = [
     "https://mainnet.base.org https://rpc.mainnet.chain.robinhood.com",
     // explorers used for position enumeration
     "https://base.blockscout.com https://robinhoodchain.blockscout.com",
+    // funding: Stripe onramp + Stripe.js, MoonPay, Coinbase Onramp, Relay (crypto deposits/bridging)
+    "https://api.stripe.com https://crypto.link.com https://api.moonpay.com https://pay.coinbase.com https://api.relay.link",
   ].join(" "),
   "worker-src 'self' blob:",
   "manifest-src 'self'",
