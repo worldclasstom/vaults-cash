@@ -8,6 +8,8 @@ import { CHAINS, CHAIN_IDS, explorerUrl, type ChainId } from "@/lib/chain";
 import { fmtAmount } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 import { useQuoteBalance, useTokenBalance } from "@/hooks/useChainData";
+import { Sheet } from "./Sheet";
+import { Chip } from "./TokenIcon";
 
 type Asset = "quote" | "ETH";
 
@@ -76,7 +78,7 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
   if (send.isSuccess) {
     return (
       <div className="mt-3 rounded-2xl bg-surface p-4 text-sm">
-        <p className="font-semibold text-accent">Sent ✓</p>
+        <p className="font-display text-2xl font-extrabold text-accent">Sent</p>
         <p className="pt-1 text-muted">
           {fmtAmount(Number(amount), 6)} {assetLabel} is on its way on {chain.chain.name}.
         </p>
@@ -105,8 +107,7 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="mt-3 rounded-2xl bg-surface p-4 text-sm">
-      {!reviewing ? (
-        <>
+      <>
           <div className="flex gap-2 pb-2">
             {CHAIN_IDS.map((id) => (
               <button
@@ -177,41 +178,52 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
           >
             Review send
           </button>
-        </>
-      ) : (
-        <>
-          <p className="text-lg font-semibold">
-            Send {fmtAmount(Number(amount), 6)} {assetLabel}
+      </>
+
+      {reviewing && (
+        <Sheet open onClose={() => setReviewing(false)} title="Confirm send" busy={send.isPending}>
+          <p className="pt-3 font-display text-4xl font-extrabold tracking-tighter">
+            {fmtAmount(Number(amount), 6)} <span className="text-xl text-muted">{assetLabel}</span>
           </p>
-          <p className="pt-2 text-xs text-muted">To ({chain.chain.name}):</p>
-          <p className="break-all font-mono text-xs">{to.trim()}</p>
-          <p className="pt-2 text-xs text-muted">
-            No vaults.cash fee
-            {chain.gasSponsored
-              ? ", and network fees are covered by vaults.cash."
-              : "; the network fee (well under a cent) comes from your ETH on this chain."}{" "}
-            Transfers can&apos;t be reversed — double-check the address.
+          <div className="flex items-center gap-2 pt-2">
+            <Chip tone="outline">{chain.label}</Chip>
+            <span className="text-xs text-muted">only an address on {chain.chain.name} can receive this</span>
+          </div>
+          <dl className="space-y-2 py-4 text-sm">
+            <div>
+              <dt className="text-muted">To</dt>
+              <dd className="break-all font-mono text-xs">{to.trim()}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-muted">vaults.cash fee</dt>
+              <dd className="font-medium">None</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-muted">Network fee</dt>
+              <dd className="font-medium">{chain.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
+            </div>
+          </dl>
+          <p className="pb-4 text-xs text-negative">
+            Transfers can&apos;t be reversed. If the address is wrong, the money is gone. Double-check it.
           </p>
-          <div className="mt-3 flex gap-2">
+          <div className="flex gap-2">
             <button
               onClick={() => setReviewing(false)}
               disabled={send.isPending}
-              className="rounded-full bg-surface-raised px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
+              className="rounded-full bg-surface px-5 py-3 font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
             >
               Back
             </button>
             <button
               onClick={() => send.mutate()}
               disabled={send.isPending}
-              className="grow rounded-full bg-accent py-2.5 font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-40"
+              className="grow rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-40"
             >
-              {send.isPending ? "Sending…" : "Send"}
+              {send.isPending ? "Sending…" : `Send ${fmtAmount(Number(amount), 6)} ${assetLabel}`}
             </button>
           </div>
-          {send.isError && (
-            <p className="pt-2 text-xs text-negative">{(send.error as Error).message}</p>
-          )}
-        </>
+          {send.isError && <p className="mt-2 text-xs text-negative">{(send.error as Error).message}</p>}
+        </Sheet>
       )}
     </div>
   );
