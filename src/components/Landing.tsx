@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/components/AuthProvider";
 import { MarketingShell } from "@/components/MarketingShell";
+import { Chip } from "@/components/TokenIcon";
 import {
   MarketChart,
   TRADER_YS,
@@ -124,9 +125,11 @@ export function Landing() {
         />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-16 sm:pt-24 lg:grid-cols-2 lg:gap-16 lg:pb-28">
           <div className="flex flex-col items-start gap-6">
-            <p className="rounded-full bg-accent/10 px-4 py-1.5 text-xs font-semibold text-accent">
-              Live on Base and Robinhood Chain
-            </p>
+            <div className="flex flex-wrap gap-2">
+              <Chip tone="accent">Live now</Chip>
+              <Chip tone="outline">Base</Chip>
+              <Chip tone="outline">Robinhood Chain</Chip>
+            </div>
             <h1 className="text-balance font-display text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl">
               Every trade pays a fee. Be the one{" "}
               <span className="text-accent">collecting it</span>.
@@ -333,17 +336,15 @@ export function Landing() {
           <h2 className="text-balance font-display text-3xl font-extrabold tracking-tight sm:text-5xl">
             Put your cash on the <span className="text-accent">earning side</span>.
           </h2>
-          <ul className="flex flex-col gap-2 text-left text-sm text-muted sm:flex-row sm:gap-8">
+          <ul className="flex flex-wrap justify-center gap-2.5">
             {[
-              "Self-custodial — funds stay in your wallet",
-              "Official Uniswap v4 pools",
-              "One flat 0.6% fee. Nothing hidden",
-            ].map((line) => (
-              <li key={line} className="flex items-center gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-accent" aria-hidden>
-                  <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                {line}
+              ["accent", "Self-custodial"],
+              ["muted", "Official Uniswap v4 pools"],
+              ["muted", "One flat 0.6% fee"],
+              ["outline", "Nothing hidden"],
+            ].map(([tone, line]) => (
+              <li key={line}>
+                <Chip tone={tone as "accent" | "muted" | "outline"}>{line}</Chip>
               </li>
             ))}
           </ul>

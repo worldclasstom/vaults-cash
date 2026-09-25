@@ -9,6 +9,7 @@ import { InviteCard } from "@/components/InviteCard";
 import { Landing } from "@/components/Landing";
 import { PoolList } from "@/components/PoolList";
 import { SendPanel } from "@/components/SendPanel";
+import { Chip } from "@/components/TokenIcon";
 import {
   useActiveAddress,
   useAssetBalances,
@@ -161,15 +162,20 @@ function Dashboard() {
   return (
     <div className="animate-rise">
       <section className="py-8">
-        <p className="text-sm text-muted">Cash available (USDC on Base)</p>
-        <p className="py-1 text-5xl font-bold tracking-tight">
-          {isLoading || !balance ? "—" : fmtUsd(balance.formatted)}
+        <p className="text-sm text-muted">Cash available</p>
+        <p className="py-1 font-display text-6xl font-extrabold tracking-tighter">
+          {isLoading || !balance ? "—" : fmtUsd(cash ? cash.totalUsd : balance.formatted)}
         </p>
-        {otherCash.length > 0 && (
-          <p className="text-sm text-muted">
-            + {otherCash.map((c) => `${fmtUsd(c.formatted)} ${c.symbol} on Robinhood Chain`).join(" · ")}
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-2 pb-1 text-sm text-muted">
+          {(cash?.perChain ?? []).map((c) => (
+            <span key={c.chainId} className="inline-flex items-center gap-1.5">
+              <Chip tone="outline">{CHAINS[c.chainId as keyof typeof CHAINS].label}</Chip>
+              <span className={c.formatted > 0 ? "text-foreground" : ""}>
+                {fmtUsd(c.formatted)} {c.symbol}
+              </span>
+            </span>
+          ))}
+        </div>
         {ethBalance && ethBalance.raw > 0n && (
           <p className="text-sm text-muted">
             + {fmtAmount(ethBalance.formatted, 5)} ETH on Base for network fees
