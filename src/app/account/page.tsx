@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { usePrivy } from "@privy-io/react-auth";
 import { Sheet } from "@/components/Sheet";
+import { AgentAccess } from "@/components/AgentAccess";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { useActiveAddress, useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
@@ -130,6 +131,8 @@ export default function AccountPage() {
           </section>
 
           <InviteCard />
+
+          <AgentAccess />
 
           <section className="rounded-3xl bg-surface shadow-card p-5">
             <Link

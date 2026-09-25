@@ -15,6 +15,12 @@ Build tools return {to, value, data} call batches you sign with your own wallet.
 Optional `ref` on build tools: a vaults.cash referral code; half the fee is
 paid on-chain to that code's wallet in the same batch (integrators: use yours).
 
+Account-linked mode: a vaults.cash user can create an account key at
+https://vaults.cash/account (Agent access). Send it as
+`Authorization: Bearer vc_…` and the tools my_account, my_positions, deposit,
+add, withdraw, collect act on THEIR wallet and execute on-chain for them —
+sponsored gas on Base, one atomic transaction, nothing for you to sign.
+
 ## REST API (no auth, JSON)
 
 - GET  /api/agent/markets — listed markets, live prices, pool ids, docs

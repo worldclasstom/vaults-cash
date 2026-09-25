@@ -65,6 +65,20 @@ export function ensureSchema(): Promise<void> {
       // fee split shipped (referrer_amount = what the referrer received)
       await q`ALTER TABLE fee_events ADD COLUMN IF NOT EXISTS referrer_did text`;
       await q`ALTER TABLE fee_events ADD COLUMN IF NOT EXISTS referrer_amount numeric NOT NULL DEFAULT 0`;
+      // account keys for agents acting on a user's own wallet (MCP/REST
+      // bearer). Only the sha256 of the key is stored; the key itself is
+      // shown once.
+      await q`CREATE TABLE IF NOT EXISTS agent_keys (
+        id serial PRIMARY KEY,
+        privy_did text NOT NULL,
+        wallet text NOT NULL,
+        key_hash text UNIQUE NOT NULL,
+        label text,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        last_used_at timestamptz,
+        revoked_at timestamptz
+      )`;
+      await q`CREATE INDEX IF NOT EXISTS agent_keys_did_idx ON agent_keys (privy_did)`;
     })();
   }
   return schemaReady;

@@ -6,8 +6,15 @@
  * custodies funds; the 0.6% platform fee is embedded in built calls.
  *
  * Endpoint: https://vaults.cash/api/mcp/mcp (Streamable HTTP)
+ *
+ * Two ways in:
+ *  - bring your own wallet: the build_* tools return call batches you sign;
+ *  - a vaults.cash account key (`Authorization: Bearer vc_…`, minted at
+ *    /account → Agent access): the deposit/add/withdraw/collect tools run
+ *    from the user's own smart wallet through their Privy session signer,
+ *    with the app's sponsored gas and atomic batches.
  */
-import { createMcpHandler } from "mcp-handler";
+import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
 import { erc20Abi, formatEther, formatUnits, isAddress, parseUnits } from "viem";
 import { CHAINS, CHAIN_IDS } from "@/lib/chain";
@@ -18,6 +25,9 @@ import { buildZapPlan } from "@/lib/zap";
 import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
 import { serializeCalls, AGENT_DOCS } from "@/lib/agent";
 import { referrerWalletForCode } from "@/lib/referral";
+import { referrerWalletForUser, resolveAgentKey } from "@/lib/agentAccess";
+import { executeForUser } from "@/lib/executor";
+import { explorerUrl, isChainId, type ChainId } from "@/lib/chain";
 
 const json = (data: unknown) => ({
   content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
@@ -322,16 +332,169 @@ const handler = createMcpHandler(
         return json({ chainId: position.market.chainId, calls: serializeCalls(calls), docs: AGENT_DOCS });
       },
     );
+
+    // ---------------------------------------------------------------
+    // Account-linked tools: act on the signed-in user's own smart wallet.
+    // ---------------------------------------------------------------
+    type Linked = { did: string; wallet: `0x${string}` };
+    const linked = (extra: { authInfo?: { extra?: Record<string, unknown> } }): Linked | null => {
+      const x = extra.authInfo?.extra;
+      return x && typeof x.did === "string" && typeof x.wallet === "string" ? { did: x.did, wallet: x.wallet as `0x${string}` } : null;
+    };
+    const needKey = json({
+      error: "This tool acts on a vaults.cash account and needs an account key. The user creates one at https://vaults.cash/account (Agent access) and you send it as `Authorization: Bearer vc_…`. Without a key, use the build_* tools with your own wallet.",
+    });
+    const findPosition = async (owner: `0x${string}`, tokenId: string, chainId?: number) => {
+      const positions = await fetchPositions(owner);
+      return positions.find((p) => p.tokenId === BigInt(tokenId) && (chainId === undefined || p.market.chainId === chainId));
+    };
+    const done = (r: { chainId: ChainId; txHash: `0x${string}`; smartWallet: `0x${string}` }, what: string) =>
+      json({ ok: true, what, chainId: r.chainId, txHash: r.txHash, explorer: explorerUrl(r.chainId, "tx", r.txHash), wallet: r.smartWallet });
+
+    server.tool(
+      "my_account",
+      "The linked vaults.cash account (needs an account key): smart wallet address, whether agent access is active, and balances on every chain.",
+      {},
+      async (_args, extra) => {
+        const me = linked(extra);
+        if (!me) return needKey;
+        const perChain = await Promise.all(
+          CHAIN_IDS.map(async (chainId) => {
+            const client = publicClientFor(chainId);
+            const { quote } = CHAINS[chainId];
+            const [stable, eth] = await Promise.all([
+              client.readContract({ address: quote.address, abi: erc20Abi, functionName: "balanceOf", args: [me.wallet] }),
+              client.getBalance({ address: me.wallet }),
+            ]);
+            return { chainId, chain: CHAINS[chainId].chain.name, [quote.symbol.toLowerCase()]: formatUnits(stable, quote.decimals), eth: formatEther(eth), gasSponsored: CHAINS[chainId].gasSponsored };
+          }),
+        );
+        return json({ wallet: me.wallet, balances: perChain, note: "Deposits come out of the chain's stablecoin balance. On Base the app pays gas; on Robinhood Chain the wallet needs a little ETH." });
+      },
+    );
+
+    server.tool(
+      "my_positions",
+      "Live positions of the linked vaults.cash account (needs an account key).",
+      {},
+      async (_args, extra) => {
+        const me = linked(extra);
+        if (!me) return needKey;
+        const positions = await fetchPositions(me.wallet);
+        const views = await Promise.all(
+          positions.map(async (p) => {
+            const { state, price, quoteUsd, priceUsd } = await getMarketPricing(p.market);
+            return { tokenId: p.tokenId.toString(), market: p.market.slug, chainId: p.market.chainId, inRange: state.tick >= p.tickLower && state.tick < p.tickUpper, price, quoteUsd, priceUsd };
+          }),
+        );
+        return json({ wallet: me.wallet, positions: views });
+      },
+    );
+
+    server.tool(
+      "deposit",
+      "Deposit from the linked account's stablecoin into a NEW position in `market` (needs an account key). Executes on-chain from the user's own smart wallet and returns the transaction. Minimum $5; 0.6% fee.",
+      {
+        market: marketSchema,
+        amountUsd: z.number().positive(),
+        preset: z.enum(["full", "balanced", "aggressive"]).default("full"),
+        widthPct: z.number().positive().max(500).optional(),
+        slippageBps: z.number().int().min(10).max(1000).default(100),
+      },
+      async ({ market: sym, amountUsd, preset, widthPct, slippageBps }, extra) => {
+        const me = linked(extra);
+        if (!me) return needKey;
+        const market = marketBySlug(sym)!;
+        const stable = CHAINS[market.chainId].quote;
+        const [poolState, referrer] = await Promise.all([getPoolState(market), referrerWalletForUser(me.did)]);
+        const plan = await buildZapPlan({
+          market, owner: me.wallet, usdcAmount: parseUnits(amountUsd.toFixed(stable.decimals), stable.decimals),
+          preset, customWidth: widthPct !== undefined ? widthPct / 100 : undefined, slippageBps, poolState, referrer,
+        });
+        if (!isChainId(plan.chainId)) return json({ error: "unsupported chain" });
+        const r = await executeForUser(me.did, plan.chainId, plan.calls);
+        return done(r, `Deposited ${amountUsd} ${stable.symbol} into ${market.slug} (fee ${formatUnits(plan.feeAmount, stable.decimals)} ${stable.symbol}, range ticks ${plan.tickLower}..${plan.tickUpper})`);
+      },
+    );
+
+    server.tool(
+      "add",
+      "Add stablecoin to one of the linked account's existing positions, keeping its range (needs an account key). Executes on-chain.",
+      { tokenId: z.string().regex(/^\d+$/), chainId: z.number().int().optional(), amountUsd: z.number().positive(), slippageBps: z.number().int().min(10).max(1000).default(100) },
+      async ({ tokenId, chainId, amountUsd, slippageBps }, extra) => {
+        const me = linked(extra);
+        if (!me) return needKey;
+        const position = await findPosition(me.wallet, tokenId, chainId);
+        if (!position) return json({ error: `no live position ${tokenId} in this account` });
+        const market = position.market;
+        const stable = CHAINS[market.chainId].quote;
+        const [poolState, referrer] = await Promise.all([getPoolState(market), referrerWalletForUser(me.did)]);
+        const plan = await buildZapPlan({
+          market, owner: me.wallet, usdcAmount: parseUnits(amountUsd.toFixed(stable.decimals), stable.decimals),
+          preset: "full", slippageBps, poolState, referrer,
+          addTo: { tokenId: position.tokenId, tickLower: position.tickLower, tickUpper: position.tickUpper },
+        });
+        if (!isChainId(plan.chainId)) return json({ error: "unsupported chain" });
+        const r = await executeForUser(me.did, plan.chainId, plan.calls);
+        return done(r, `Added ${amountUsd} ${stable.symbol} to position #${tokenId} (${market.slug})`);
+      },
+    );
+
+    server.tool(
+      "withdraw",
+      "Close one of the linked account's positions and convert everything back to the chain's stablecoin (needs an account key). Executes on-chain; fees earned are collected in the same transaction.",
+      { tokenId: z.string().regex(/^\d+$/), chainId: z.number().int().optional(), slippageBps: z.number().int().min(10).max(1000).default(50) },
+      async ({ tokenId, chainId, slippageBps }, extra) => {
+        const me = linked(extra);
+        if (!me) return needKey;
+        const position = await findPosition(me.wallet, tokenId, chainId);
+        if (!position) return json({ error: `no live position ${tokenId} in this account` });
+        const referrer = await referrerWalletForUser(me.did);
+        const plan = await buildWithdrawPlan({ position, slippageBps, owner: me.wallet, referrer });
+        if (!isChainId(plan.chainId)) return json({ error: "unsupported chain" });
+        const stable = CHAINS[position.market.chainId].quote;
+        const r = await executeForUser(me.did, plan.chainId, plan.calls);
+        return done(r, `Withdrew position #${tokenId} (${position.market.slug}); at least ${formatUnits(plan.stableOutMin - plan.feeAmount, stable.decimals)} ${stable.symbol} after the ${formatUnits(plan.feeAmount, stable.decimals)} ${stable.symbol} fee`);
+      },
+    );
+
+    server.tool(
+      "collect",
+      "Collect the trading fees one of the linked account's positions has earned, without touching principal (needs an account key). Executes on-chain.",
+      { tokenId: z.string().regex(/^\d+$/), chainId: z.number().int().optional() },
+      async ({ tokenId, chainId }, extra) => {
+        const me = linked(extra);
+        if (!me) return needKey;
+        const position = await findPosition(me.wallet, tokenId, chainId);
+        if (!position) return json({ error: `no live position ${tokenId} in this account` });
+        const calls = await buildCollectPlan(position, me.wallet);
+        const r = await executeForUser(me.did, position.market.chainId as ChainId, calls);
+        return done(r, `Collected fees on position #${tokenId} (${position.market.slug})`);
+      },
+    );
   },
   {
-    serverInfo: { name: "vaults-cash", version: "1.2.0" },
+    serverInfo: { name: "vaults-cash", version: "1.3.0" },
     instructions:
       `vaults.cash turns stablecoins into earning Uniswap v4 LP positions on ${chainSummary}; gas is ETH on both. ` +
       "Every market has a slug; every plan returns the chainId its calls must be executed on. " +
       "Build tools return {to, value, data} call batches; execute them in order from the owner's wallet — atomically if it supports batching (EIP-7702/ERC-4337). " +
-      "Plans embed slippage bounds and expire ~20 minutes after building — rebuild stale plans. Pass `ref` (a referral code) on build tools to have half the fee paid on-chain to that code's wallet. Positions carry impermanent-loss risk.",
+      "Plans embed slippage bounds and expire ~20 minutes after building — rebuild stale plans. Pass `ref` (a referral code) on build tools to have half the fee paid on-chain to that code's wallet. " +
+      "With a vaults.cash account key (Authorization: Bearer vc_…) the my_account / my_positions / deposit / add / withdraw / collect tools act on the user's own wallet and execute on-chain for them. Positions carry impermanent-loss risk.",
   },
   { basePath: "/api/mcp", maxDuration: 60, disableSse: true },
 );
 
-export { handler as GET, handler as POST, handler as DELETE };
+/** Optional bearer: a vaults.cash account key links the session to a user.
+ *  Anything else (or nothing) is the bring-your-own-wallet mode. */
+const authed = withMcpAuth(
+  handler,
+  async (_req, bearer) => {
+    const me = await resolveAgentKey(bearer);
+    if (!me) return undefined;
+    return { token: bearer!, clientId: "vaults-cash-account-key", scopes: ["account"], extra: { did: me.privyDid, wallet: me.wallet } };
+  },
+  { required: false },
+);
+
+export { authed as GET, authed as POST, authed as DELETE };

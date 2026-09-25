@@ -81,9 +81,14 @@ discovery at [/llms.txt](public/llms.txt):
   existing position
 - `GET /api/agent/positions?owner=0x…`
 
-The agent brings its own wallet and pays its own gas; a plain EOA sends the
-calls sequentially (not atomic), a smart account batches them. End-to-end
-harness: `scripts/agent-e2e.ts` (see its header).
+Two modes. Bring-your-own-wallet: the agent signs the returned calls and
+pays its own gas (a plain EOA sends them sequentially, a smart account
+batches them). Account-linked: a user turns on "Agent access" on their
+Account page (a Privy session signer scoped by policy) and mints an account
+key; with `Authorization: Bearer vc_…` the deposit/add/withdraw/collect tools
+execute from the user's own smart wallet server-side
+(`src/lib/executor.ts`), with the app's sponsored gas and atomic batches.
+End-to-end harness for the first mode: `scripts/agent-e2e.ts`.
 
 
 ## Security

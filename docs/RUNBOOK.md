@@ -19,7 +19,11 @@ July entries at the bottom are kept as history._
 | `NEXT_PUBLIC_SOURCE_URL` | Vercel | repo URL shown on `/trust`; unset hides the line |
 | `ALCHEMY_API_KEY` | Vercel prod/preview/dev | origin-allowlisted; server sends `Origin: https://vaults.cash` |
 | `BASE_RPC_URL`, `ROBINHOOD_RPC_URL` | optional | override the server RPC (else Alchemy, else public) |
-| `DATABASE_URL` (+`PG*`) | Vercel all envs | Neon, injected by the integration; referral ledger only |
+| `DATABASE_URL` (+`PG*`) | Vercel all envs | Neon, injected by the integration; referral ledger + agent keys |
+| `NEXT_PUBLIC_PRIVY_SIGNER_ID` | Vercel | Privy key-quorum id of the server signer; the Account "Agent access" card hides until set |
+| `NEXT_PUBLIC_PRIVY_SIGNER_POLICY_ID` | Vercel | optional Privy policy scoping that signer to our contracts |
+| `PRIVY_AUTHORIZATION_PRIVATE_KEY` | Vercel (server only) | base64 PKCS8 P-256 key matching the quorum; signs session-signer requests |
+| `BUNDLER_URL_8453`, `BUNDLER_URL_4663` | Vercel (server only) | bundler (+paymaster on Base) URLs the executor sends user ops to; 4663 falls back to Alchemy |
 
 Privy dashboard: embedded wallets (Ethereum: users without wallets; Solana:
 all users — "SVM wallets" toggle on), smart wallets = Kernel; Base uses the
