@@ -43,10 +43,10 @@ function ChainRow({ chainId, stable, address }: { chainId: ChainId; stable: numb
         <ChainChip chainId={chainId} />
         <span className="text-xs text-muted">
           {eth && eth.raw > 0n
-            ? `${fmtAmount(eth.formatted, 5)} ETH for fees`
+            ? `${fmtAmount(eth.formatted, 5)} ETH for gas`
             : chain.gasSponsored
-              ? "fees covered by vaults.cash"
-              : "no ETH for fees yet"}
+              ? "gas (network fees) covered by vaults.cash"
+              : "no ETH for gas yet"}
         </span>
       </span>
       <span className="flex items-center gap-3">

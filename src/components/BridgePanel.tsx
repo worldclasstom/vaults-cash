@@ -79,7 +79,7 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
       </div>
       <p className="pt-1 text-muted">
         This pool takes {to.quote.symbol} on {to.label}. Move some over and it arrives at this same wallet, usually in under a
-        minute. {from.gasSponsored ? "Network fees covered by vaults.cash." : "Network fee under a cent, in ETH."}
+        minute. {from.gasSponsored ? "Gas (network fees) covered by vaults.cash." : "Gas under a cent, in ETH."}
       </p>
       <div className="mt-3 flex items-center gap-2">
         <span className="text-muted">$</span>
@@ -132,7 +132,7 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
                   <dd className="text-muted">{fmtUsd(q.conversionUsd)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted">Network fee</dt>
+                  <dt className="text-muted">Gas (network fee)</dt>
                   <dd className="font-medium">{from.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
                 </div>
               </dl>

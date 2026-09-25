@@ -279,7 +279,7 @@ export function MarketDetail({ slug }: { slug: string }) {
             </dl>
             <p className="pb-2 text-xs text-muted">
               {plan.quoteLeg && `Your ${stable.symbol} is converted to ${market.quote.symbol} first. `}
-              {chain.gasSponsored ? "Network fees are covered by vaults.cash." : "Network fee well under a cent, paid in ETH from your wallet."}{" "}
+              {chain.gasSponsored ? "Gas (network fees) covered by vaults.cash." : "Gas well under a cent, paid in ETH from your wallet."}{" "}
               You&apos;ll earn {market.pool.fee / 10_000}% of every trade that crosses your range. Withdraw anytime.{" "}
               <Link href="/trust" className="underline underline-offset-2">
                 What vaults.cash can and can&apos;t do

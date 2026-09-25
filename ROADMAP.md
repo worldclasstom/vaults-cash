@@ -24,16 +24,23 @@ that history is in docs/DECISIONS.md._
   source for "rung sold" notifications and Targets auto-close.
 
 - **Targets — range orders for people who think in prices.** Buy the asset,
-  set a range from today's price to an exit target, collect fees as price
-  walks through it; the mirror (stable-only range below price) is a buy
-  ladder. Maps 1:1 onto single-sided v4 positions; the engine already
-  supports custom ticks and single-sided mints. Needs **auto-close** when
-  the target is hit, or a retrace re-buys the asset: a tiny immutable
-  contract (approve the NFT to it; anyone may call `close(tokenId)`; only
-  succeeds past the upper tick; proceeds only to the NFT owner) with our
-  hourly cron as the caller. First feature that justifies a contract and
-  an audit (small reviewer or bounty, not a full-firm engagement). Naming
-  candidates: "Targets" / "Buy zones".
+  set a ladder of rungs from today's price to an exit target, collect fees
+  as price walks through it; the mirror (stable-only rungs below price) is
+  a buy ladder. v1 ships BOTH directions. Maps 1:1 onto single-sided v4
+  positions; the engine already supports custom ticks and single-sided
+  mints. Decisions (2026-09-25): name is "Targets" (rungs inside); rung
+  defaults borrow Uniswap's limit-order controls (price + expiry), four
+  equal rungs, 2–8 allowed; **auto-close** = the account-linked keeper
+  (agent access session signer) closing the whole ladder only once the
+  final target prints — rungs price crosses back into keep earning, and
+  the setup sheet says so plainly; notify-only is the fallback for users
+  who decline the signer; a tiny immutable close contract (anyone may call
+  `close`, proceeds only to the NFT owner) comes later and is the first
+  thing worth an audit. **Performance fee: 8% of trading fees earned, on
+  Targets ladders only, never on Pools**, taken at close and at collect in
+  the same batch as today's fee, with the referrer's 50% paid on-chain
+  alongside it; the 0.6% withdraw fee applies to principal, not to the fee
+  portion.
 - **Leverage loop** (Aave/Morpho): supply ETH → borrow USDC → LP,
   atomically; LTV cap ~40–50%, live health factor, one-tap unwind.
 - **Managed "pick an outcome" layer** over the pools (MaxFi-style UX

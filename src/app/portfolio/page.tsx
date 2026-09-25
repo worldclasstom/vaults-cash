@@ -411,7 +411,7 @@ function PositionCard({ p }: { p: PositionView }) {
                   <dd className="font-medium">{fmtUsd(Number(formatUnits(wplan.feeAmount, chain.quote.decimals)))}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted">Network fee</dt>
+                  <dt className="text-muted">Gas (network fee)</dt>
                   <dd className="font-medium">{chain.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
                 </div>
               </dl>

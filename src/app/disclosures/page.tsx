@@ -1,6 +1,7 @@
 import { MarketingShell } from "@/components/MarketingShell";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { MIN_DEPOSIT_USD } from "@/lib/limits";
+import { CHAINS } from "@/lib/chain";
 
 export const metadata = { title: "Disclosures" };
 
@@ -59,8 +60,13 @@ export default function DisclosuresPage() {
             same transaction. It does not change what you pay.
           </p>
           <p>
-            Network fees: on Base, vaults.cash pays them for you. On Robinhood Chain you pay them from the ETH in your
-            wallet, typically a few cents per action, directly to the network. vaults.cash never marks them up.
+            Gas (network fees) is separate from our fee and goes to the network, never to us.{" "}
+            {CHAINS[8453].gasSponsored && CHAINS[4663].gasSponsored
+              ? "On both Base and Robinhood Chain, vaults.cash pays it for you."
+              : CHAINS[8453].gasSponsored
+                ? "On Base, vaults.cash pays it for you. On Robinhood Chain you pay it from the ETH in your wallet, typically a few cents per action."
+                : "You pay it from the ETH in your wallet, typically a few cents per action."}{" "}
+            vaults.cash never marks it up.
           </p>
           <p>
             Moving dollars between chains uses Relay, a third-party bridge. Relay&apos;s route fee and the conversion

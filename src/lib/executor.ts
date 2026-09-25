@@ -81,6 +81,9 @@ export async function executeForUser(privyDid: string, chainId: ChainId, calls: 
   }
 
   const url = bundlerUrl(chainId);
+  // CDP (Base) sponsors from the bundler URL alone; Alchemy (Robinhood) needs the
+  // Gas Manager policy id in the ERC-7677 context, same as the Privy dashboard holds.
+  const policyId = chainId === 4663 ? process.env.ALCHEMY_GAS_POLICY_ID_4663 : undefined;
   const paymaster = cfg.gasSponsored ? createPaymasterClient({ transport: http(url) }) : undefined;
   const client = createKernelAccountClient({
     account,
@@ -88,6 +91,7 @@ export async function executeForUser(privyDid: string, chainId: ChainId, calls: 
     client: publicClient,
     bundlerTransport: http(url),
     ...(paymaster ? { paymaster } : {}),
+    ...(paymaster && policyId ? { paymasterContext: { policyId } } : {}),
   });
   const userOpHash = await client.sendUserOperation({
     calls: calls.map((c) => ({ to: c.to, value: c.value, data: c.data })),

@@ -115,7 +115,7 @@ export const CHAINS: Record<ChainId, ChainConfig> = {
     },
     gecko: "robinhood",
     rpcEnv: "ROBINHOOD_RPC_URL",
-    gasSponsored: false,
+    gasSponsored: process.env.NEXT_PUBLIC_GAS_SPONSORED_4663 === "1",
   },
 };
 

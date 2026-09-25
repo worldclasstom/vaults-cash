@@ -11,10 +11,9 @@ import type { MarketStats } from "@/app/api/stats/route";
 import { MarketChips, PairIcons } from "./TokenIcon";
 import { Select } from "./Select";
 
-type Category = "all" | "steady" | "majors" | "crypto" | "stock";
+type Category = "all" | "majors" | "crypto" | "stock";
 const CATEGORIES: Array<{ id: Category; label: string; hint: string }> = [
   { id: "all", label: "All pools", hint: "" },
-  { id: "steady", label: "Steady", hint: "Both sides track the same thing — minimal price risk" },
   { id: "majors", label: "ETH & BTC", hint: "Pairs of the two majors" },
   { id: "crypto", label: "Crypto", hint: "" },
   { id: "stock", label: "Stocks", hint: "Robinhood stock tokens" },
@@ -26,8 +25,6 @@ function inCategory(m: Market, c: Category) {
   switch (c) {
     case "all":
       return true;
-    case "steady":
-      return m.lowIl;
     case "majors":
       return MAJORS.has(m.base.symbol) && (MAJORS.has(m.quote.symbol) || m.quoteIsStable);
     case "crypto":
@@ -125,7 +122,7 @@ export function PoolList() {
         </p>
       ) : (
         <>
-          <div className="hidden grid-cols-[minmax(0,2.2fr)_1fr_1fr_1fr_0.8fr] gap-3 px-4 pb-2 text-xs text-muted sm:grid">
+          <div className="sticky top-[59px] z-20 hidden grid-cols-[minmax(0,2.2fr)_1fr_1fr_1fr_0.8fr] gap-3 bg-background/95 px-4 py-2 text-xs text-muted backdrop-blur-md sm:grid md:top-[67px]">
             <span>Pool</span>
             <span className="text-right">Price</span>
             <span className="text-right">Liquidity</span>

@@ -46,7 +46,7 @@ function AddFundsPanel({
     </>,
     <>
       It lands in your account here within seconds
-      {chain.gasSponsored ? "" : " — plus a little ETH on the same network for fees (about $1 covers many transactions)"}.
+      {chain.gasSponsored ? "" : " — plus a little ETH on the same network for gas (about $1 covers many transactions)"}.
     </>,
   ];
 

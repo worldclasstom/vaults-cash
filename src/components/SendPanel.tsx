@@ -199,7 +199,7 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
               <dd className="font-medium">None</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-muted">Network fee</dt>
+              <dt className="text-muted">Gas (network fee)</dt>
               <dd className="font-medium">{chain.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
             </div>
           </dl>
