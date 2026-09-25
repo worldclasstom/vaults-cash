@@ -40,15 +40,15 @@ function marketForTruncatedPoolId(chainId: ChainId, truncated: string): Market |
   );
 }
 
-const feeViewAbi = parseAbi([
+export const feeViewAbi = parseAbi([
   "function getFeeGrowthInside(bytes32 poolId, int24 tickLower, int24 tickUpper) view returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128)",
   "function getPositionInfo(bytes32 poolId, address owner, int24 tickLower, int24 tickUpper, bytes32 salt) view returns (uint128 liquidity, uint256 feeGrowthInside0LastX128, uint256 feeGrowthInside1LastX128)",
 ]);
 
-const Q128 = 1n << 128n;
+export const Q128 = 1n << 128n;
 const U256 = (1n << 256n) - 1n;
 /** fee growth counters wrap; subtraction is defined mod 2^256 */
-const wrapSub = (a: bigint, b: bigint) => (a - b) & U256;
+export const wrapSub = (a: bigint, b: bigint) => (a - b) & U256;
 
 /** Uncollected trading fees for a position, in raw token units. */
 export async function getUncollectedFees(position: OwnedPosition) {
@@ -138,4 +138,25 @@ export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPositio
     throw (results[0] as PromiseRejectedResult).reason;
   }
   return ok.flatMap((r) => r.value);
+}
+
+/** One position by id, whoever owns it (share pages, activity). Null when
+ *  it's burned, empty, or in a pool we don't list. */
+export async function readPosition(chainId: ChainId, tokenId: bigint): Promise<(OwnedPosition & { owner: `0x${string}` }) | null> {
+  const client = publicClientFor(chainId);
+  const posm = posmOf(chainId);
+  try {
+    const [poolAndInfo, liquidity, owner] = await Promise.all([
+      client.readContract({ address: posm, abi: posmAbi, functionName: "getPoolAndPositionInfo", args: [tokenId] }),
+      client.readContract({ address: posm, abi: posmAbi, functionName: "getPositionLiquidity", args: [tokenId] }),
+      client.readContract({ address: posm, abi: posmAbi, functionName: "ownerOf", args: [tokenId] }),
+    ]);
+    if (liquidity === 0n) return null;
+    const { tickLower, tickUpper, truncatedPoolId } = decodePositionInfo(poolAndInfo[1]);
+    const market = marketForTruncatedPoolId(chainId, truncatedPoolId);
+    if (!market) return null;
+    return { tokenId, market, tickLower, tickUpper, liquidity, owner };
+  } catch {
+    return null;
+  }
 }

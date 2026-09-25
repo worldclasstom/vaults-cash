@@ -13,6 +13,9 @@ import { Sheet } from "@/components/Sheet";
 import { SigningSteps } from "@/components/SigningSteps";
 import { describeWithdrawCalls } from "@/lib/describeCalls";
 import { formatUnits } from "viem";
+import { useActivities, useActivity } from "@/hooks/useActivity";
+import { useReferral } from "@/hooks/useReferral";
+import type { Activity } from "@/lib/activity";
 import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
 import { CHAINS, explorerNftUrl, uniswapPositionUrl } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
@@ -125,6 +128,119 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
 
 const FEE_RATE = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 10_000;
 
+const fmtEarned = (n: number) => (n >= 0.01 ? `+${fmtUsd(n)}` : n > 0 ? "+<$0.01" : "$0.00");
+const ago = (ts: number) => {
+  const s = Math.max(0, Math.floor(Date.now() / 1000) - ts);
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+  if (s < 86_400) return `${Math.floor(s / 3600)} h ago`;
+  return `${Math.floor(s / 86_400)} d ago`;
+};
+
+/** The reason to open the app: what traders paid you today, across positions. */
+function TodayLine({ positions }: { positions: PositionView[] }) {
+  const results = useActivities(positions);
+  const loaded = results.filter((r) => r.data);
+  if (!positions.length) return null;
+  const today = loaded.reduce((s, r) => s + (r.data as Activity).todayUsd, 0);
+  const trades = loaded.reduce((s, r) => s + (r.data as Activity).tradesInRangeToday, 0);
+  const pending = loaded.length < positions.length;
+  return (
+    <section className="relative mb-4 overflow-hidden rounded-3xl bg-surface p-5 shadow-card">
+      <p className="text-sm text-muted">Traders paid you today</p>
+      <p className={`font-display text-5xl font-extrabold tracking-tighter ${today > 0 ? "text-accent" : ""}`}>
+        {pending && !loaded.length ? "…" : fmtEarned(today)}
+      </p>
+      <p className="pt-1 text-sm text-muted">
+        {pending && !loaded.length
+          ? "Counting today's trades…"
+          : trades > 0
+            ? `${trades.toLocaleString()} trade${trades === 1 ? "" : "s"} crossed your range in the last 24 hours${pending ? " (still counting)" : ""}.`
+            : "No trades have crossed your range in the last 24 hours yet."}
+      </p>
+      {today > 0 && (
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-6 flex items-end gap-6 pb-4">
+          {[0, 0.7].map((d, i) => (
+            <span key={i} className="animate-cash-up font-display text-lg font-extrabold text-accent" style={{ animationDelay: `${d}s` }}>
+              +$
+            </span>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** The trades that paid this position, newest first. */
+function TradeFeed({ p, a }: { p: PositionView; a: Activity }) {
+  const m = p.market;
+  return (
+    <details className="mt-3 rounded-2xl bg-surface-raised p-3 text-sm">
+      <summary className="cursor-pointer text-muted">
+        <span className="font-display font-bold text-foreground">Today {fmtEarned(a.todayUsd)}</span> · {a.tradesInRangeToday.toLocaleString()} of{" "}
+        {a.tradesToday.toLocaleString()} trades were in your range{a.partial ? " (so far)" : ""} · recent trades
+      </summary>
+      <ul className="mt-2 divide-y divide-borderline">
+        {a.recent.slice(0, 6).map((t) => (
+          <li key={t.txHash + t.block} className="flex items-center justify-between gap-3 py-2">
+            <span className={t.inRange ? "" : "text-muted"}>
+              Someone {t.side} {fmtAmount(shareAmount(m, t.baseAmount), 4)} {m.base.symbol}{" "}
+              <span className="text-muted">({fmtUsd(t.usd)})</span>
+            </span>
+            <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
+              <span className={`font-display font-bold ${t.inRange && t.earnedUsd > 0 ? "text-accent" : ""}`}>
+                {t.inRange ? (t.earnedUsd >= 0.001 ? `+${fmtUsd(t.earnedUsd)}` : "+<$0.001") : "outside range"}
+              </span>
+              {ago(t.ts)}
+            </span>
+          </li>
+        ))}
+        {a.recent.length === 0 && <li className="py-2 text-muted">No trades in this pool in the last 24 hours.</li>}
+      </ul>
+    </details>
+  );
+}
+
+/** Share a position: a card image, a link with your invite code, the native share sheet when there is one. */
+function ShareSheet({ p, onClose }: { p: PositionView; onClose: () => void }) {
+  const { data: ref } = useReferral();
+  const [copied, setCopied] = useState(false);
+  const slug = CHAINS[p.market.chainId].slug;
+  const url = `https://vaults.cash/p/${slug}/${p.tokenId}${ref?.refCode ? `?ref=${ref.refCode}` : ""}`;
+  const img = `/api/share/${slug}/${p.tokenId}`;
+  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+  return (
+    <Sheet open onClose={onClose} title="Share this position">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={img} alt={`${p.market.base.symbol} / ${p.market.quote.symbol} position card`} className="mt-3 w-full rounded-2xl shadow-elevated" />
+      <p className="pt-3 text-xs text-muted">
+        A live card: pair, what traders have paid this position, and where the price sits. The link opens a public page
+        with the same numbers{ref?.refCode ? " and carries your invite code, so anyone who joins from it pays you half our fee" : ""}.
+      </p>
+      <div className="mt-4 flex gap-2">
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(url);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          }}
+          className="grow rounded-full bg-surface px-5 py-3 font-semibold transition-colors hover:bg-borderline"
+        >
+          {copied ? "Link copied" : "Copy link"}
+        </button>
+        {canShare && (
+          <button
+            onClick={() => navigator.share({ title: "Traders are paying me", text: "Every trade pays a fee. I'm the one collecting it.", url }).catch(() => undefined)}
+            className="grow rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong"
+          >
+            Share
+          </button>
+        )}
+      </div>
+    </Sheet>
+  );
+}
+
 /** Fills as trades pay the position back the fee it cost to enter — the
  *  honest version of a progress bar: once it's full, everything is profit. */
 function FeeBar({ feesUsd, valueUsd }: { feesUsd: number; valueUsd: number }) {
@@ -155,6 +271,8 @@ function PositionCard({ p }: { p: PositionView }) {
   const collect = useCollect();
   const [adding, setAdding] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const activity = useActivity(p);
   const chain = CHAINS[p.market.chainId];
   const wplan = planWithdraw.data;
   // guaranteed minimum the user ends with, after the fee (stablecoin ≈ $1)
@@ -208,6 +326,12 @@ function PositionCard({ p }: { p: PositionView }) {
       {/* the fee bar: how far the fees traders paid have gone toward covering the 0.6% it cost to enter */}
       <FeeBar feesUsd={p.feesUsd} valueUsd={p.valueUsd} />
 
+      {activity.data ? (
+        <TradeFeed p={p} a={activity.data} />
+      ) : activity.isError ? null : (
+        <div className="mt-3 h-10 animate-pulse rounded-2xl bg-surface-raised" />
+      )}
+
       <p className="pt-3 text-sm text-muted">
         Holding {fmtAmount(shareAmount(m, p.baseAmount), 5)} {m.base.symbol} + {fmtAmount(p.quoteAmount, m.quoteIsStable ? 2 : 5)}{" "}
         {m.quote.symbol}
@@ -242,6 +366,12 @@ function PositionCard({ p }: { p: PositionView }) {
           {withdraw.isSuccess ? "Withdrawn ✓" : planWithdraw.isPending ? "Preparing…" : withdraw.isPending ? "Withdrawing…" : `Withdraw to ${stable.symbol}`}
         </button>
         <button
+          onClick={() => setSharing(true)}
+          className="rounded-full bg-surface-raised px-4 py-2 text-sm text-muted transition-colors hover:bg-borderline hover:text-foreground"
+        >
+          Share
+        </button>
+        <button
           onClick={() => collect.mutate(p)}
           disabled={collect.isPending || !collectible}
           title={collectible ? undefined : `Collect unlocks at ${fmtUsd(MIN_COLLECT_USD)} earned`}
@@ -251,6 +381,7 @@ function PositionCard({ p }: { p: PositionView }) {
         </button>
       </div>
       {adding && <AddPanel p={p} onClose={() => setAdding(false)} />}
+      {sharing && <ShareSheet p={p} onClose={() => setSharing(false)} />}
       {withdraw.isSuccess && (
         <p className="mt-2 text-xs text-accent">
           Withdrawn. Your {stable.symbol} is in your wallet on {chain.label}; this card will clear in a moment.
@@ -424,6 +555,7 @@ export default function PortfolioPage() {
               </p>
             </div>
           </section>
+          {positions && positions.length > 0 && <TodayLine positions={positions} />}
           <section>
             <h2 className="pb-3 font-display text-2xl font-extrabold tracking-tight">Positions</h2>
             {isLoading ? (

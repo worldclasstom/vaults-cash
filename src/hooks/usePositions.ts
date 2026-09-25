@@ -9,6 +9,7 @@ import { buildPool } from "@/lib/zap";
 import { useActiveAddress } from "./useChainData";
 import { useSendCalls } from "./useSendCalls";
 import { useReferral } from "./useReferral";
+import { playKaching } from "@/lib/sound";
 
 export type PositionView = OwnedPosition & {
   inRange: boolean;
@@ -118,6 +119,7 @@ export function useCollect() {
       });
     },
     onSuccess: () => {
+      playKaching();
       queryClient.invalidateQueries({ queryKey: ["positions"] });
       queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
       queryClient.invalidateQueries({ queryKey: ["cash-balances"] });

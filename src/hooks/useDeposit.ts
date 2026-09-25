@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { playKaching } from "@/lib/sound";
 import { parseAbiItem, parseEventLogs, parseUnits } from "viem";
 import { CHAINS } from "@/lib/chain";
 import { rememberPosition } from "@/lib/knownPositions";
@@ -104,6 +105,7 @@ export function useSendDeposit() {
       return result;
     },
     onSuccess: () => {
+      playKaching();
       queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
       queryClient.invalidateQueries({ queryKey: ["cash-balances"] });
       queryClient.invalidateQueries({ queryKey: ["positions"] });
