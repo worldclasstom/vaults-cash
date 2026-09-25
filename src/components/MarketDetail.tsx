@@ -18,6 +18,8 @@ import { useAuth } from "./AuthProvider";
 import { Select } from "./Select";
 import { SigningSteps } from "./SigningSteps";
 import { MIN_DEPOSIT_USD, poolIdle } from "@/lib/limits";
+import { BridgePanel } from "./BridgePanel";
+import { useCashBalances } from "@/hooks/useChainData";
 import { RangeBar } from "./RangeBar";
 import { useStats } from "./PoolList";
 
@@ -36,6 +38,8 @@ export function MarketDetail({ slug }: { slug: string }) {
   const { data: quote } = useMarketQuote(market);
   const { data: stats } = useStats();
   const { data: balance } = useQuoteBalance(market.chainId);
+  const { data: cash } = useCashBalances();
+  const elsewhere = cash?.perChain.find((c) => c.chainId !== market.chainId && c.formatted >= 1);
 
   const [amount, setAmount] = useState("");
   const [preset, setPreset] = useState<RangePreset>("full");
@@ -148,8 +152,14 @@ export function MarketDetail({ slug }: { slug: string }) {
               </button>
             </div>
             <p className="pb-4 text-xs text-muted">
-              Minimum {fmtUsd(MIN_DEPOSIT_USD)} · Available: {balance ? fmtUsd(balance.formatted) : "—"}
+              Minimum {fmtUsd(MIN_DEPOSIT_USD)} · Available here: {balance ? fmtUsd(balance.formatted) : "—"}
+              {elsewhere && ` · ${fmtUsd(elsewhere.formatted)} ${elsewhere.symbol} on ${CHAINS[elsewhere.chainId as keyof typeof CHAINS].label}`}
             </p>
+            {authenticated && elsewhere && (balance === undefined || balance.formatted < Math.max(amountNum, MIN_DEPOSIT_USD)) && (
+              <div className="pb-4">
+                <BridgePanel toChainId={market.chainId} suggestedUsd={amountNum || undefined} />
+              </div>
+            )}
 
             <p className="pb-2 text-sm font-semibold">Price range</p>
             <div className="grid grid-cols-3 gap-2">
