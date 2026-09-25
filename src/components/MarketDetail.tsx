@@ -126,7 +126,7 @@ export function MarketDetail({ slug }: { slug: string }) {
         </section>
 
         <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
-          <section className="rounded-3xl bg-surface p-5">
+          <section className="rounded-3xl bg-surface shadow-card p-5">
             <label className="text-sm text-muted" htmlFor="amount">
               Deposit {stable.symbol}
             </label>
@@ -293,7 +293,7 @@ export function MarketDetail({ slug }: { slug: string }) {
 
 function Stat({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="rounded-2xl bg-surface px-4 py-3">
+    <div className="rounded-2xl bg-surface px-4 py-3 shadow-card">
       <p className="text-[11px] uppercase tracking-wide text-muted">{label}</p>
       <p className={`pt-0.5 text-lg font-semibold ${accent ? "text-accent" : ""}`}>{value}</p>
     </div>
@@ -310,7 +310,7 @@ function HowItWorks({ market }: { market: Market }) {
       ? `The stock token follows its share price. If it moves outside your range you hold mostly one side and stop earning until it comes back — or you withdraw and re-enter.`
       : `If ${b} moves a lot against ${q}, you end up holding more of the one that fell. Wider ranges soften this; "Set & forget" never goes out of range.`;
   return (
-    <section className="space-y-4 rounded-3xl bg-surface p-5 text-sm">
+    <section className="space-y-4 rounded-3xl bg-surface shadow-card p-5 text-sm">
       <h2 className="font-semibold">How this pool works</h2>
       <Step n={1} title={`You hold ${b} and ${q}`}>
         Your deposit is split into both, matched to your price range, and placed in the official Uniswap pool. It stays in your own wallet as a position you can withdraw any time.

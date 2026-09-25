@@ -33,7 +33,7 @@ export function InviteCard() {
   // no referral program" — show the card with a retry instead
   if (!data) {
     return (
-      <section className="mt-6 rounded-3xl bg-surface p-5">
+      <section className="mt-6 rounded-3xl bg-surface shadow-card p-5">
         <h2 className="font-semibold">Invite friends, earn together</h2>
         <p className="pt-1 text-sm text-muted">
           You earn <span className="text-accent">50% of vaults.cash fees</span> from every deposit your invites make.
@@ -51,7 +51,7 @@ export function InviteCard() {
   const link = `https://vaults.cash?ref=${data.refCode}`;
 
   return (
-    <section className="mt-6 rounded-3xl bg-surface p-5">
+    <section className="mt-6 rounded-3xl bg-surface shadow-card p-5">
       <h2 className="font-semibold">Invite friends, earn together</h2>
       <p className="pt-1 text-sm text-muted">
         You earn <span className="text-accent">50% of vaults.cash fees</span> from every deposit your invites make —

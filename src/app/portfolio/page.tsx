@@ -151,7 +151,7 @@ function PositionCard({ p }: { p: PositionView }) {
   const priceUsd = sharePrice(m, p.price * p.quoteUsd);
 
   return (
-    <li className="rounded-3xl bg-surface p-5">
+    <li className="rounded-3xl bg-surface shadow-card p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <PairIcons market={m} size={38} />
@@ -312,7 +312,7 @@ function EmptyPositions() {
   const justDeposited = !!useSearchParams().get("deposited");
   if (justDeposited) {
     return (
-      <div className="rounded-3xl bg-surface p-8 text-center">
+      <div className="rounded-3xl bg-surface shadow-card p-8 text-center">
         <p className="font-semibold text-accent">Deposit confirmed ✓</p>
         <p className="pt-2 text-sm text-muted">Your position is on-chain and will show here in a few seconds.</p>
         <div className="mx-auto mt-4 h-1.5 w-24 animate-pulse rounded-full bg-accent/40" />
@@ -320,7 +320,7 @@ function EmptyPositions() {
     );
   }
   return (
-    <div className="rounded-3xl bg-surface p-8 text-center">
+    <div className="rounded-3xl bg-surface shadow-card p-8 text-center">
       <p className="pb-3 text-muted">No positions yet.</p>
       <Link href="/" className="font-semibold text-accent hover:underline">
         Explore pools →
@@ -358,7 +358,7 @@ export default function PortfolioPage() {
       ) : (
         <div className="animate-rise py-4">
           <section className="grid grid-cols-2 gap-2 pb-8 sm:grid-cols-4">
-            <div className="col-span-2 rounded-3xl bg-surface p-5 sm:col-span-2">
+            <div className="col-span-2 rounded-3xl bg-surface shadow-card p-5 sm:col-span-2">
               <p className="text-sm text-muted">In positions</p>
               <p className="py-1 text-4xl font-bold tracking-tight">{fmtUsd(total)}</p>
               <p className="text-sm text-muted">
@@ -376,11 +376,11 @@ export default function PortfolioPage() {
                 )}
               </p>
             </div>
-            <div className="rounded-3xl bg-surface p-5">
+            <div className="rounded-3xl bg-surface shadow-card p-5">
               <p className="text-sm text-muted">Fees to collect</p>
               <p className="py-1 text-2xl font-bold text-accent">{fmtUsd(fees)}</p>
             </div>
-            <div className="rounded-3xl bg-surface p-5">
+            <div className="rounded-3xl bg-surface shadow-card p-5">
               <p className="text-sm text-muted">Earning</p>
               <p className="py-1 text-2xl font-bold">
                 {positions ? `${earning}/${positions.length}` : "—"}
@@ -390,9 +390,9 @@ export default function PortfolioPage() {
           <section>
             <h2 className="pb-3 text-lg font-semibold">Positions</h2>
             {isLoading ? (
-              <div className="h-28 animate-pulse rounded-3xl bg-surface" />
+              <div className="h-28 animate-pulse rounded-3xl bg-surface shadow-card" />
             ) : isError ? (
-              <p className="rounded-3xl bg-surface p-5 text-sm text-muted">Couldn&apos;t load positions right now — refresh to retry.</p>
+              <p className="rounded-3xl bg-surface shadow-card p-5 text-sm text-muted">Couldn&apos;t load positions right now — refresh to retry.</p>
             ) : positions && positions.length > 0 ? (
               <ul className="space-y-3">
                 {positions.map((p) => (

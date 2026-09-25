@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T03:01:57+00:00",
+  "title": "Design System: vaults.cash",
+  "extensions": {
+    "colorMeta": {
+      "drawer-black": {
+        "role": "neutral",
+        "displayName": "Drawer Black",
+        "canonical": "#0b0d0b",
+        "tonalRamp": [
+          "#232923",
+          "#3a453a",
+          "#526152",
+          "#697c69",
+          "#839683",
+          "#9ead9e",
+          "#c8d0c8",
+          "#f1f3f1"
+        ]
+      },
+      "felt": {
+        "role": "neutral",
+        "displayName": "Felt",
+        "canonical": "#141714",
+        "tonalRamp": [
+          "#242924",
+          "#3b443b",
+          "#535f53",
+          "#6b7b6b",
+          "#849484",
+          "#a0aca0",
+          "#c8d0c8",
+          "#f1f3f1"
+        ]
+      },
+      "till": {
+        "role": "neutral",
+        "displayName": "Till",
+        "canonical": "#1b1f1b",
+        "tonalRamp": [
+          "#242924",
+          "#3b443b",
+          "#535f53",
+          "#6b7b6b",
+          "#849484",
+          "#a0aca0",
+          "#c8d0c8",
+          "#f1f3f1"
+        ]
+      },
+      "seam": {
+        "role": "neutral",
+        "displayName": "Seam",
+        "canonical": "#262b26",
+        "tonalRamp": [
+          "#242924",
+          "#3c443c",
+          "#545f54",
+          "#6c7a6c",
+          "#859385",
+          "#a0aba0",
+          "#c9cfc9",
+          "#f1f3f1"
+        ]
+      },
+      "bill-white": {
+        "role": "neutral",
+        "displayName": "Bill White",
+        "canonical": "#f4f6f4",
+        "tonalRamp": [
+          "#222a22",
+          "#394639",
+          "#506250",
+          "#677e67",
+          "#819881",
+          "#9daf9d",
+          "#c7d1c7",
+          "#f1f4f1"
+        ]
+      },
+      "ledger-gray": {
+        "role": "neutral",
+        "displayName": "Ledger Gray",
+        "canonical": "#8b938b",
+        "tonalRamp": [
+          "#252825",
+          "#3d423d",
+          "#565c56",
+          "#6f776f",
+          "#889088",
+          "#a3a9a3",
+          "#caceca",
+          "#f2f3f2"
+        ]
+      },
+      "fresh-bill": {
+        "role": "primary",
+        "displayName": "Fresh Bill",
+        "canonical": "#7cd44a",
+        "tonalRamp": [
+          "#203e0f",
+          "#356718",
+          "#4a9022",
+          "#5fb92c",
+          "#79d346",
+          "#97dd6f",
+          "#c3ebad",
+          "#f0faea"
+        ]
+      },
+      "crisp-bill": {
+        "role": "primary",
+        "displayName": "Crisp Bill",
+        "canonical": "#8ee55c",
+        "tonalRamp": [
+          "#1f420b",
+          "#336e12",
+          "#489a19",
+          "#5cc620",
+          "#76df39",
+          "#94e665",
+          "#c2f1a7",
+          "#f0fbe9"
+        ]
+      },
+      "deep-ink": {
+        "role": "primary",
+        "displayName": "Deep Ink",
+        "canonical": "#2f7a1e",
+        "tonalRamp": [
+          "#183d0f",
+          "#276619",
+          "#378f23",
+          "#47b82d",
+          "#60d247",
+          "#84dc70",
+          "#b9ebad",
+          "#edfaeb"
+        ]
+      },
+      "red-flag": {
+        "role": "semantic",
+        "displayName": "Red Flag",
+        "canonical": "#ff5c5c",
+        "tonalRamp": [
+          "#4c0000",
+          "#800000",
+          "#b20000",
+          "#e60000",
+          "#ff1a1a",
+          "#ff4d4d",
+          "#ff9999",
+          "#ffe5e5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page and pair titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section and sheet titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Explanations and disclosures."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Stat captions and chips."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Prices, ranges, addresses; anything copyable."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-lift",
+        "value": "0 8px 24px -16px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.04)",
+        "purpose": "Cards, rows and stat tiles at rest."
+      },
+      {
+        "name": "elevated",
+        "value": "0 16px 40px -12px rgb(0 0 0 / 0.65), 0 2px 8px rgb(0 0 0 / 0.35)",
+        "purpose": "Menus, popovers, sheets."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-spring",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Pops, ticks and sheet rises."
+      },
+      {
+        "name": "press",
+        "value": "transform .12s cubic-bezier(.2,.8,.2,1)",
+        "purpose": "Button press to 98%."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one green action on a screen; names the outcome and amount.",
+      "html": "<button class=\"ds-btn-primary\">Withdraw $5.79</button>",
+      "css": ".ds-btn-primary{font-family:Geist, -apple-system, sans-serif;font-weight:600;font-size:1rem;background:var(--accent,#7cd44a);color:#000;border:0;border-radius:9999px;padding:12px 32px;transition:background-color .15s,transform .12s cubic-bezier(.2,.8,.2,1)}.ds-btn-primary:hover{background:var(--accent-strong,#8ee55c)}.ds-btn-primary:focus-visible{outline:2px solid var(--accent,#7cd44a);outline-offset:2px}.ds-btn-primary:active{transform:scale(.98)}.ds-btn-primary:disabled{opacity:.4;cursor:not-allowed}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet action beside the primary (Keep it, Cancel, Withdraw to USDC).",
+      "html": "<button class=\"ds-btn-secondary\">Keep it</button>",
+      "css": ".ds-btn-secondary{font-family:Geist, -apple-system, sans-serif;font-weight:600;font-size:.875rem;background:var(--surface-raised,#1b1f1b);color:var(--foreground,#f4f6f4);border:0;border-radius:9999px;padding:8px 20px;transition:background-color .15s,transform .12s}.ds-btn-secondary:hover{background:var(--border,#262b26)}.ds-btn-secondary:focus-visible{outline:2px solid var(--accent,#7cd44a);outline-offset:2px}.ds-btn-secondary:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Informational tag: fee tier, chain, state. Accent and negative variants sit on a 15% tint.",
+      "html": "<span class=\"ds-chip\">0.3% fee</span> <span class=\"ds-chip ds-chip--accent\">Earning</span> <span class=\"ds-chip ds-chip--negative\">No trades in 24h</span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;font-family:Geist, -apple-system, sans-serif;font-size:11px;font-weight:500;line-height:16px;padding:2px 8px;border-radius:9999px;background:var(--surface-raised,#1b1f1b);color:var(--muted,#8b938b);white-space:nowrap}.ds-chip--accent{background:rgba(124,212,74,.15);color:var(--accent,#7cd44a)}.ds-chip--negative{background:rgba(255,92,92,.15);color:var(--negative,#ff5c5c)}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A lifted felt slab: position card, stat tile, deposit panel.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card__label\">In positions</p><p class=\"ds-card__money\">$5.83</p><p class=\"ds-card__note\">+ $5.04 cash available</p></div>",
+      "css": ".ds-card{font-family:Geist, -apple-system, sans-serif;background:var(--surface,#141714);color:var(--foreground,#f4f6f4);border-radius:24px;padding:20px;box-shadow:0 8px 24px -16px rgb(0 0 0/.7),inset 0 1px 0 rgb(255 255 255/.04)}.ds-card__label{margin:0;font-size:.875rem;color:var(--muted,#8b938b)}.ds-card__money{margin:4px 0;font-size:2.25rem;font-weight:700;letter-spacing:-.02em;font-feature-settings:'tnum'}.ds-card__note{margin:0;font-size:.875rem;color:var(--muted,#8b938b)}"
+    },
+    {
+      "name": "Amount Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The deposit field: a bare bold figure after a dollar sign, on the drawer-black well for smaller fields.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field__label\">Range width (\u00b1%)</span><input class=\"ds-input\" placeholder=\"full range\" /></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:4px;font-family:Geist, -apple-system, sans-serif;font-size:12px;color:var(--muted,#8b938b)}.ds-input{font-family:Geist, -apple-system, sans-serif;font-size:.875rem;background:var(--background,#0b0d0b);color:var(--foreground,#f4f6f4);border:0;border-radius:12px;padding:8px;outline:none}.ds-input::placeholder{color:rgba(139,147,139,.55)}.ds-input:focus-visible{outline:2px solid var(--accent,#7cd44a);outline-offset:2px}"
+    },
+    {
+      "name": "Navigation Tabs",
+      "kind": "nav",
+      "refersTo": "nav-tab-active",
+      "description": "Header tabs on desktop; active tab sits on Till.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav__tab\">Pools</a><a class=\"ds-nav__tab ds-nav__tab--active\">Portfolio</a><a class=\"ds-nav__tab\">Account</a></nav>",
+      "css": ".ds-nav{display:flex;gap:4px;font-family:Geist, -apple-system, sans-serif}.ds-nav__tab{font-size:.875rem;color:var(--muted,#8b938b);padding:6px 16px;border-radius:9999px;text-decoration:none;transition:color .15s,background-color .15s}.ds-nav__tab:hover{color:var(--foreground,#f4f6f4)}.ds-nav__tab--active{background:var(--surface-raised,#1b1f1b);color:var(--foreground,#f4f6f4)}"
+    },
+    {
+      "name": "Select",
+      "kind": "custom",
+      "refersTo": "select-trigger",
+      "description": "Own listbox: pill trigger with a rotating chevron, elevated Till menu, green check on the current option.",
+      "html": "<div class=\"ds-select\"><button class=\"ds-select__trigger\" aria-expanded=\"true\">Most liquid <svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><path d=\"M4 6l4 4 4-4\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button><ul class=\"ds-select__menu\" role=\"listbox\"><li class=\"ds-select__opt ds-select__opt--selected\" role=\"option\" aria-selected=\"true\"><span>Most liquid<small>Deepest pools first</small></span><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\"><path d=\"M3 8.5l3 3 7-7\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></li><li class=\"ds-select__opt\" role=\"option\"><span>Highest APR<small>Best recent fee rate</small></span></li><li class=\"ds-select__opt\" role=\"option\"><span>Most traded<small>Busiest in 24h</small></span></li></ul></div>",
+      "css": ".ds-select{position:relative;display:inline-block;font-family:Geist, -apple-system, sans-serif}.ds-select__trigger{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 10px 0 14px;border:0;border-radius:9999px;background:var(--surface-raised,#1b1f1b);color:var(--foreground,#f4f6f4);font-size:.875rem;font-weight:500}.ds-select__trigger svg{transform:rotate(180deg)}.ds-select__menu{list-style:none;margin:6px 0 0;padding:4px;min-width:11rem;border-radius:16px;border:1px solid var(--border,#262b26);background:var(--surface-raised,#1b1f1b);box-shadow:0 16px 40px -12px rgb(0 0 0/.65),0 2px 8px rgb(0 0 0/.35)}.ds-select__opt{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;font-size:.875rem;color:var(--muted,#8b938b);cursor:pointer}.ds-select__opt small{display:block;font-size:11px}.ds-select__opt:hover{background:var(--surface,#141714);color:var(--foreground,#f4f6f4)}.ds-select__opt--selected{color:var(--foreground,#f4f6f4);font-weight:600}.ds-select__opt--selected svg{color:var(--accent,#7cd44a)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Cash Drawer",
+    "overview": "vaults.cash looks like the inside of a cash drawer at night: a near-black felt bed, one green that reads as money, and every figure printed where a teller can read it at a glance. Surfaces are slabs that sit on the felt (lifted, not floating), controls are pills you can press, and numbers are the loudest thing on any screen. The mood is playful but precise: motion has character only where it explains something, and never on a number.",
+    "keyCharacteristics": [
+      "Near-black tonal layering with a single money-green accent",
+      "Tabular figures everywhere a number lives; mono for prices, ranges, addresses",
+      "Pills for everything interactive; big radii for everything that contains",
+      "Lifted cards on a felt bed; stronger lift only for things that float",
+      "One authored motion moment per surface, spring-eased, reduced-motion safe"
+    ],
+    "rules": [
+      {
+        "name": "The One Green Rule",
+        "body": "Fresh Bill appears on at most one action per screen and on figures that represent money earned. If two things are green, one of them is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tinted Semantic Rule",
+        "body": "Red and green state chips sit on a 15% tint of their own hue, never on gray.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ledger Rule",
+        "body": "A number the user might act on is set in Geist Mono with tabular figures. Prose numbers stay in Geist.",
+        "section": "typography"
+      },
+      {
+        "name": "The Slab Rule",
+        "body": "Shadows have an offset and a blur, always downward. A zero-offset halo is decoration and is not part of this system.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put the fee, the minimum you receive, and the chain on every confirm sheet before the button.",
+      "Do set money in tabular figures and copyable values in Geist Mono.",
+      "Do use one green action per screen and let it be the only saturated thing in view.",
+      "Do lift cards with the card-lift shadow and reserve the elevated shadow for menus and sheets.",
+      "Do give every custom control keyboard behavior and the accent focus ring; sheets trap focus and restore it.",
+      "Do respect reduced motion; the pop and rise animations switch off."
+    ],
+    "donts": [
+      "Don't use gradient text, glass panels as decoration, or glows in place of shadows.",
+      "Don't invent proof: no testimonials, TVL badges, \"audited\" claims or APY promises anywhere in the UI.",
+      "Don't use emoji or unicode glyphs as icons; draw SVG at 14 to 16px in a 1.75 stroke.",
+      "Don't hide which chain money is on, and don't show an amount without its currency.",
+      "Don't put a colored left border on cards or alerts; state lives in the chip, not the frame."
+    ]
+  }
+}

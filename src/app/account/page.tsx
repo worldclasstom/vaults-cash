@@ -65,12 +65,12 @@ export default function AccountPage() {
         <div className="animate-rise space-y-4 py-4">
           <h1 className="text-2xl font-bold">Account</h1>
 
-          <section className="rounded-3xl bg-surface p-5">
+          <section className="rounded-3xl bg-surface shadow-card p-5">
             <p className="text-sm text-muted">Signed in as</p>
             <p className="pt-0.5 font-semibold break-all">{loginId}</p>
           </section>
 
-          <section className="rounded-3xl bg-surface p-5">
+          <section className="rounded-3xl bg-surface shadow-card p-5">
             <p className="pb-1 text-sm text-muted">
               Your wallet — same address on Base and Robinhood Chain
             </p>
@@ -131,7 +131,7 @@ export default function AccountPage() {
 
           <InviteCard />
 
-          <section className="rounded-3xl bg-surface p-5">
+          <section className="rounded-3xl bg-surface shadow-card p-5">
             <Link
               href="/how-it-works"
               className="block py-1 text-sm text-muted transition-colors hover:text-foreground"

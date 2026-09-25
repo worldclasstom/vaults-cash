@@ -31,7 +31,7 @@ export default function HowItWorksPage() {
           </p>
         </header>
 
-        <section className="rounded-3xl bg-surface p-6">
+        <section className="rounded-3xl bg-surface shadow-card p-6">
           <h2 className="pb-4 text-lg font-semibold">
             When you deposit — say, $100 into the ETH market
           </h2>
@@ -63,7 +63,7 @@ export default function HowItWorksPage() {
           </ol>
         </section>
 
-        <section className="rounded-3xl bg-surface p-6">
+        <section className="rounded-3xl bg-surface shadow-card p-6">
           <h2 className="pb-2 text-lg font-semibold">How you earn</h2>
           <p className="text-sm leading-relaxed text-muted">
             Every trade in your pool pays a fee to its liquidity providers —
@@ -74,7 +74,7 @@ export default function HowItWorksPage() {
           </p>
         </section>
 
-        <section className="rounded-3xl bg-surface p-6">
+        <section className="rounded-3xl bg-surface shadow-card p-6">
           <h2 className="pb-2 text-lg font-semibold">When you withdraw</h2>
           <p className="text-sm leading-relaxed text-muted">
             The position is burned, both halves come back, and the non-USDC
@@ -85,7 +85,7 @@ export default function HowItWorksPage() {
           </p>
         </section>
 
-        <section className="rounded-3xl bg-surface p-6">
+        <section className="rounded-3xl bg-surface shadow-card p-6">
           <h2 className="pb-3 text-lg font-semibold">The honest risk list</h2>
           <ul className="space-y-3 text-sm leading-relaxed text-muted">
             <li>
@@ -115,7 +115,7 @@ export default function HowItWorksPage() {
           </ul>
         </section>
 
-        <section className="rounded-3xl bg-surface p-6">
+        <section className="rounded-3xl bg-surface shadow-card p-6">
           <h2 className="pb-2 text-lg font-semibold">Don&apos;t trust — verify</h2>
           <p className="text-sm leading-relaxed text-muted">
             Every claim above is checkable. Your wallet, your positions, our
