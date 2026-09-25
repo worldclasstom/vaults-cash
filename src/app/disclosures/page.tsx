@@ -1,69 +1,106 @@
 import { MarketingShell } from "@/components/MarketingShell";
+import { ChainChip, Chip } from "@/components/TokenIcon";
+import { MIN_DEPOSIT_USD } from "@/lib/limits";
 
 export const metadata = { title: "Disclosures — vaults.cash" };
+
+const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100;
+
+function Section({ title, sticker, children }: { title: string; sticker?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="rounded-3xl bg-surface p-6 shadow-card sm:p-7">
+      <div className="flex flex-wrap items-center gap-3 pb-3">
+        <h2 className="font-display text-2xl font-extrabold tracking-tight">{title}</h2>
+        {sticker}
+      </div>
+      <div className="space-y-3 text-sm leading-relaxed text-muted">{children}</div>
+    </section>
+  );
+}
 
 export default function DisclosuresPage() {
   return (
     <MarketingShell>
-      <div className="mx-auto max-w-2xl animate-rise px-6 py-14">
-        <h1 className="pb-6 text-3xl font-bold">Disclosures</h1>
-        <div className="space-y-6 text-sm leading-relaxed text-muted">
-          <section>
-            <h2 className="pb-1 font-semibold text-foreground">What vaults.cash is</h2>
-            <p>
-              vaults.cash is a self-custodial interface for providing liquidity to
-              Uniswap pools on Base and Robinhood Chain. Your funds sit in your own
-              wallet and in pool positions you own — vaults.cash never takes
-              custody. vaults.cash is not affiliated with, endorsed by, or
-              sponsored by Coinbase, Robinhood, Uniswap Labs, Circle, or Paxos.
-              Markets labeled &ldquo;stock token&rdquo; are Robinhood-issued tokens
-              on Robinhood Chain that track a US equity or ETF; they are not
-              the underlying shares, carry no shareholder rights, and their
-              availability depends on your jurisdiction. vaults.cash does not
-              issue them.
-            </p>
-          </section>
-          <section>
-            <h2 className="pb-1 font-semibold text-foreground">Fees</h2>
-            <p>
-              vaults.cash charges {Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of
-              the amount converted when you enter or exit a position. Pool trading
-              fees you earn are yours entirely. Network (gas) fees — typically
-              under $0.02 per action — are paid from your wallet directly to the
-              blockchain; vaults.cash does not mark them up or profit from them.
-            </p>
-          </section>
-          <section>
-            <h2 className="pb-1 font-semibold text-foreground">Risks</h2>
-            <p>
-              Liquidity positions are not deposits and are not insured. The value
-              of a position changes with the price of the assets in it, and
-              concentrated positions can underperform simply holding the assets
-              (&quot;impermanent loss&quot;). Positions can go out of range and stop
-              earning. Smart contracts can have bugs. Never deposit more than you
-              can afford to lose.
-            </p>
-          </section>
-          <section>
-            <h2 className="pb-1 font-semibold text-foreground">Stablecoin pairs</h2>
-            <p>
-              Markets marked &quot;Stablecoin&quot; pair USDC against another
-              dollar-denominated token. Because both sides track the dollar,
-              impermanent loss is typically minimal — but it is not zero:
-              stablecoins can and do de-peg, and a de-peg is realized as a loss
-              in the position. Stablecoins are not bank deposits and are not
-              FDIC-insured.
-            </p>
-          </section>
-          <section>
-            <h2 className="pb-1 font-semibold text-foreground">No advice</h2>
-            <p>
-              Nothing here is investment, legal, or tax advice. Estimated APRs are
-              extrapolations of recent pool activity and are not promises of
-              future returns.
-            </p>
-          </section>
-        </div>
+      <div className="mx-auto max-w-3xl animate-rise space-y-6 px-4 py-14 sm:px-6">
+        <header className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Chip>Plain words</Chip>
+            <ChainChip chainId={8453} />
+            <ChainChip chainId={4663} long />
+          </div>
+          <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-6xl">Disclosures</h1>
+          <p className="max-w-xl text-lg text-muted">
+            Everything we charge, everything that can go wrong, and what we are not. Short on purpose.
+          </p>
+        </header>
+
+        <Section title="What vaults.cash is" sticker={<Chip tone="accent">Self-custodial</Chip>}>
+          <p>
+            vaults.cash is a self-custodial interface for providing liquidity to Uniswap v4 pools on Base and Robinhood
+            Chain. Your funds sit in your own wallet and in pool positions you own. vaults.cash deploys no smart contracts
+            and never takes custody. It is not affiliated with, endorsed by, or sponsored by Coinbase, Robinhood, Uniswap
+            Labs, Circle, Paxos, Privy or Relay.
+          </p>
+          <p>
+            Markets labelled &ldquo;Stock token&rdquo; are Robinhood-issued tokens on Robinhood Chain that track a US
+            equity or ETF. They are not the underlying shares, carry no shareholder rights, and their availability depends
+            on your jurisdiction. vaults.cash does not issue them.
+          </p>
+        </Section>
+
+        <Section title="Fees" sticker={<Chip>{FEE_PCT}% flat</Chip>}>
+          <p>
+            vaults.cash charges {FEE_PCT}% of the amount converted when you enter a position, and {FEE_PCT}% of the amount
+            converted back when you exit. It is a plain transfer inside the transaction you review before signing. Pool
+            trading fees you earn are yours entirely. The minimum deposit is ${MIN_DEPOSIT_USD}.
+          </p>
+          <p>
+            If you were invited, half of our fee on your deposits is paid to the person who invited you, on-chain, in the
+            same transaction. It does not change what you pay.
+          </p>
+          <p>
+            Network fees: on Base, vaults.cash pays them for you. On Robinhood Chain you pay them from the ETH in your
+            wallet, typically a few cents per action, directly to the network. vaults.cash never marks them up.
+          </p>
+          <p>
+            Moving dollars between chains uses Relay, a third-party bridge. Relay&apos;s route fee and the conversion
+            rate are shown before you confirm; vaults.cash charges nothing for it.
+          </p>
+        </Section>
+
+        <Section title="Risks" sticker={<Chip tone="negative">Read this one</Chip>}>
+          <p>
+            Liquidity positions are not deposits and are not insured. The value of a position changes with the price of
+            the assets in it, and concentrated positions can underperform simply holding the assets (&ldquo;impermanent
+            loss&rdquo;). Positions can go out of range and stop earning. Uniswap&apos;s contracts are widely audited but
+            no smart contract is risk-free. Never deposit more than you can afford to lose.
+          </p>
+        </Section>
+
+        <Section title="Steady pairs" sticker={<Chip tone="accent">Steady</Chip>}>
+          <p>
+            Markets marked &ldquo;Steady&rdquo; pair two assets that track the same thing, such as staked ETH against ETH,
+            or one dollar token against another. Because both sides move together, impermanent loss is typically minimal.
+            It is not zero: a stablecoin can de-peg and a staked token can trade away from its underlying, and either is
+            realized as a loss in the position. Stablecoins are not bank deposits and are not FDIC-insured.
+          </p>
+        </Section>
+
+        <Section title="Agent access" sticker={<Chip>Optional</Chip>}>
+          <p>
+            If you turn on agent access from your Account page, you authorize vaults.cash&apos;s server to sign
+            transactions from your wallet through Privy, limited to depositing, adding, withdrawing and collecting through
+            vaults.cash. Anyone holding an account key you create can trigger those actions. You can revoke keys and turn
+            access off at any time; until you do, treat a key like a password.
+          </p>
+        </Section>
+
+        <Section title="No advice">
+          <p>
+            Nothing here is investment, legal, or tax advice. Estimated APRs are extrapolations of the last 24 hours of
+            real pool activity and are not promises of future returns. Availability may be restricted in some regions.
+          </p>
+        </Section>
       </div>
     </MarketingShell>
   );
