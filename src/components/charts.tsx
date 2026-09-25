@@ -101,12 +101,17 @@ export function MarketChart({
               d={d}
               fill="none"
               stroke={s.color}
-              strokeWidth={s.width ?? 1.75}
+              strokeWidth={s.width ?? 2.25}
               strokeLinejoin="round"
               strokeDasharray={s.dashed ? "3 4" : undefined}
             />
             {/* live endpoint */}
-            {!s.dashed && <circle cx={last[0]} cy={last[1]} r="2.5" fill={s.color} />}
+            {!s.dashed && (
+              <>
+                <circle cx={last[0]} cy={last[1]} r="5" fill="var(--foreground)" />
+                <circle cx={last[0]} cy={last[1]} r="3" fill={s.color} />
+              </>
+            )}
             {/* "+$" fee badges */}
             {s.ticks?.map((idx, j) => {
               const [x, y] = pts[idx];
@@ -116,17 +121,21 @@ export function MarketChart({
                   className="tick-pop"
                   style={{ animationDelay: `${0.6 + j * 0.3}s` }}
                 >
-                  <circle cx={x} cy={y - 14} r="8.5" fill={s.color} opacity="0.16" />
-                  <text
-                    x={x}
-                    y={y - 11}
-                    textAnchor="middle"
-                    fontSize="8"
-                    fontWeight="700"
-                    fill={s.color}
-                  >
-                    +$
-                  </text>
+                  {/* a sticker: filled pill, white edge, a little crooked */}
+                  <g transform={`rotate(${j % 2 ? 6 : -6} ${x} ${y - 14})`}>
+                    <rect x={x - 12} y={y - 22} width="24" height="16" rx="8" fill={s.color} stroke="var(--foreground)" strokeWidth="1.75" />
+                    <text
+                      x={x}
+                      y={y - 10.5}
+                      textAnchor="middle"
+                      fontSize="9"
+                      fontWeight="800"
+                      fontFamily="var(--font-bricolage), var(--font-geist-sans), sans-serif"
+                      fill="#000"
+                    >
+                      +$
+                    </text>
+                  </g>
                 </g>
               );
             })}

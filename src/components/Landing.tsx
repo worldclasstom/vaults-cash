@@ -156,8 +156,8 @@ export function Landing() {
           <div className="rounded-3xl border border-borderline bg-surface/80 p-6 shadow-2xl shadow-black/40 backdrop-blur">
             <div className="flex items-center justify-between pb-4">
               <p className="font-semibold">Your position</p>
-              <span className="flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
+              <span className="sticker inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs text-black">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-black" />
                 Earning
               </span>
             </div>
@@ -185,35 +185,35 @@ export function Landing() {
       {/* why */}
       <section className="border-y border-borderline/60 bg-surface/30">
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-          <h2 className="max-w-2xl text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="max-w-2xl text-balance font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
             Between trading and holding, there&apos;s{" "}
             <span className="text-accent">earning</span>.
           </h2>
           <div className="grid gap-5 pt-10 md:grid-cols-3">
-            <div className="rounded-3xl border border-borderline bg-surface p-7">
+            <div className="tilt rounded-3xl border border-borderline bg-surface p-7 shadow-card">
               <MarketChart series={[{ ys: TRADER_YS, color: "var(--negative)", fill: true }]} />
-              <p className="pt-5 text-lg font-semibold">Trading is hard</p>
+              <p className="pt-5 font-display text-xl font-extrabold">Trading is hard</p>
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Timing the market is a full-time job, and most people who try
                 end up behind where simply holding would have left them.
               </p>
             </div>
-            <div className="rounded-3xl border border-borderline bg-surface p-7">
+            <div className="tilt rounded-3xl border border-borderline bg-surface p-7 shadow-card">
               <MarketChart domain={[88, 112]} series={[{ ys: HOLDER_YS, color: "var(--muted)" }]} />
-              <p className="pt-5 text-lg font-semibold">Holding earns nothing</p>
+              <p className="pt-5 font-display text-xl font-extrabold">Holding earns nothing</p>
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Holding is easier — but your assets just sit there. No income,
                 no cashflow, nothing working for you.
               </p>
             </div>
-            <div className="rounded-3xl border border-accent/40 bg-surface p-7">
+            <div className="tilt rounded-3xl border border-accent/40 bg-surface p-7 shadow-card">
               <MarketChart
                 series={[
                   { ys: HOLDER_YS, color: "var(--muted)", width: 1.25, dashed: true },
                   { ys: EARNER_YS, color: "var(--accent)", fill: true, ticks: [12, 26, 40, 52] },
                 ]}
               />
-              <p className="pt-5 text-lg font-semibold text-accent">Hold — and collect</p>
+              <p className="pt-5 font-display text-xl font-extrabold text-accent">Hold — and collect</p>
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Your assets sit in a market position that traders trade
                 against. You keep holding; every trade pays you a fee — in
@@ -229,7 +229,7 @@ export function Landing() {
         <CashStack className="pointer-events-none absolute -left-16 top-4 -z-10 h-[340px] w-[340px] opacity-[0.15] sm:opacity-[0.18] lg:-left-20 lg:top-1/2 lg:h-[520px] lg:w-[520px] lg:-translate-y-1/2" />
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:py-24 lg:grid-cols-2 lg:gap-16">
           <div>
-            <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="text-balance font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
               What could that earn?
             </h2>
             <p className="max-w-md pt-4 text-lg leading-relaxed text-muted">
@@ -251,7 +251,7 @@ export function Landing() {
       {/* how */}
       <section className="border-y border-borderline/60 bg-surface/30">
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-balance font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
             Three taps, no jargon
           </h2>
           <div className="grid gap-5 pt-10 md:grid-cols-3">
@@ -272,11 +272,11 @@ export function Landing() {
                 d: "Trading fees accrue to your position. Withdraw back to cash anytime.",
               },
             ].map((s) => (
-              <div key={s.n} className="rounded-3xl border border-borderline bg-surface p-7">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/15 font-mono text-base font-bold text-accent">
+              <div key={s.n} className="tilt rounded-3xl border border-borderline bg-surface p-7 shadow-card">
+                <span className="sticker flex h-10 w-10 items-center justify-center rounded-full bg-accent text-base text-black">
                   {s.n}
                 </span>
-                <p className="pt-4 text-lg font-semibold">{s.t}</p>
+                <p className="pt-4 font-display text-xl font-extrabold">{s.t}</p>
                 <p className="pt-2 text-sm leading-relaxed text-muted">{s.d}</p>
               </div>
             ))}
@@ -297,7 +297,7 @@ export function Landing() {
         <RobinhoodMark className="pointer-events-none absolute -left-12 -top-10 -z-10 h-[380px] w-[284px] text-[#00C805] opacity-[0.16] sm:-left-8 sm:-top-6 sm:h-[620px] sm:w-[464px] sm:opacity-20" />
         <BaseMark className="pointer-events-none absolute -right-16 -top-16 -z-10 h-[380px] w-[380px] text-[#0052ff] opacity-[0.16] sm:-right-12 sm:h-[620px] sm:w-[620px] sm:opacity-20" />
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-balance font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
             Built on Base and Robinhood Chain
           </h2>
           <p className="max-w-2xl pt-4 text-lg leading-relaxed text-muted">
@@ -313,8 +313,8 @@ export function Landing() {
               ["Real depth", "ETH, Bitcoin, blue-chip DeFi and Robinhood stock tokens, with the trading volume to actually generate fees."],
               ["Fully public", "Every position, fee, and trade is verifiable on the public explorers. Nothing happens behind a curtain."],
             ].map(([t, d]) => (
-              <li key={t} className="rounded-3xl border border-borderline bg-surface p-7">
-                <p className="text-lg font-semibold">{t}</p>
+              <li key={t} className="tilt rounded-3xl border border-borderline bg-surface p-7 shadow-card">
+                <p className="font-display text-xl font-extrabold">{t}</p>
                 <p className="pt-2 text-sm leading-relaxed text-muted">{d}</p>
               </li>
             ))}
@@ -330,7 +330,7 @@ export function Landing() {
       {/* final CTA */}
       <section className="border-t border-borderline/60 bg-surface/30">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-7 px-6 py-20 text-center sm:py-24">
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+          <h2 className="text-balance font-display text-3xl font-extrabold tracking-tight sm:text-5xl">
             Put your cash on the <span className="text-accent">earning side</span>.
           </h2>
           <ul className="flex flex-col gap-2 text-left text-sm text-muted sm:flex-row sm:gap-8">

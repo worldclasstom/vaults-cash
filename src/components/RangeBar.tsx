@@ -36,7 +36,7 @@ export function RangeBar({
   const bandL = full ? 0 : Math.max(0, x(lower));
   const bandR = full ? 100 : Math.min(100, x(upper));
   const cur = Math.min(99, Math.max(1, x(price)));
-  const h = compact ? 6 : 10;
+  const h = compact ? 8 : 14;
   const tone = inRange ? "bg-accent" : "bg-negative";
 
   return (
@@ -50,14 +50,14 @@ export function RangeBar({
           </>
         )}
         <div
-          className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-foreground shadow"
-          style={{ left: `${cur}%`, height: compact ? 12 : 16, width: compact ? 12 : 16 }}
+          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-background bg-foreground shadow-elevated"
+          style={{ left: `${cur}%`, height: compact ? 16 : 22, width: compact ? 16 : 22 }}
           title={`Now ${unit}${fmtPrice(price)}`}
         />
       </div>
       <div className={`flex justify-between font-mono text-muted ${compact ? "text-[10px]" : "text-xs"}`}>
         <span>{full ? "Any price" : `${unit}${fmtPrice(lower)}`}</span>
-        <span className="text-foreground">
+        <span className="font-display font-bold text-foreground">
           now {unit}
           {fmtPrice(price)}
         </span>

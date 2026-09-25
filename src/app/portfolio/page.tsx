@@ -357,9 +357,10 @@ function EmptyPositions() {
   }
   return (
     <div className="rounded-3xl bg-surface shadow-card p-8 text-center">
-      <p className="pb-3 text-muted">No positions yet.</p>
-      <Link href="/" className="font-semibold text-accent hover:underline">
-        Explore pools →
+      <p className="font-display text-2xl font-extrabold">Nothing earning yet</p>
+      <p className="pt-2 text-sm text-muted">Pick a pool, type a dollar amount, and traders start paying you on the next trade.</p>
+      <Link href="/pools" className="mt-5 inline-block rounded-full bg-accent px-7 py-3 font-display text-base font-extrabold text-black transition-colors hover:bg-accent-strong">
+        Explore pools
       </Link>
     </div>
   );

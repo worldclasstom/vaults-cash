@@ -333,7 +333,7 @@ function HowItWorks({ market }: { market: Market }) {
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <div className="flex gap-3">
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-bold text-accent">{n}</span>
+      <span className="sticker flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-xs text-black">{n}</span>
       <div>
         <p className="font-medium">{title}</p>
         <p className="pt-0.5 text-muted">{children}</p>

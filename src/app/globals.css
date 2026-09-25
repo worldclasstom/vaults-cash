@@ -122,6 +122,9 @@ input::placeholder {
     animation: none;
     opacity: 0;
   }
+  .rise {
+    animation: none;
+  }
   .tilt,
   .nudge,
   button {
@@ -211,6 +214,10 @@ body {
 }
 .animate-cash-up {
   animation: cash-up 2.2s ease-out infinite;
+}
+/* diagram pieces land one after another */
+.rise {
+  animation: rise 0.6s var(--ease-bounce) both;
 }
 
 @keyframes bob {
