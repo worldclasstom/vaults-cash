@@ -16,6 +16,13 @@ that history is in docs/DECISIONS.md._
 
 ## Next
 
+- **Swap indexer cron (before Targets).** The activity engine caches each
+  pool's 24h swaps in serverless memory, so a cold instance re-pays the
+  first-load scan (~9s for a busy pool). Replace with a one-minute cron that
+  appends new Swap events for every listed pool into Neon; page views then
+  read from the table with zero RPC, and the same table is the trigger
+  source for "rung sold" notifications and Targets auto-close.
+
 - **Targets — range orders for people who think in prices.** Buy the asset,
   set a range from today's price to an exit target, collect fees as price
   walks through it; the mirror (stable-only range below price) is a buy
