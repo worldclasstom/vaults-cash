@@ -24,9 +24,9 @@ export function LogoMark({ size = 28 }: { size?: number }) {
 
 export function Wordmark() {
   return (
-    <span className="flex items-center gap-2 font-semibold tracking-tight">
+    <span className="flex items-center gap-2 font-display font-extrabold tracking-tight">
       <LogoMark />
-      <span className="text-lg">
+      <span className="text-xl">
         vaults<span className="text-accent">.cash</span>
       </span>
     </span>

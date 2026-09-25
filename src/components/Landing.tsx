@@ -129,7 +129,7 @@ export function Landing() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-16 sm:pt-24 lg:grid-cols-2 lg:gap-16 lg:pb-28">
           <div className="flex flex-col items-start gap-6">
             <div className="flex flex-wrap gap-2">
-              <Chip tone="accent">Live now</Chip>
+              <Chip>Live now</Chip>
               <ChainChip chainId={8453} />
               <ChainChip chainId={4663} long />
             </div>
