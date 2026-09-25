@@ -133,7 +133,6 @@ function Dashboard() {
   const { data: cash } = useCashBalances();
   const { data: ethBalance } = useTokenBalance(NATIVE_ETH, 18);
   const { data: assetBalances } = useAssetBalances();
-  const otherCash = (cash?.perChain ?? []).filter((c) => c.chainId !== 8453 && c.formatted > 0);
   const [showReceive, setShowReceive] = useState(false);
   const [showSend, setShowSend] = useState(false);
   const [copied, setCopied] = useState(false);
