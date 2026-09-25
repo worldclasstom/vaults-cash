@@ -80,7 +80,13 @@ async function mintBlock(chainId: ChainId, tokenId: bigint, head: bigint): Promi
 const SCAN_TTL_MS = 30_000;
 const SCAN_BUDGET_MS = 8_000;
 
-/** The pool's swaps over the last day, newest first; cached 30s per pool. */
+/**
+ * The pool's swaps over the last day, newest first. The first call pays for
+ * a full day of logs; after that each refresh only fetches the blocks mined
+ * since the last one (a few hundred on Base, a few thousand on Robinhood)
+ * and prunes what fell out of the window, so steady-state cost is one small
+ * getLogs per pool per refresh no matter how busy the pool is.
+ */
 async function poolSwaps(chainId: ChainId, poolId: `0x${string}`): Promise<PoolScan> {
   const key = `${chainId}:${poolId}`;
   const hit = scans.get(key);
@@ -89,20 +95,38 @@ async function poolSwaps(chainId: ChainId, poolId: `0x${string}`): Promise<PoolS
   const head = await client.getBlockNumber();
   const floor = head - BLOCKS_PER_DAY[chainId];
   const pm = CHAINS[chainId].uniswap.v4.poolManager;
-  const logs: SwapLog[] = [];
-  let partial = false;
   const start = Date.now();
-  // newest chunks first so the feed is right even when we run out of time
-  for (let to = head; to > floor; to -= CHUNK[chainId]) {
-    if (Date.now() - start > SCAN_BUDGET_MS) {
-      partial = true;
-      break;
+  const fetchRange = async (from: bigint, to: bigint): Promise<{ logs: SwapLog[]; partial: boolean }> => {
+    const out: SwapLog[] = [];
+    let partial = false;
+    for (let hi = to; hi >= from; hi -= CHUNK[chainId]) {
+      if (Date.now() - start > SCAN_BUDGET_MS) {
+        partial = true;
+        break;
+      }
+      const lo = hi - CHUNK[chainId] + 1n > from ? hi - CHUNK[chainId] + 1n : from;
+      const raw = await client.getLogs({ address: pm, event: SWAP, args: { id: poolId }, fromBlock: lo, toBlock: hi });
+      for (const l of raw) {
+        out.push({ txHash: l.transactionHash, block: l.blockNumber, amount0: l.args.amount0!, amount1: l.args.amount1!, tick: l.args.tick!, liquidity: l.args.liquidity! });
+      }
     }
-    const from = to - CHUNK[chainId] + 1n > floor ? to - CHUNK[chainId] + 1n : floor + 1n;
-    const raw = await client.getLogs({ address: pm, event: SWAP, args: { id: poolId }, fromBlock: from, toBlock: to });
-    for (const l of raw) {
-      logs.push({ txHash: l.transactionHash, block: l.blockNumber, amount0: l.args.amount0!, amount1: l.args.amount1!, tick: l.args.tick!, liquidity: l.args.liquidity! });
-    }
+    return { logs: out, partial };
+  };
+
+  let logs: SwapLog[];
+  let partial: boolean;
+  if (hit && !hit.partial && hit.head >= floor && hit.head < head) {
+    // incremental: only the new blocks, then drop what's older than a day
+    const delta = await fetchRange(hit.head + 1n, head);
+    logs = [...delta.logs, ...hit.logs.filter((l) => l.block > floor)];
+    partial = delta.partial;
+  } else if (hit && hit.head === head) {
+    logs = hit.logs;
+    partial = hit.partial;
+  } else {
+    const full = await fetchRange(floor + 1n, head);
+    logs = full.logs;
+    partial = full.partial;
   }
   logs.sort((a, b) => (a.block > b.block ? -1 : a.block < b.block ? 1 : 0));
   const scan = { at: Date.now(), head, logs, partial };
