@@ -191,8 +191,12 @@ A drawer palette: black felt, white bills, one green, one red flag.
   tabs. Never for a number that matters.
 
 ### Secondary
-- **Sticker Yellow** (#ffd23f): the chain sticker (Base, Robinhood) and
-  nothing else. Never a button, never text on dark.
+- **Sticker Yellow** (#ffd23f): the info sticker for things that are neither
+  good nor bad (a "Base + Robinhood" note, a category). Never a button.
+- **Base Blue** (#0052ff, white text) and **Robinhood Green** (#00c805, black
+  text): the chain stickers, in the chains' own colors, so a glance says
+  where money is. Robinhood's green is deeper and purer than Fresh Bill and
+  always carries black text; Fresh Bill stays the only green on actions.
 
 ### Semantic
 - **Red Flag** (#ff5c5c): the warn sticker (Out of range, No trades in 24h),
@@ -300,7 +304,8 @@ a circle; pair marks overlap with the base token on top.
   edge, `0 2px 6px rgb(0 0 0 / .45)` shadow, rotated -3° / 2.5° / -1.5° by
   position in the row.
 - **Meaning:** white (fee tier, stock token), green (Earning, Steady), red
-  (Out of range, No trades in 24h), yellow (chain). Stickers inform; they are
+  (Out of range, No trades in 24h), yellow (info), Base blue / Robinhood
+  green (which chain). Stickers inform; they are
   not buttons.
 
 ### Cards / Containers

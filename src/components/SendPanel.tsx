@@ -9,7 +9,7 @@ import { fmtAmount } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 import { useQuoteBalance, useTokenBalance } from "@/hooks/useChainData";
 import { Sheet } from "./Sheet";
-import { Chip } from "./TokenIcon";
+import { ChainChip } from "./TokenIcon";
 
 type Asset = "quote" | "ETH";
 
@@ -186,7 +186,7 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
             {fmtAmount(Number(amount), 6)} <span className="text-xl text-muted">{assetLabel}</span>
           </p>
           <div className="flex items-center gap-2 pt-2">
-            <Chip tone="outline">{chain.label}</Chip>
+            <ChainChip chainId={chainId} />
             <span className="text-xs text-muted">only an address on {chain.chain.name} can receive this</span>
           </div>
           <dl className="space-y-2 py-4 text-sm">

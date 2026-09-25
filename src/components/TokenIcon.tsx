@@ -61,21 +61,30 @@ export function Chip({
   title,
 }: {
   children: React.ReactNode;
-  tone?: "muted" | "accent" | "negative" | "outline";
+  tone?: "muted" | "accent" | "negative" | "outline" | "base" | "robinhood";
   title?: string;
 }) {
-  // stickers: white edge, a color per meaning (neutral / good / warn / chain)
+  // stickers: white edge, a color per meaning (neutral / good / warn / info),
+  // and the chains in their own brand colors so a glance says where money is
   const cls = {
     muted: "bg-foreground text-background",
     accent: "bg-accent text-black",
     negative: "bg-negative text-white",
     outline: "bg-sticker-yellow text-black",
+    base: "bg-[#0052ff] text-white",
+    robinhood: "bg-[#00c805] text-black",
   }[tone];
   return (
     <span title={title} className={`sticker inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] leading-4 ${cls}`}>
       {children}
     </span>
   );
+}
+
+/** A chain in its own colors: Base blue, Robinhood green. */
+export function ChainChip({ chainId, long = false }: { chainId: number; long?: boolean }) {
+  const cfg = chainConfig(chainId);
+  return <Chip tone={chainId === 8453 ? "base" : "robinhood"}>{long ? cfg.chain.name : cfg.label}</Chip>;
 }
 
 /** The standard chip row for a market: fee tier, chain, and what kind of
@@ -98,7 +107,7 @@ export function MarketChips({
   return (
     <span className="flex flex-wrap items-center gap-1">
       <Chip title="Share of every trade that LPs earn">{market.pool.fee / 10_000}% fee</Chip>
-      {chain && <Chip tone="outline">{chainConfig(market.chainId).label}</Chip>}
+      {chain && <ChainChip chainId={market.chainId} />}
       {steady && (
         <Chip tone="accent" title="Both sides track the same thing, so price swings barely change what you hold">
           Steady

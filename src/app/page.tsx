@@ -9,7 +9,7 @@ import { InviteCard } from "@/components/InviteCard";
 import { Landing } from "@/components/Landing";
 import { PoolList } from "@/components/PoolList";
 import { SendPanel } from "@/components/SendPanel";
-import { Chip } from "@/components/TokenIcon";
+import { ChainChip } from "@/components/TokenIcon";
 import {
   useActiveAddress,
   useAssetBalances,
@@ -168,7 +168,7 @@ function Dashboard() {
         <div className="flex flex-wrap items-center gap-2 pb-1 text-sm text-muted">
           {(cash?.perChain ?? []).map((c) => (
             <span key={c.chainId} className="inline-flex items-center gap-1.5">
-              <Chip tone="outline">{CHAINS[c.chainId as keyof typeof CHAINS].label}</Chip>
+              <ChainChip chainId={c.chainId} />
               <span className={c.formatted > 0 ? "text-foreground" : ""}>
                 {fmtUsd(c.formatted)} {c.symbol}
               </span>

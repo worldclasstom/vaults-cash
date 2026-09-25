@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MarketingShell } from "@/components/MarketingShell";
-import { Chip } from "@/components/TokenIcon";
+import { ChainChip, Chip } from "@/components/TokenIcon";
 import { DepositFlow, RangeDemo, WithdrawFlow } from "@/components/HowItWorksVisuals";
 import { CHAINS, CHAIN_IDS } from "@/lib/chain";
 
@@ -40,7 +40,8 @@ export default function HowItWorksPage() {
           <div className="flex flex-wrap gap-2">
             <Chip tone="accent">No black box</Chip>
             <Chip>Every step on-chain</Chip>
-            <Chip tone="outline">Base + Robinhood Chain</Chip>
+            <ChainChip chainId={8453} />
+            <ChainChip chainId={4663} long />
           </div>
           <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-6xl">How it works</h1>
           <p className="max-w-xl text-lg text-muted">

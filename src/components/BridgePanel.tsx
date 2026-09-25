@@ -7,7 +7,7 @@ import { fmtUsd } from "@/lib/format";
 import { useCashBalances } from "@/hooks/useChainData";
 import { useBridgeQuote, useBridgeStatus, useSendBridge } from "@/hooks/useBridge";
 import { Sheet } from "./Sheet";
-import { Chip } from "./TokenIcon";
+import { ChainChip } from "./TokenIcon";
 
 /**
  * "Your dollars are on the other chain": offered wherever a deposit needs
@@ -72,7 +72,7 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
   return (
     <div className="mt-3 rounded-2xl bg-surface-raised p-4 text-sm">
       <div className="flex flex-wrap items-center gap-2">
-        <Chip tone="outline">{from.label}</Chip>
+        <ChainChip chainId={source.chainId} />
         <span className="font-display text-lg font-extrabold">
           {fmtUsd(max)} {from.quote.symbol} is sitting on {from.label}
         </span>

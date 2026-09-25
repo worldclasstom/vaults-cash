@@ -8,7 +8,7 @@ import { Sheet } from "@/components/Sheet";
 import { AgentAccess } from "@/components/AgentAccess";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
-import { Chip } from "@/components/TokenIcon";
+import { ChainChip, Chip } from "@/components/TokenIcon";
 import { useActiveAddress, useCashBalances, useTokenBalance } from "@/hooks/useChainData";
 import { CHAINS, CHAIN_IDS, explorerUrl, type ChainId } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
@@ -40,7 +40,7 @@ function ChainRow({ chainId, stable, address }: { chainId: ChainId; stable: numb
   return (
     <li className="flex items-center justify-between gap-3 rounded-2xl bg-surface-raised px-4 py-3">
       <span className="flex items-center gap-3">
-        <Chip tone="outline">{chain.label}</Chip>
+        <ChainChip chainId={chainId} />
         <span className="text-xs text-muted">
           {eth && eth.raw > 0n
             ? `${fmtAmount(eth.formatted, 5)} ETH for fees`
@@ -88,8 +88,8 @@ export default function AccountPage() {
               <h1 className="font-display text-4xl font-extrabold tracking-tight">Account</h1>
               <div className="flex flex-wrap gap-2 pt-2">
                 <Chip tone="accent">Self-custodial</Chip>
-                <Chip tone="outline">Base</Chip>
-                <Chip tone="outline">Robinhood</Chip>
+                <ChainChip chainId={8453} />
+                <ChainChip chainId={4663} />
               </div>
             </div>
             <p className="text-sm text-muted">

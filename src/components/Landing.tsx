@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/components/AuthProvider";
 import { MarketingShell } from "@/components/MarketingShell";
-import { Chip } from "@/components/TokenIcon";
+import { ChainChip, Chip } from "@/components/TokenIcon";
 import {
   MarketChart,
   TRADER_YS,
@@ -71,15 +71,18 @@ function EarningsCalculator() {
   const monthly = eth ? (amount * eth.estAprPct) / 100 / 12 : undefined;
 
   return (
-    <div className="rounded-3xl border border-borderline bg-surface p-6 sm:p-8">
-      <p className="text-sm font-semibold">If you put in</p>
+    <div className="rounded-3xl border border-borderline bg-surface p-6 shadow-card sm:p-8">
+      <div className="flex items-center justify-between">
+        <p className="font-display text-lg font-extrabold">If you put in</p>
+        <Chip tone="accent">Live rate</Chip>
+      </div>
       <div className="flex items-baseline gap-1 pt-1">
-        <span className="text-3xl font-bold text-muted">$</span>
+        <span className="font-display text-3xl font-extrabold text-muted">$</span>
         <input
           inputMode="numeric"
           value={amount || ""}
           onChange={(e) => setAmount(Number(e.target.value.replace(/[^0-9]/g, "")) || 0)}
-          className="w-full bg-transparent text-5xl font-bold tracking-tight outline-none"
+          className="w-full bg-transparent font-display text-6xl font-extrabold tracking-tighter outline-none"
           aria-label="Deposit amount in dollars"
         />
       </div>
@@ -95,7 +98,7 @@ function EarningsCalculator() {
       />
       <div className="mt-6 rounded-2xl bg-surface-raised p-5">
         <p className="text-sm text-muted">could earn about</p>
-        <p className="py-1 text-4xl font-bold text-accent">
+        <p className="py-1 font-display text-4xl font-extrabold tracking-tight text-accent">
           {monthly !== undefined ? `${fmtUsd(monthly)} / month` : "…"}
         </p>
         <p className="text-xs leading-relaxed text-muted">
@@ -127,8 +130,8 @@ export function Landing() {
           <div className="flex flex-col items-start gap-6">
             <div className="flex flex-wrap gap-2">
               <Chip tone="accent">Live now</Chip>
-              <Chip tone="outline">Base</Chip>
-              <Chip tone="outline">Robinhood Chain</Chip>
+              <ChainChip chainId={8453} />
+              <ChainChip chainId={4663} long />
             </div>
             <h1 className="text-balance font-display text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl">
               Every trade pays a fee. Be the one{" "}
@@ -195,7 +198,10 @@ export function Landing() {
           <div className="grid gap-5 pt-10 md:grid-cols-3">
             <div className="tilt rounded-3xl border border-borderline bg-surface p-7 shadow-card">
               <MarketChart series={[{ ys: TRADER_YS, color: "var(--negative)", fill: true }]} />
-              <p className="pt-5 font-display text-xl font-extrabold">Trading is hard</p>
+              <div className="flex items-center gap-2 pt-5">
+                <p className="font-display text-xl font-extrabold">Trading is hard</p>
+                <Chip tone="negative">Most lose</Chip>
+              </div>
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Timing the market is a full-time job, and most people who try
                 end up behind where simply holding would have left them.
@@ -203,7 +209,10 @@ export function Landing() {
             </div>
             <div className="tilt rounded-3xl border border-borderline bg-surface p-7 shadow-card">
               <MarketChart domain={[88, 112]} series={[{ ys: HOLDER_YS, color: "var(--muted)" }]} />
-              <p className="pt-5 font-display text-xl font-extrabold">Holding earns nothing</p>
+              <div className="flex items-center gap-2 pt-5">
+                <p className="font-display text-xl font-extrabold">Holding earns nothing</p>
+                <Chip>$0 income</Chip>
+              </div>
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Holding is easier — but your assets just sit there. No income,
                 no cashflow, nothing working for you.
@@ -216,7 +225,10 @@ export function Landing() {
                   { ys: EARNER_YS, color: "var(--accent)", fill: true, ticks: [12, 26, 40, 52] },
                 ]}
               />
-              <p className="pt-5 font-display text-xl font-extrabold text-accent">Hold — and collect</p>
+              <div className="flex items-center gap-2 pt-5">
+                <p className="font-display text-xl font-extrabold text-accent">Hold — and collect</p>
+                <Chip tone="accent">Earning</Chip>
+              </div>
               <p className="pt-2 text-sm leading-relaxed text-muted">
                 Your assets sit in a market position that traders trade
                 against. You keep holding; every trade pays you a fee — in
@@ -312,12 +324,15 @@ export function Landing() {
           </p>
           <ul className="grid gap-5 pt-10 md:grid-cols-3">
             {[
-              ["Markets never close", "Crypto and stock tokens trade around the clock — your position earns while you sleep, weekends included."],
-              ["Real depth", "ETH, Bitcoin, blue-chip DeFi and Robinhood stock tokens, with the trading volume to actually generate fees."],
-              ["Fully public", "Every position, fee, and trade is verifiable on the public explorers. Nothing happens behind a curtain."],
-            ].map(([t, d]) => (
+              ["Markets never close", "Crypto and stock tokens trade around the clock — your position earns while you sleep, weekends included.", "24/7"],
+              ["Real depth", "ETH, Bitcoin, blue-chip DeFi and Robinhood stock tokens, with the trading volume to actually generate fees.", "Billions traded"],
+              ["Fully public", "Every position, fee, and trade is verifiable on the public explorers. Nothing happens behind a curtain.", "On-chain"],
+            ].map(([t, d, tag]) => (
               <li key={t} className="tilt rounded-3xl border border-borderline bg-surface p-7 shadow-card">
-                <p className="font-display text-xl font-extrabold">{t}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-display text-xl font-extrabold">{t}</p>
+                  <Chip>{tag}</Chip>
+                </div>
                 <p className="pt-2 text-sm leading-relaxed text-muted">{d}</p>
               </li>
             ))}
