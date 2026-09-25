@@ -312,7 +312,19 @@ function EmptyPositions() {
   const justDeposited = !!useSearchParams().get("deposited");
   if (justDeposited) {
     return (
-      <div className="rounded-3xl bg-surface shadow-card p-8 text-center">
+      <div className="relative overflow-hidden rounded-3xl bg-surface shadow-card p-8 text-center">
+        {/* the one playful moment: a few bills leave the drawer */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center gap-10">
+          {[-8, 4, -3].map((tilt, i) => (
+            <span
+              key={i}
+              className="animate-bill-escape rounded-md bg-accent/15 px-2 py-0.5 font-mono text-xs font-semibold text-accent"
+              style={{ animationDelay: `${i * 0.7}s`, ["--tilt" as string]: `${tilt}deg` } as React.CSSProperties}
+            >
+              +$
+            </span>
+          ))}
+        </div>
         <p className="font-semibold text-accent">Deposit confirmed ✓</p>
         <p className="pt-2 text-sm text-muted">Your position is on-chain and will show here in a few seconds.</p>
         <div className="mx-auto mt-4 h-1.5 w-24 animate-pulse rounded-full bg-accent/40" />

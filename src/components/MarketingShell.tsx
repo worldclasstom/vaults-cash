@@ -18,7 +18,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full">
       <header className="sticky top-0 z-40 border-b border-borderline/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" aria-label="vaults.cash home">
             <Wordmark />
           </Link>
@@ -40,13 +40,13 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
               <>
                 <button
                   onClick={login}
-                  className="rounded-full border border-borderline px-5 py-2 text-sm font-semibold transition-colors hover:border-muted"
+                  className="whitespace-nowrap rounded-full border border-borderline px-4 py-2 text-sm font-semibold transition-colors hover:border-muted sm:px-5"
                 >
                   Log in
                 </button>
                 <button
                   onClick={login}
-                  className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"
+                  className="whitespace-nowrap rounded-full bg-accent px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong sm:px-5"
                 >
                   Get started
                 </button>

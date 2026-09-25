@@ -141,7 +141,7 @@ function PoolRow({ q, s }: { q: MarketQuote; s?: MarketStats }) {
     <li>
       <Link
         href={`/market/${m.slug}`}
-        className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl bg-surface p-4 shadow-card transition-colors hover:bg-surface-raised sm:grid-cols-[minmax(0,2.2fr)_1fr_1fr_1fr_0.8fr]"
+        className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl bg-surface p-4 shadow-card transition-[background-color,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-surface-raised hover:shadow-elevated sm:grid-cols-[minmax(0,2.2fr)_1fr_1fr_1fr_0.8fr]"
       >
         <span className="flex min-w-0 items-center gap-3 sm:col-span-1">
           <PairIcons market={m} size={34} />
