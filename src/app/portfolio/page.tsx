@@ -8,7 +8,11 @@ import { AppShell } from "@/components/AppShell";
 import { RangeBar } from "@/components/RangeBar";
 import { Chip, MarketChips, PairIcons } from "@/components/TokenIcon";
 import { usePlanAdd, useSendDeposit } from "@/hooks/useDeposit";
-import { useCollect, usePositions, useWithdraw, type PositionView } from "@/hooks/usePositions";
+import { useCollect, usePlanWithdraw, usePositions, useWithdraw, type PositionView } from "@/hooks/usePositions";
+import { Sheet } from "@/components/Sheet";
+import { SigningSteps } from "@/components/SigningSteps";
+import { describeWithdrawCalls } from "@/lib/describeCalls";
+import { formatUnits } from "viem";
 import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
 import { CHAINS, explorerNftUrl, uniswapPositionUrl } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
@@ -121,9 +125,20 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
 
 function PositionCard({ p }: { p: PositionView }) {
   const { data: stats } = useStats();
+  const planWithdraw = usePlanWithdraw();
   const withdraw = useWithdraw();
   const collect = useCollect();
   const [adding, setAdding] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const chain = CHAINS[p.market.chainId];
+  const wplan = planWithdraw.data;
+  // guaranteed minimum the user ends with, after the fee (stablecoin ≈ $1)
+  const receiveMin = wplan ? Number(formatUnits(wplan.stableOutMin - wplan.feeAmount, chain.quote.decimals)) : 0;
+  const closeSheet = () => {
+    if (withdraw.isPending) return;
+    setConfirming(false);
+    planWithdraw.reset();
+  };
   const collectible = p.feesUsd >= MIN_COLLECT_USD;
   const m = p.market;
   const stable = CHAINS[m.chainId].quote;
@@ -189,11 +204,14 @@ function PositionCard({ p }: { p: PositionView }) {
           Add
         </button>
         <button
-          onClick={() => withdraw.mutate(p)}
-          disabled={withdraw.isPending}
+          onClick={() => {
+            setConfirming(true);
+            planWithdraw.mutate(p);
+          }}
+          disabled={planWithdraw.isPending || withdraw.isPending || withdraw.isSuccess}
           className="grow rounded-full bg-surface-raised py-2 text-sm font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
         >
-          {withdraw.isPending ? "Withdrawing…" : `Withdraw to ${stable.symbol}`}
+          {withdraw.isSuccess ? "Withdrawn ✓" : planWithdraw.isPending ? "Preparing…" : withdraw.isPending ? "Withdrawing…" : `Withdraw to ${stable.symbol}`}
         </button>
         <button
           onClick={() => collect.mutate(p)}
@@ -205,8 +223,83 @@ function PositionCard({ p }: { p: PositionView }) {
         </button>
       </div>
       {adding && <AddPanel p={p} onClose={() => setAdding(false)} />}
-      {(withdraw.isError || collect.isError) && (
-        <p className="mt-2 text-xs text-negative">{((withdraw.error ?? collect.error) as Error).message}</p>
+      {withdraw.isSuccess && (
+        <p className="mt-2 text-xs text-accent">
+          Withdrawn. Your {stable.symbol} is in your wallet on {chain.label}; this card will clear in a moment.
+        </p>
+      )}
+      {(planWithdraw.isError || collect.isError) && !confirming && (
+        <p className="mt-2 text-xs text-negative">{((planWithdraw.error ?? collect.error) as Error).message}</p>
+      )}
+
+      {confirming && !withdraw.isSuccess && (
+        <Sheet open onClose={closeSheet} title={`Withdraw ${m.base.symbol} / ${m.quote.symbol}`} busy={withdraw.isPending}>
+          {wplan ? (
+            <>
+              <p className="pt-3 text-3xl font-bold tracking-tight">
+                ≥ {fmtUsd(receiveMin)} <span className="text-lg font-semibold text-muted">{stable.symbol}</span>
+              </p>
+              <p className="pt-1 text-xs text-muted">
+                Guaranteed minimum; you usually receive a little more. Position value now {fmtUsd(p.valueUsd)}.
+              </p>
+              <dl className="space-y-2 py-4 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-muted">Trading fees earned, included</dt>
+                  <dd className="font-medium">{p.feesUsd >= 0.01 ? fmtUsd(p.feesUsd) : p.feesUsd > 0 ? "<$0.01" : "$0.00"}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted">vaults.cash fee ({Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}%)</dt>
+                  <dd className="font-medium">{fmtUsd(Number(formatUnits(wplan.feeAmount, chain.quote.decimals)))}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted">Network fee</dt>
+                  <dd className="font-medium">{chain.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
+                </div>
+              </dl>
+              <p className="pb-2 text-xs text-muted">
+                This closes the position. Everything converts back to {stable.symbol} and lands in your wallet on {chain.label} in one
+                transaction. You can open a new position anytime.
+              </p>
+              <SigningSteps steps={describeWithdrawCalls(wplan, p)} />
+              <div className="flex gap-2">
+                <button
+                  onClick={closeSheet}
+                  disabled={withdraw.isPending}
+                  className="rounded-full bg-surface px-5 py-3 font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
+                >
+                  Keep it
+                </button>
+                <button
+                  onClick={() => withdraw.mutate({ position: p, plan: wplan }, { onSuccess: () => setConfirming(false) })}
+                  disabled={withdraw.isPending}
+                  className="grow rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-40"
+                >
+                  {withdraw.isPending ? "Withdrawing…" : `Withdraw ${fmtUsd(receiveMin)}`}
+                </button>
+              </div>
+              {withdraw.isError && <p className="mt-2 text-xs text-negative">{(withdraw.error as Error).message}</p>}
+            </>
+          ) : planWithdraw.isError ? (
+            <>
+              <p className="pt-3 text-sm text-negative">Couldn&apos;t price this withdrawal: {(planWithdraw.error as Error).message}</p>
+              <div className="mt-4 flex gap-2">
+                <button onClick={closeSheet} className="rounded-full bg-surface px-5 py-3 font-semibold transition-colors hover:bg-borderline">
+                  Close
+                </button>
+                <button onClick={() => planWithdraw.mutate(p)} className="grow rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong">
+                  Try again
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-3 py-4" aria-busy>
+              <div className="h-9 w-40 animate-pulse rounded-lg bg-surface" />
+              <div className="h-4 w-64 animate-pulse rounded bg-surface" />
+              <div className="h-24 animate-pulse rounded-xl bg-surface" />
+              <p className="text-xs text-muted">Pricing your withdrawal against the live pool…</p>
+            </div>
+          )}
+        </Sheet>
       )}
     </li>
   );

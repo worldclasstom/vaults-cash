@@ -4,6 +4,8 @@ import { fmtAmount, fmtUsd } from "./format";
 import { NATIVE_ETH, shareAmount, type Market } from "./markets";
 import { PERMIT2, contractsOf, permit2Abi, type Call } from "./uniswap";
 import { planSummary, type ZapPlan } from "./zap";
+import type { WithdrawPlan } from "./withdraw";
+import type { OwnedPosition } from "./positions";
 
 /** One step of the batch, in words a first-time user can check against the
  *  confirm sheet. Every deposit is a handful of well-known calls, so this is
@@ -39,7 +41,9 @@ export function contractLabels(market: Market): Record<string, string> {
   };
 }
 
-export function describeCalls(plan: ZapPlan, market: Market): CallDescription[] {
+/** Per-market context every describer needs: token names, amounts in
+ *  display units, contract labels, the fee wallet. */
+function describer(market: Market) {
   const chain = CHAINS[market.chainId];
   const { router, posm } = contractsOf(market);
   const labels = contractLabels(market);
@@ -56,18 +60,12 @@ export function describeCalls(plan: ZapPlan, market: Market): CallDescription[] 
     const n = Number(formatUnits(units, t.decimals));
     return `${fmtAmount(t.base ? shareAmount(market, n) : n, 5)} ${t.symbol}`;
   };
-  const summary = planSummary(plan, market);
-  let swaps = 0;
-
-  return plan.calls.map((call) => {
-    const sel = call.data.slice(0, 10);
-    const to = call.to.toLowerCase();
+  /** the steps every batch shares: approvals and fee transfers */
+  const common = (call: Call, sel: string, to: string, verb: "deposit" | "withdrawal"): CallDescription | null => {
     const contract = labels[to] ?? short(call.to);
     const base = { contract, call };
-    const value = call.value > 0n ? ` Sends ${fmtAmount(Number(formatEther(call.value)), 6)} ETH along with it.` : "";
-
     if (sel === SEL.approve) {
-      return { ...base, title: `Allow Permit2 to move your ${tok(to).symbol}`, detail: "One-time approval, the standard first step of any Uniswap deposit." };
+      return { ...base, title: `Allow Permit2 to move your ${tok(to).symbol}`, detail: `One-time approval, the standard first step of any Uniswap ${verb}.` };
     }
     if (sel === SEL.permit2Approve && to === PERMIT2.toLowerCase()) {
       const { args } = decodeFunctionData({ abi: permit2Abi, data: call.data });
@@ -81,8 +79,27 @@ export function describeCalls(plan: ZapPlan, market: Market): CallDescription[] 
       const dollars = fmtUsd(Number(formatUnits(amount, tok(to).decimals)));
       return recipient.toLowerCase() === feeRecipient
         ? { ...base, title: `vaults.cash fee ${dollars}`, detail: `Paid to ${short(recipient)}, the published fee wallet. The only thing vaults.cash receives.` }
-        : { ...base, title: `Referral share ${dollars}`, detail: `Paid to ${short(recipient)}, the wallet that referred you — it comes out of the fee, not your deposit.` };
+        : { ...base, title: `Referral share ${dollars}`, detail: `Paid to ${short(recipient)}, the wallet that referred you — it comes out of the fee, not your ${verb}.` };
     }
+    return null;
+  };
+  return { chain, labels, tok, amt, common };
+}
+
+export function describeCalls(plan: ZapPlan, market: Market): CallDescription[] {
+  const { chain, labels, amt, common } = describer(market);
+  const summary = planSummary(plan, market);
+  let swaps = 0;
+
+  return plan.calls.map((call) => {
+    const sel = call.data.slice(0, 10);
+    const to = call.to.toLowerCase();
+    const contract = labels[to] ?? short(call.to);
+    const base = { contract, call };
+    const value = call.value > 0n ? ` Sends ${fmtAmount(Number(formatEther(call.value)), 6)} ETH along with it.` : "";
+
+    const shared = common(call, sel, to, "deposit");
+    if (shared) return shared;
     if (sel === SEL.execute) {
       swaps += 1;
       if (plan.quoteLeg && swaps === 1) {
@@ -97,5 +114,37 @@ export function describeCalls(plan: ZapPlan, market: Market): CallDescription[] 
         : { ...base, title: `Place ${what} in the pool as a position NFT`, detail: `Minted straight to your wallet — vaults.cash never holds it.${value}` };
     }
     return { ...base, title: `Call ${contract}`, detail: value || undefined };
+  });
+}
+
+/** Same idea for a withdrawal: burn, unwind the legs, pay the fee. */
+export function describeWithdrawCalls(plan: WithdrawPlan, position: OwnedPosition): CallDescription[] {
+  const market = position.market;
+  const { chain, labels, amt, common } = describer(market);
+  let swaps = 0;
+  const legs = [
+    plan.baseOutMin > 0n ? { from: market.base.address, out: market.quote.address, min: plan.quoteOutMin } : null,
+    market.quote.address.toLowerCase() !== chain.quote.address.toLowerCase() && plan.quoteOutMin > 0n
+      ? { from: market.quote.address, out: chain.quote.address, min: plan.stableOutMin }
+      : null,
+  ].filter(Boolean) as Array<{ from: `0x${string}`; out: `0x${string}`; min: bigint }>;
+
+  return plan.calls.map((call) => {
+    const sel = call.data.slice(0, 10);
+    const to = call.to.toLowerCase();
+    const contract = labels[to] ?? short(call.to);
+    const base = { contract, call };
+    const shared = common(call, sel, to, "withdrawal");
+    if (shared) return shared;
+    if (sel === SEL.modifyLiquidities) {
+      return { ...base, title: `Close position #${position.tokenId} and collect its trading fees`, detail: "Burns the position NFT; both tokens come back to your wallet." };
+    }
+    if (sel === SEL.execute) {
+      const leg = legs[swaps++];
+      return leg
+        ? { ...base, title: `Swap the ${labels[leg.from.toLowerCase()]?.replace(" token", "") ?? "asset"} back for at least ${amt(leg.min, leg.out)}`, detail: "On Uniswap. Reverts if the pool moves and can't deliver the minimum." }
+        : { ...base, title: "Swap on Uniswap" };
+    }
+    return { ...base, title: `Call ${contract}` };
   });
 }

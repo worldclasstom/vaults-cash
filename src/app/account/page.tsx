@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { usePrivy } from "@privy-io/react-auth";
+import { Sheet } from "@/components/Sheet";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { useActiveAddress, useTokenBalance, useUsdcBalance } from "@/hooks/useChainData";
@@ -13,15 +14,7 @@ import { NATIVE_ETH } from "@/lib/markets";
 
 function LogoutConfirm({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center"
-      onClick={onCancel}
-    >
-      <div
-        className="w-full max-w-sm rounded-3xl bg-surface p-6 animate-rise"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="text-lg font-semibold">Log out?</h3>
+    <Sheet open onClose={onCancel} title="Log out?">
         <p className="pt-2 text-sm text-muted">
           Your funds stay safe in your wallet — nothing moves. Log back in with
           the same email anytime to pick up where you left off.
@@ -40,8 +33,7 @@ function LogoutConfirm({ onCancel, onConfirm }: { onCancel: () => void; onConfir
             Log out
           </button>
         </div>
-      </div>
-    </div>
+    </Sheet>
   );
 }
 

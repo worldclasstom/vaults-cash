@@ -13,6 +13,10 @@ import { planSummary, presetTicks, PRESET_WIDTH, type RangePreset, type ZapPlan 
 import { tickToPrice } from "@/lib/onchain";
 import { MarketChips, PairIcons } from "./TokenIcon";
 import { describeCalls } from "@/lib/describeCalls";
+import { Sheet } from "./Sheet";
+import { useAuth } from "./AuthProvider";
+import { Select } from "./Select";
+import { SigningSteps } from "./SigningSteps";
 import { MIN_DEPOSIT_USD, poolIdle } from "@/lib/limits";
 import { RangeBar } from "./RangeBar";
 import { useStats } from "./PoolList";
@@ -28,6 +32,7 @@ export function MarketDetail({ slug }: { slug: string }) {
   const chain = chainConfig(market.chainId);
   const stable = CHAINS[market.chainId].quote;
   const router = useRouter();
+  const { authenticated, login } = useAuth();
   const { data: quote } = useMarketQuote(market);
   const { data: stats } = useStats();
   const { data: balance } = useQuoteBalance(market.chainId);
@@ -64,8 +69,10 @@ export function MarketDetail({ slug }: { slug: string }) {
     })();
 
   const buildPlan = async () => {
-    const p = await planMutation.mutateAsync({ market, amountUsd: amountNum, preset, customWidth, slippageBps });
-    setPlan(p);
+    // the mutation's own error state renders below the button; don't let the
+    // rejection escape as an uncaught promise
+    const p = await planMutation.mutateAsync({ market, amountUsd: amountNum, preset, customWidth, slippageBps }).catch(() => null);
+    if (p) setPlan(p);
   };
 
   const confirm = async () => {
@@ -184,15 +191,17 @@ export function MarketDetail({ slug }: { slug: string }) {
                 </label>
                 <label className="flex flex-col gap-1 text-xs text-muted">
                   Max slippage
-                  <select
+                  <Select
                     value={slippageBps}
-                    onChange={(e) => setSlippageBps(Number(e.target.value))}
-                    className="rounded-lg bg-background p-2 text-foreground outline-none"
-                  >
-                    <option value={50}>0.5%</option>
-                    <option value={100}>1%</option>
-                    <option value={300}>3%</option>
-                  </select>
+                    onChange={setSlippageBps}
+                    ariaLabel="Max slippage"
+                    align="left"
+                    options={[
+                      { value: 50, label: "0.5%" },
+                      { value: 100, label: "1%" },
+                      { value: 300, label: "3%" },
+                    ]}
+                  />
                 </label>
               </div>
             )}
@@ -218,15 +227,17 @@ export function MarketDetail({ slug }: { slug: string }) {
             )}
 
             <button
-              disabled={amountNum <= 0 || belowMin || insufficient || planMutation.isPending}
-              onClick={buildPlan}
+              disabled={authenticated && (amountNum <= 0 || belowMin || insufficient || planMutation.isPending)}
+              onClick={authenticated ? buildPlan : login}
               className="mt-4 w-full rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {insufficient
-                ? `Insufficient ${stable.symbol}`
-                : belowMin
-                  ? `Minimum ${fmtUsd(MIN_DEPOSIT_USD)}`
-                  : planMutation.isPending ? "Getting quote…" : "Review deposit"}
+              {!authenticated
+                ? "Log in to deposit"
+                : insufficient
+                  ? `Insufficient ${stable.symbol}`
+                  : belowMin
+                    ? `Minimum ${fmtUsd(MIN_DEPOSIT_USD)}`
+                    : planMutation.isPending ? "Getting quote…" : "Review deposit"}
             </button>
             {planMutation.isError && (
               <p className="mt-2 text-xs text-negative">
@@ -240,12 +251,7 @@ export function MarketDetail({ slug }: { slug: string }) {
       </div>
 
       {plan && summary && (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center"
-          onClick={() => !sendMutation.isPending && setPlan(null)}
-        >
-          <div className="w-full max-w-md animate-rise rounded-t-3xl bg-surface-raised p-6 sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold">Confirm deposit</h3>
+        <Sheet open onClose={() => setPlan(null)} title="Confirm deposit" busy={sendMutation.isPending}>
             <dl className="space-y-2 py-4 text-sm">
               <Row k={`${market.base.symbol} side`} v={`~${fmtUsd(summary.baseUsd)}`} />
               <Row k={`${market.quote.symbol} side`} v={`~${fmtUsd(summary.quoteUsd)}`} />
@@ -270,17 +276,16 @@ export function MarketDetail({ slug }: { slug: string }) {
               </Link>
               .
             </p>
-            <TxDetails market={market} plan={plan} />
+            <SigningSteps steps={describeCalls(plan, market)} />
             <button
               onClick={confirm}
               disabled={sendMutation.isPending}
-              className="w-full rounded-full bg-accent py-3 font-semibold text-black hover:bg-accent-strong disabled:opacity-40"
+              className="w-full rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-40"
             >
               {sendMutation.isPending ? "Depositing…" : "Deposit"}
             </button>
             {sendMutation.isError && <p className="mt-2 text-xs text-negative">{(sendMutation.error as Error).message}</p>}
-          </div>
-        </div>
+        </Sheet>
       )}
     </AppShell>
   );
@@ -334,37 +339,6 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
         <p className="pt-0.5 text-muted">{children}</p>
       </div>
     </div>
-  );
-}
-
-function TxDetails({ market, plan }: { market: Market; plan: ZapPlan }) {
-  const steps = describeCalls(plan, market);
-  return (
-    <details className="pb-4 text-xs text-muted">
-      <summary className="cursor-pointer underline-offset-2 hover:underline">
-        What you&apos;re signing ({steps.length} steps, one transaction)
-      </summary>
-      <ol className="mt-2 max-h-56 space-y-2 overflow-y-auto rounded-xl bg-background p-3">
-        {steps.map((st, i) => (
-          <li key={i}>
-            <p className="text-foreground">
-              {i + 1}. {st.title}
-            </p>
-            {st.detail && <p className="text-muted">{st.detail}</p>}
-            <details className="font-mono text-muted/60">
-              <summary className="cursor-pointer">
-                → {st.contract} {st.call.to.slice(0, 6)}…{st.call.to.slice(-4)}
-              </summary>
-              <p className="break-all">{st.call.data}</p>
-            </details>
-          </li>
-        ))}
-        <li className="pt-1 text-muted/60">
-          Executed atomically from your wallet as one ERC-4337 user operation. All-or-nothing: if any step fails,
-          everything reverts and nothing leaves your wallet.
-        </li>
-      </ol>
-    </details>
   );
 }
 

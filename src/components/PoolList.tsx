@@ -9,6 +9,7 @@ import { fmtPct, fmtPrice, fmtUsd } from "@/lib/format";
 import { sharePrice, type Market } from "@/lib/markets";
 import type { MarketStats } from "@/app/api/stats/route";
 import { MarketChips, PairIcons } from "./TokenIcon";
+import { Select } from "./Select";
 
 type Category = "all" | "steady" | "majors" | "crypto" | "stock";
 const CATEGORIES: Array<{ id: Category; label: string; hint: string }> = [
@@ -82,29 +83,22 @@ export function PoolList() {
           </button>
         ))}
         <span className="grow" />
-        <select
+        <Select<ChainId | 0>
           value={chain}
-          onChange={(e) => setChain(Number(e.target.value) as ChainId | 0)}
-          className="rounded-full bg-surface px-3 py-1.5 text-sm text-muted outline-none"
-          aria-label="Network"
-        >
-          <option value={0}>All networks</option>
-          {CHAIN_IDS.map((id) => (
-            <option key={id} value={id}>
-              {CHAINS[id].chain.name}
-            </option>
-          ))}
-        </select>
-        <select
+          onChange={setChain}
+          ariaLabel="Network"
+          options={[{ value: 0, label: "All networks" }, ...CHAIN_IDS.map((id) => ({ value: id, label: CHAINS[id].chain.name }))]}
+        />
+        <Select<Sort>
           value={sort}
-          onChange={(e) => setSort(e.target.value as Sort)}
-          className="rounded-full bg-surface px-3 py-1.5 text-sm text-muted outline-none"
-          aria-label="Sort"
-        >
-          <option value="tvl">Most liquid</option>
-          <option value="apr">Highest APR</option>
-          <option value="vol">Most traded</option>
-        </select>
+          onChange={setSort}
+          ariaLabel="Sort by"
+          options={[
+            { value: "tvl", label: "Most liquid", hint: "Deepest pools first" },
+            { value: "apr", label: "Highest APR", hint: "Best recent fee rate" },
+            { value: "vol", label: "Most traded", hint: "Busiest in 24h" },
+          ]}
+        />
       </div>
 
       {isLoading ? (

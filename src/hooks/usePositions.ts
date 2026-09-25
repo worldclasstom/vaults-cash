@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Position } from "@uniswap/v4-sdk";
 import { getMarketPricing } from "@/lib/onchain";
 import { fetchPositions, getUncollectedFees, type OwnedPosition } from "@/lib/positions";
-import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
+import { buildWithdrawPlan, buildCollectPlan, type WithdrawPlan } from "@/lib/withdraw";
 import { buildPool } from "@/lib/zap";
 import { useActiveAddress } from "./useChainData";
 import { useSendCalls } from "./useSendCalls";
@@ -75,21 +75,28 @@ export function usePositions() {
   });
 }
 
-export function useWithdraw() {
-  const send = useSendCalls();
+/** Build (but don't send) the withdrawal, so the confirm sheet can show
+ *  exactly what comes back before anything moves. */
+export function usePlanWithdraw() {
   const owner = useActiveAddress();
   const { data: referral } = useReferral();
-  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (position: OwnedPosition) => {
+    mutationFn: async (position: OwnedPosition): Promise<WithdrawPlan> =>
       // tight tolerance: the slippage buffer is exactly what comes back as
       // dust, and blocks are ~250ms — worst case a revert + retry
-      const plan = await buildWithdrawPlan({ position, slippageBps: 25, owner, referrer: referral?.referrerWallet });
-      return send(plan.calls, {
+      buildWithdrawPlan({ position, slippageBps: 25, owner, referrer: referral?.referrerWallet }),
+  });
+}
+
+export function useWithdraw() {
+  const send = useSendCalls();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ position, plan }: { position: OwnedPosition; plan: WithdrawPlan }) =>
+      send(plan.calls, {
         description: `Withdraw position to ${position.market.quote.symbol}`,
         chainId: plan.chainId,
-      });
-    },
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["positions"] });
       queryClient.invalidateQueries({ queryKey: ["usdc-balance"] });
