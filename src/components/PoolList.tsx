@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useMarketQuotes, type MarketQuote } from "@/hooks/useChainData";
@@ -51,6 +51,18 @@ export function PoolList() {
   const [category, setCategory] = useState<Category>("all");
   const [chain, setChain] = useState<ChainId | 0>(0);
   const [sort, setSort] = useState<Sort>("tvl");
+  // pagination: a page of pools is a screen, not a scroll; filters reset it
+  const PAGE = 8;
+  const [page, setPage] = useState(0);
+  const listTop = useRef<HTMLDivElement>(null);
+  const pick = <T,>(set: (v: T) => void) => (v: T) => {
+    set(v);
+    setPage(0);
+  };
+  const goTo = (p: number) => {
+    setPage(p);
+    listTop.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  };
 
   const rows = useMemo(() => {
     const list = (data ?? []).filter(
@@ -68,12 +80,12 @@ export function PoolList() {
   }, [data, stats, category, chain, sort]);
 
   return (
-    <div>
+    <div ref={listTop} className="scroll-mt-24">
       <div className="flex flex-wrap items-center gap-2 pb-3">
         {CATEGORIES.map((c) => (
           <button
             key={c.id}
-            onClick={() => setCategory(c.id)}
+            onClick={() => pick(setCategory)(c.id)}
             title={c.hint || undefined}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
               category === c.id ? "bg-accent text-black" : "bg-surface text-muted hover:text-foreground"
@@ -85,13 +97,13 @@ export function PoolList() {
         <span className="grow" />
         <Select<ChainId | 0>
           value={chain}
-          onChange={setChain}
+          onChange={pick(setChain)}
           ariaLabel="Network"
           options={[{ value: 0, label: "All networks" }, ...CHAIN_IDS.map((id) => ({ value: id, label: CHAINS[id].chain.name }))]}
         />
         <Select<Sort>
           value={sort}
-          onChange={setSort}
+          onChange={pick(setSort)}
           ariaLabel="Sort by"
           options={[
             { value: "tvl", label: "Most liquid", hint: "Deepest pools first" },
@@ -121,16 +133,47 @@ export function PoolList() {
             <span className="text-right">Est. APR</span>
           </div>
           <ul className="space-y-2">
-            {rows.map((q) => (
+            {rows.slice(page * PAGE, page * PAGE + PAGE).map((q) => (
               <PoolRow key={q.market.slug} q={q} s={stats?.[q.market.slug]} />
             ))}
           </ul>
           {rows.length === 0 && (
             <p className="rounded-2xl bg-surface p-6 text-center text-sm text-muted">Nothing here yet.</p>
           )}
+          {rows.length > PAGE && (
+            <Pager page={page} pages={Math.ceil(rows.length / PAGE)} total={rows.length} per={PAGE} onChange={goTo} />
+          )}
         </>
       )}
     </div>
+  );
+}
+
+/** Page pills: the current one green, the rest quiet; arrows at both ends. */
+function Pager({ page, pages, total, per, onChange }: { page: number; pages: number; total: number; per: number; onChange: (p: number) => void }) {
+  const first = page * per + 1;
+  const last = Math.min(total, (page + 1) * per);
+  const pill = (active: boolean) =>
+    `h-9 min-w-9 rounded-full px-3 text-sm font-semibold transition-colors ${active ? "bg-accent text-black" : "bg-surface text-muted hover:text-foreground"} disabled:opacity-30 disabled:hover:text-muted`;
+  return (
+    <nav className="flex flex-wrap items-center justify-between gap-3 pt-4" aria-label="Pool pages">
+      <p className="text-xs text-muted">
+        Showing {first}–{last} of {total} pools
+      </p>
+      <div className="flex items-center gap-1.5">
+        <button onClick={() => onChange(page - 1)} disabled={page === 0} className={pill(false)} aria-label="Previous page">
+          ‹
+        </button>
+        {Array.from({ length: pages }, (_, i) => (
+          <button key={i} onClick={() => onChange(i)} className={pill(i === page)} aria-current={i === page ? "page" : undefined}>
+            {i + 1}
+          </button>
+        ))}
+        <button onClick={() => onChange(page + 1)} disabled={page >= pages - 1} className={pill(false)} aria-label="Next page">
+          ›
+        </button>
+      </div>
+    </nav>
   );
 }
 

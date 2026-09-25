@@ -238,7 +238,7 @@ function Dashboard() {
         </p>
         <PoolList />
       </section>
-      <InviteCard />
+      <InviteCard className="mt-8" />
     </div>
   );
 }
