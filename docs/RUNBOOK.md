@@ -17,7 +17,8 @@ July entries at the bottom are kept as history._
 | `NEXT_PUBLIC_FEE_BPS` | local + Vercel | `60` |
 | `NEXT_PUBLIC_GAS_SPONSORED` | Vercel | `1` when the CDP paymaster is live on Base; only changes copy |
 | `NEXT_PUBLIC_GAS_SPONSORED_4663` | Vercel | `1` when the Alchemy Gas Manager policy is live on Robinhood Chain; changes copy and lets the server executor use the paymaster |
-| `ALCHEMY_GAS_POLICY_ID_4663` | Vercel | Gas Manager policy id for the server executor (agent access) on Robinhood Chain |
+| `ALCHEMY_GAS_POLICY_ID_4663` | Vercel | Gas Manager *sponsorship* policy id for the server executor on Robinhood Chain (only with the flag above) |
+| `NEXT_PUBLIC_GAS_TOKEN_POLICY_4663` | Vercel | Alchemy *ERC-20 Payments* policy id: users pay Robinhood gas in USDG (no ETH). Browser and server both use it. Privy's Robinhood chain entry needs the Alchemy paymaster URL + this id |
 | `NEXT_PUBLIC_SOURCE_URL` | Vercel | repo URL shown on `/trust`; unset hides the line |
 | `ALCHEMY_API_KEY` | Vercel prod/preview/dev | origin-allowlisted; server sends `Origin: https://vaults.cash` |
 | `BASE_RPC_URL`, `ROBINHOOD_RPC_URL` | optional | override the server RPC (else Alchemy, else public) |

@@ -17,7 +17,7 @@
 import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
 import { erc20Abi, formatEther, formatUnits, isAddress, parseUnits } from "viem";
-import { CHAINS, CHAIN_IDS } from "@/lib/chain";
+import { CHAINS, CHAIN_IDS, gasMode } from "@/lib/chain";
 import { MARKETS, NATIVE_ETH, marketBySlug, marketsOnChain } from "@/lib/markets";
 import { getMarketPricing, getPoolState, publicClientFor } from "@/lib/onchain";
 import { fetchPositions, getUncollectedFees } from "@/lib/positions";
@@ -112,6 +112,7 @@ const handler = createMcpHandler(
               [quote.symbol.toLowerCase()]: formatUnits(stable, quote.decimals),
               eth: formatEther(eth),
               gasSponsored: CHAINS[chainId].gasSponsored,
+              gas: gasMode(chainId),
               assets,
             };
           }),
@@ -119,7 +120,7 @@ const handler = createMcpHandler(
         return json({
           owner,
           balances: perChain,
-          note: "Deposits are made in the chain's stablecoin. Where gasSponsored is false, ETH on that chain pays network fees (well under a cent per op).",
+          note: "Deposits are made in the chain's stablecoin. gas is 'sponsored' (paid by vaults.cash), 'token' (a few cents charged in the chain's stablecoin — keep ~$0.50 of it spare), or 'eth' (paid from the wallet's ETH).",
         });
       },
     );
@@ -366,7 +367,7 @@ const handler = createMcpHandler(
               client.readContract({ address: quote.address, abi: erc20Abi, functionName: "balanceOf", args: [me.wallet] }),
               client.getBalance({ address: me.wallet }),
             ]);
-            return { chainId, chain: CHAINS[chainId].chain.name, [quote.symbol.toLowerCase()]: formatUnits(stable, quote.decimals), eth: formatEther(eth), gasSponsored: CHAINS[chainId].gasSponsored };
+            return { chainId, chain: CHAINS[chainId].chain.name, [quote.symbol.toLowerCase()]: formatUnits(stable, quote.decimals), eth: formatEther(eth), gasSponsored: CHAINS[chainId].gasSponsored, gas: gasMode(chainId) };
           }),
         );
         return json({ wallet: me.wallet, balances: perChain, note: "Deposits come out of the chain's stablecoin balance. On Base the app pays gas; on Robinhood Chain the wallet needs a little ETH." });

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { formatUnits, parseUnits } from "viem";
 import { CHAINS, type ChainId } from "@/lib/chain";
+import { spendableUsd } from "@/lib/gasToken";
+import { GasLine, gasSentence } from "./GasLine";
 import { fmtUsd } from "@/lib/format";
 import { useCashBalances } from "@/hooks/useChainData";
 import { useBridgeQuote, useBridgeStatus, useSendBridge } from "@/hooks/useBridge";
@@ -27,7 +29,7 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
   const status = useBridgeStatus(requestId);
 
   if (!source || !from) return null;
-  const max = source.formatted;
+  const max = spendableUsd(source.chainId as ChainId, source.formatted);
   const initial = Math.min(max, Math.max(suggestedUsd ?? max, 5));
   const amountNum = Number(amount || initial.toFixed(2));
   const tooMuch = amountNum > max;
@@ -79,7 +81,7 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
       </div>
       <p className="pt-1 text-muted">
         This pool takes {to.quote.symbol} on {to.label}. Move some over and it arrives at this same wallet, usually in under a
-        minute. {from.gasSponsored ? "Gas (network fees) covered by vaults.cash." : "Gas under a cent, in ETH."}
+        minute. {gasSentence(source.chainId as ChainId)}
       </p>
       <div className="mt-3 flex items-center gap-2">
         <span className="text-muted">$</span>
@@ -133,7 +135,9 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted">Gas (network fee)</dt>
-                  <dd className="font-medium">{from.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
+                  <dd className="font-medium">
+                    <GasLine chainId={source.chainId as ChainId} calls={q.calls.map((c) => ({ to: c.to, value: BigInt(c.value), data: c.data }))} />
+                  </dd>
                 </div>
               </dl>
               <p className="pb-2 text-xs text-muted">

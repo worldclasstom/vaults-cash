@@ -97,6 +97,7 @@ export function useWithdraw() {
       send(plan.calls, {
         description: `Withdraw position to ${position.market.quote.symbol}`,
         chainId: plan.chainId,
+        proceedsPayGas: true,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["positions"] });

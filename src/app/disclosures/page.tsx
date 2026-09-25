@@ -1,7 +1,7 @@
 import { MarketingShell } from "@/components/MarketingShell";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { MIN_DEPOSIT_USD } from "@/lib/limits";
-import { CHAINS } from "@/lib/chain";
+import { CHAINS, gasMode } from "@/lib/chain";
 
 export const metadata = { title: "Disclosures" };
 
@@ -61,11 +61,15 @@ export default function DisclosuresPage() {
           </p>
           <p>
             Gas (network fees) is separate from our fee and goes to the network, never to us.{" "}
-            {CHAINS[8453].gasSponsored && CHAINS[4663].gasSponsored
-              ? "On both Base and Robinhood Chain, vaults.cash pays it for you."
-              : CHAINS[8453].gasSponsored
-                ? "On Base, vaults.cash pays it for you. On Robinhood Chain you pay it from the ETH in your wallet, typically a few cents per action."
-                : "You pay it from the ETH in your wallet, typically a few cents per action."}{" "}
+            {[8453, 4663].map((id) => {
+              const c = CHAINS[id as 8453 | 4663];
+              const m = gasMode(id as 8453 | 4663);
+              return m === "sponsored"
+                ? `On ${c.chain.name}, vaults.cash pays it for you. `
+                : m === "token"
+                  ? `On ${c.chain.name} you pay it in ${c.quote.symbol} from your balance, typically a few cents per action, so you never need ETH. `
+                  : `On ${c.chain.name} you pay it from the ETH in your wallet, typically a few cents per action. `;
+            })}
             vaults.cash never marks it up.
           </p>
           <p>

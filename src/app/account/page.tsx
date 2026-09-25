@@ -10,7 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { useActiveAddress, useCashBalances, useTokenBalance } from "@/hooks/useChainData";
-import { CHAINS, CHAIN_IDS, explorerUrl, type ChainId } from "@/lib/chain";
+import { CHAINS, CHAIN_IDS, explorerUrl, gasMode, type ChainId } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 
@@ -42,11 +42,13 @@ function ChainRow({ chainId, stable, address }: { chainId: ChainId; stable: numb
       <span className="flex items-center gap-3">
         <ChainChip chainId={chainId} />
         <span className="text-xs text-muted">
-          {eth && eth.raw > 0n
-            ? `${fmtAmount(eth.formatted, 5)} ETH for gas`
-            : chain.gasSponsored
-              ? "gas (network fees) covered by vaults.cash"
-              : "no ETH for gas yet"}
+          {gasMode(chainId) === "sponsored"
+            ? "gas (network fees) covered by vaults.cash"
+            : gasMode(chainId) === "token"
+              ? `gas paid in ${chain.quote.symbol}, no ETH needed`
+              : eth && eth.raw > 0n
+                ? `${fmtAmount(eth.formatted, 5)} ETH for gas`
+                : "no ETH for gas yet"}
         </span>
       </span>
       <span className="flex items-center gap-3">

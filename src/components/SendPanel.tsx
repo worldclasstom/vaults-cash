@@ -5,6 +5,8 @@ import { useSendCalls } from "@/hooks/useSendCalls";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData, erc20Abi, formatUnits, isAddress, parseUnits } from "viem";
 import { CHAINS, CHAIN_IDS, explorerUrl, type ChainId } from "@/lib/chain";
+import { GAS_RESERVE_USD, gasTokenOf } from "@/lib/gasToken";
+import { GasLine } from "./GasLine";
 import { fmtAmount } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 import { useQuoteBalance, useTokenBalance } from "@/hooks/useChainData";
@@ -45,25 +47,29 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
     if (!balance) return;
     // on a sponsored chain no gas reserve is needed; on an unsponsored one
     // the user op's own fee comes out of the ETH balance, so leave a sliver
-    const reserve = asset === "ETH" && !chain.gasSponsored ? parseUnits("0.00002", 18) : 0n;
+    const reserve =
+      asset === "ETH" && !chain.gasSponsored && !gasTokenOf(chainId)
+        ? parseUnits("0.00002", 18)
+        : asset !== "ETH" && gasTokenOf(chainId)
+          ? parseUnits(GAS_RESERVE_USD.toFixed(decimals), decimals)
+          : 0n;
     setAmount(formatUnits(balance.raw > reserve ? balance.raw - reserve : 0n, decimals));
   };
 
+  // the one call the review sheet describes and the send executes
+  const call = canReview
+    ? asset === "ETH"
+      ? { to: to.trim() as `0x${string}`, value: amountRaw, data: "0x" as `0x${string}` }
+      : {
+          to: chain.quote.address,
+          value: 0n,
+          data: encodeFunctionData({ abi: erc20Abi, functionName: "transfer", args: [to.trim() as `0x${string}`, amountRaw] }),
+        }
+    : null;
+
   const send = useMutation({
     mutationFn: async () => {
-      const recipient = to.trim() as `0x${string}`;
-      const call =
-        asset === "ETH"
-          ? { to: recipient, value: amountRaw, data: "0x" as `0x${string}` }
-          : {
-              to: chain.quote.address,
-              value: 0n,
-              data: encodeFunctionData({
-                abi: erc20Abi,
-                functionName: "transfer",
-                args: [recipient, amountRaw],
-              }),
-            };
+      if (!call) throw new Error("Check the amount and address");
       // one user operation — waits for inclusion, returns the tx hash
       const { hash } = await sendCalls([call], { description: `Send ${assetLabel}`, chainId });
       return hash;
@@ -200,7 +206,9 @@ export function SendPanel({ onClose }: { onClose: () => void }) {
             </div>
             <div className="flex justify-between">
               <dt className="text-muted">Gas (network fee)</dt>
-              <dd className="font-medium">{chain.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
+              <dd className="font-medium">
+                <GasLine chainId={chainId} calls={call ? [call] : null} />
+              </dd>
             </div>
           </dl>
           <p className="pb-4 text-xs text-negative">

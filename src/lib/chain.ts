@@ -67,7 +67,17 @@ export type ChainConfig = {
    *  sponsors gas. Base: CDP paymaster ($15/mo free tier). Robinhood: none —
    *  users pay their own (sub-cent) gas from the wallet's ETH. */
   gasSponsored: boolean;
+  /** Set when users pay gas in this chain's stablecoin through Alchemy's
+   *  ERC-20 paymaster (no ETH needed). `paymaster` is the contract the op
+   *  approves; Alchemy reports it from pm_getPaymasterStubData. */
+  gasToken?: { policyId: string; paymaster: `0x${string}` };
 };
+
+/** How gas is paid on a chain: by us, in the chain's own dollar, or in ETH. */
+export function gasMode(chainId: ChainId): "sponsored" | "token" | "eth" {
+  const c = CHAINS[chainId];
+  return c.gasSponsored ? "sponsored" : c.gasToken ? "token" : "eth";
+}
 
 const PERMIT2 = "0x000000000022D473030F116dDEE9F6B43aC78BA3" as const;
 
@@ -116,6 +126,9 @@ export const CHAINS: Record<ChainId, ChainConfig> = {
     gecko: "robinhood",
     rpcEnv: "ROBINHOOD_RPC_URL",
     gasSponsored: process.env.NEXT_PUBLIC_GAS_SPONSORED_4663 === "1",
+    gasToken: process.env.NEXT_PUBLIC_GAS_TOKEN_POLICY_4663
+      ? { policyId: process.env.NEXT_PUBLIC_GAS_TOKEN_POLICY_4663, paymaster: "0x00000000000667f27d4db42334ec11a25db7ebb4" }
+      : undefined,
   },
 };
 

@@ -17,7 +17,7 @@ import {
   useTokenBalance,
   useUsdcBalance,
 } from "@/hooks/useChainData";
-import { CHAINS, CHAIN_IDS, type ChainId } from "@/lib/chain";
+import { CHAINS, CHAIN_IDS, gasMode, type ChainId } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
 
@@ -46,7 +46,7 @@ function AddFundsPanel({
     </>,
     <>
       It lands in your account here within seconds
-      {chain.gasSponsored ? "" : " — plus a little ETH on the same network for gas (about $1 covers many transactions)"}.
+      {gasMode(chain.chain.id as ChainId) === "eth" ? " — plus a little ETH on the same network for gas (about $1 covers many transactions)" : ""}.
     </>,
   ];
 

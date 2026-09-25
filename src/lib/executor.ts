@@ -8,6 +8,7 @@ import { KERNEL_V3_1, getEntryPoint } from "@zerodev/sdk/constants";
 import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
 import { CHAINS, chainConfig, type ChainId } from "./chain";
 import { serverRpcUrl } from "./rpc";
+import { gasTokenContext, withGasTokenApproval } from "./gasToken";
 import type { Call } from "./uniswap";
 import { privyWallets } from "./agentAccess";
 
@@ -54,7 +55,12 @@ export type ExecutionResult = { chainId: ChainId; userOpHash: Hex; txHash: Hex; 
  * Send `calls` as one user operation from the user's smart wallet on `chainId`.
  * Throws with a plain message when the user hasn't granted the session signer.
  */
-export async function executeForUser(privyDid: string, chainId: ChainId, calls: Call[]): Promise<ExecutionResult> {
+export async function executeForUser(
+  privyDid: string,
+  chainId: ChainId,
+  calls: Call[],
+  opts: { proceedsPayGas?: boolean } = {},
+): Promise<ExecutionResult> {
   const appID = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
   const appSecret = process.env.PRIVY_APP_SECRET;
   const authKey = process.env.PRIVY_AUTHORIZATION_PRIVATE_KEY;
@@ -81,20 +87,25 @@ export async function executeForUser(privyDid: string, chainId: ChainId, calls: 
   }
 
   const url = bundlerUrl(chainId);
-  // CDP (Base) sponsors from the bundler URL alone; Alchemy (Robinhood) needs the
-  // Gas Manager policy id in the ERC-7677 context, same as the Privy dashboard holds.
-  const policyId = chainId === 4663 ? process.env.ALCHEMY_GAS_POLICY_ID_4663 : undefined;
-  const paymaster = cfg.gasSponsored ? createPaymasterClient({ transport: http(url) }) : undefined;
+  // Alchemy's key is origin-allowlisted: server calls present the site's origin.
+  const transport = http(url, url.includes("g.alchemy.com") ? { fetchOptions: { headers: { Origin: "https://vaults.cash" } } } : {});
+  // CDP (Base) sponsors from the bundler URL alone. On Robinhood the user pays
+  // gas in USDG through Alchemy's ERC-20 paymaster (same context + approval the
+  // browser sends), or a sponsorship policy id when that is what's configured.
+  const sponsorPolicy = chainId === 4663 ? process.env.ALCHEMY_GAS_POLICY_ID_4663 : undefined;
+  const tokenContext = gasTokenContext(chainId, { proceedsPayGas: opts.proceedsPayGas });
+  const paymaster = cfg.gasSponsored || tokenContext ? createPaymasterClient({ transport }) : undefined;
+  const paymasterContext = tokenContext ?? (cfg.gasSponsored && sponsorPolicy ? { policyId: sponsorPolicy } : undefined);
   const client = createKernelAccountClient({
     account,
     chain: cfg.chain,
     client: publicClient,
-    bundlerTransport: http(url),
+    bundlerTransport: transport,
     ...(paymaster ? { paymaster } : {}),
-    ...(paymaster && policyId ? { paymasterContext: { policyId } } : {}),
+    ...(paymaster && paymasterContext ? { paymasterContext } : {}),
   });
   const userOpHash = await client.sendUserOperation({
-    calls: calls.map((c) => ({ to: c.to, value: c.value, data: c.data })),
+    calls: withGasTokenApproval(chainId, calls).map((c) => ({ to: c.to, value: c.value, data: c.data })),
   });
   const receipt = await client.waitForUserOperationReceipt({ hash: userOpHash, timeout: 120_000 });
   if (!receipt.success) throw new Error(`User operation reverted (tx ${receipt.receipt.transactionHash})`);

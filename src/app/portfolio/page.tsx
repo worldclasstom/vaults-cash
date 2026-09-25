@@ -18,6 +18,7 @@ import { useReferral } from "@/hooks/useReferral";
 import type { Activity } from "@/lib/activity";
 import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
 import { CHAINS, explorerNftUrl, uniswapPositionUrl } from "@/lib/chain";
+import { GasLine } from "@/components/GasLine";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { shareAmount, sharePrice } from "@/lib/markets";
 import { tickToPrice } from "@/lib/onchain";
@@ -412,7 +413,9 @@ function PositionCard({ p }: { p: PositionView }) {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted">Gas (network fee)</dt>
-                  <dd className="font-medium">{chain.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
+                  <dd className="font-medium">
+                    <GasLine chainId={chain.chain.id as 8453 | 4663} calls={wplan.calls} />
+                  </dd>
                 </div>
               </dl>
               <p className="pb-2 text-xs text-muted">

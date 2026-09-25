@@ -8,7 +8,9 @@ import { useMarketQuote, useQuoteBalance, useTokenBalance } from "@/hooks/useCha
 import { NATIVE_ETH, marketBySlug, sharePrice, type Market } from "@/lib/markets";
 import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
 import { fmtPct, fmtPrice, fmtUsd } from "@/lib/format";
-import { CHAINS, chainConfig } from "@/lib/chain";
+import { CHAINS, chainConfig, gasMode } from "@/lib/chain";
+import { leavesGasReserve, spendableUsd } from "@/lib/gasToken";
+import { GasLine, gasSentence } from "./GasLine";
 import { planSummary, presetTicks, PRESET_WIDTH, type RangePreset, type ZapPlan } from "@/lib/zap";
 import { tickToPrice } from "@/lib/onchain";
 import { MarketChips, PairIcons } from "./TokenIcon";
@@ -55,7 +57,7 @@ export function MarketDetail({ slug }: { slug: string }) {
 
   const s = stats?.[market.slug];
   const amountNum = Number(amount) || 0;
-  const insufficient = balance !== undefined && amountNum > (balance?.formatted ?? 0);
+  const insufficient = balance !== undefined && !leavesGasReserve(market.chainId, balance.formatted, amountNum);
   const belowMin = amountNum > 0 && amountNum < MIN_DEPOSIT_USD;
   const idle = poolIdle(s);
   const tooThin = s !== undefined && s.tvlUsd > 0 && amountNum > s.tvlUsd * 0.1;
@@ -145,7 +147,7 @@ export function MarketDetail({ slug }: { slug: string }) {
                 className="w-full bg-transparent font-display text-4xl font-extrabold tracking-tight outline-none placeholder:text-muted/40"
               />
               <button
-                onClick={() => balance && setAmount(String(Math.floor(balance.formatted * 100) / 100))}
+                onClick={() => balance && setAmount(String(Math.floor(spendableUsd(market.chainId, balance.formatted) * 100) / 100))}
                 className="rounded-full bg-surface-raised px-3 py-1 text-xs text-muted hover:text-foreground"
               >
                 Max
@@ -216,7 +218,7 @@ export function MarketDetail({ slug }: { slug: string }) {
               </div>
             )}
 
-            {!chain.gasSponsored && noGas && amountNum > 0 && (
+            {gasMode(market.chainId) === "eth" && noGas && amountNum > 0 && (
               <p className="mt-3 text-xs text-negative">
                 Your wallet has no ETH on {chain.label} for network fees. Send a small amount of ETH on{" "}
                 {chain.chain.name} (about $1 covers many transactions) — see Add funds on the home screen.
@@ -266,6 +268,7 @@ export function MarketDetail({ slug }: { slug: string }) {
               <Row k={`${market.base.symbol} side`} v={`~${fmtUsd(summary.baseUsd)}`} />
               <Row k={`${market.quote.symbol} side`} v={`~${fmtUsd(summary.quoteUsd)}`} />
               <Row k={`vaults.cash fee (${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 60) / 100}%)`} v={fmtUsd(summary.feeUsd)} />
+              <Row k="Gas (network fee)" v={<GasLine chainId={market.chainId} calls={plan?.calls} />} />
               <Row
                 k="Range"
                 v={
@@ -279,7 +282,7 @@ export function MarketDetail({ slug }: { slug: string }) {
             </dl>
             <p className="pb-2 text-xs text-muted">
               {plan.quoteLeg && `Your ${stable.symbol} is converted to ${market.quote.symbol} first. `}
-              {chain.gasSponsored ? "Gas (network fees) covered by vaults.cash." : "Gas well under a cent, paid in ETH from your wallet."}{" "}
+              {gasSentence(market.chainId)}{" "}
               You&apos;ll earn {market.pool.fee / 10_000}% of every trade that crosses your range. Withdraw anytime.{" "}
               <Link href="/trust" className="underline underline-offset-2">
                 What vaults.cash can and can&apos;t do
@@ -352,7 +355,7 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
   );
 }
 
-function Row({ k, v }: { k: string; v: string }) {
+function Row({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="flex justify-between">
       <dt className="text-muted">{k}</dt>
