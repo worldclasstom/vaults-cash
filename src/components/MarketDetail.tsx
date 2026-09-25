@@ -95,7 +95,7 @@ export function MarketDetail({ slug }: { slug: string }) {
           <div className="flex items-center gap-3">
             <PairIcons market={market} size={44} />
             <div>
-              <h1 className="text-2xl font-bold leading-tight">
+              <h1 className="font-display text-3xl font-extrabold leading-tight tracking-tight">
                 {market.base.symbol} <span className="text-muted">/</span> {market.quote.symbol}
               </h1>
               <p className="pt-0.5 text-sm text-muted">
@@ -107,7 +107,7 @@ export function MarketDetail({ slug }: { slug: string }) {
             </div>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold tracking-tight">{priceUsd !== undefined ? `$${fmtPrice(priceUsd)}` : "—"}</p>
+            <p className="font-display text-4xl font-extrabold tracking-tighter">{priceUsd !== undefined ? `$${fmtPrice(priceUsd)}` : "—"}</p>
             <p className="text-xs text-muted">
               {market.quoteIsStable
                 ? `1 ${market.base.symbol}`
@@ -131,14 +131,14 @@ export function MarketDetail({ slug }: { slug: string }) {
               Deposit {stable.symbol}
             </label>
             <div className="flex items-baseline gap-2 py-1">
-              <span className="text-3xl font-bold">$</span>
+              <span className="font-display text-4xl font-extrabold">$</span>
               <input
                 id="amount"
                 inputMode="decimal"
                 placeholder="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
-                className="w-full bg-transparent text-3xl font-bold outline-none placeholder:text-muted/40"
+                className="w-full bg-transparent font-display text-4xl font-extrabold tracking-tight outline-none placeholder:text-muted/40"
               />
               <button
                 onClick={() => balance && setAmount(String(Math.floor(balance.formatted * 100) / 100))}
@@ -157,11 +157,11 @@ export function MarketDetail({ slug }: { slug: string }) {
                 <button
                   key={p.id}
                   onClick={() => setPreset(p.id)}
-                  className={`rounded-2xl border p-3 text-left transition-colors ${
+                  className={`tilt rounded-2xl border p-3 text-left ${
                     preset === p.id ? "border-accent bg-accent/10" : "border-borderline bg-surface-raised hover:border-muted"
                   }`}
                 >
-                  <span className="block text-sm font-semibold">{p.label}</span>
+                  <span className="block font-display text-base font-bold">{p.label}</span>
                   <span className="block pt-0.5 text-[11px] leading-snug text-muted">{p.blurb}</span>
                 </button>
               ))}
@@ -295,7 +295,7 @@ function Stat({ label, value, accent = false }: { label: string; value: string; 
   return (
     <div className="rounded-2xl bg-surface px-4 py-3 shadow-card">
       <p className="text-[11px] uppercase tracking-wide text-muted">{label}</p>
-      <p className={`pt-0.5 text-lg font-semibold ${accent ? "text-accent" : ""}`}>{value}</p>
+      <p className={`pt-0.5 font-display text-2xl font-extrabold tracking-tight ${accent ? "text-accent" : ""}`}>{value}</p>
     </div>
   );
 }
@@ -311,7 +311,7 @@ function HowItWorks({ market }: { market: Market }) {
       : `If ${b} moves a lot against ${q}, you end up holding more of the one that fell. Wider ranges soften this; "Set & forget" never goes out of range.`;
   return (
     <section className="space-y-4 rounded-3xl bg-surface shadow-card p-5 text-sm">
-      <h2 className="font-semibold">How this pool works</h2>
+      <h2 className="font-display text-xl font-extrabold">How this pool works</h2>
       <Step n={1} title={`You hold ${b} and ${q}`}>
         Your deposit is split into both, matched to your price range, and placed in the official Uniswap pool. It stays in your own wallet as a position you can withdraw any time.
       </Step>

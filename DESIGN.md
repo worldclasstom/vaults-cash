@@ -1,6 +1,6 @@
 ---
 name: vaults.cash
-description: Robinhood-simple earning on Uniswap, drawn as a cash drawer at night
+description: Robinhood-simple earning on Uniswap, drawn as a sticker-covered ledger
 colors:
   drawer-black: "#0b0d0b"
   felt: "#141714"
@@ -12,23 +12,30 @@ colors:
   crisp-bill: "#8ee55c"
   deep-ink: "#2f7a1e"
   red-flag: "#ff5c5c"
+  sticker-yellow: "#ffd23f"
 typography:
   display:
-    fontFamily: "Geist, -apple-system, sans-serif"
+    fontFamily: "Bricolage Grotesque, Geist, sans-serif"
     fontSize: "clamp(3rem, 6vw, 4.5rem)"
-    fontWeight: 700
-    lineHeight: 1.05
+    fontWeight: 800
+    lineHeight: 1.02
     letterSpacing: "-0.025em"
   headline:
-    fontFamily: "Geist, -apple-system, sans-serif"
+    fontFamily: "Bricolage Grotesque, Geist, sans-serif"
     fontSize: "1.875rem"
-    fontWeight: 700
+    fontWeight: 800
     lineHeight: 1.15
     letterSpacing: "-0.02em"
+  money:
+    fontFamily: "Bricolage Grotesque, Geist, sans-serif"
+    fontSize: "clamp(1.875rem, 5vw, 3.75rem)"
+    fontWeight: 800
+    lineHeight: 1
+    letterSpacing: "-0.04em"
   title:
-    fontFamily: "Geist, -apple-system, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 600
+    fontFamily: "Bricolage Grotesque, Geist, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 800
     lineHeight: 1.3
   body:
     fontFamily: "Geist, -apple-system, sans-serif"
@@ -80,22 +87,27 @@ components:
     textColor: "{colors.red-flag}"
     rounded: "{rounded.pill}"
     padding: "10px 20px"
-  chip:
-    backgroundColor: "{colors.till}"
-    textColor: "{colors.ledger-gray}"
+  sticker:
+    backgroundColor: "{colors.bill-white}"
+    textColor: "{colors.drawer-black}"
     rounded: "{rounded.pill}"
-    padding: "2px 8px"
+    padding: "2px 10px"
     typography: "{typography.label}"
-  chip-accent:
-    backgroundColor: "rgba(124, 212, 74, 0.15)"
-    textColor: "{colors.fresh-bill}"
+  sticker-good:
+    backgroundColor: "{colors.fresh-bill}"
+    textColor: "#000000"
     rounded: "{rounded.pill}"
-    padding: "2px 8px"
-  chip-negative:
-    backgroundColor: "rgba(255, 92, 92, 0.15)"
-    textColor: "{colors.red-flag}"
+    padding: "2px 10px"
+  sticker-warn:
+    backgroundColor: "{colors.red-flag}"
+    textColor: "#ffffff"
     rounded: "{rounded.pill}"
-    padding: "2px 8px"
+    padding: "2px 10px"
+  sticker-chain:
+    backgroundColor: "{colors.sticker-yellow}"
+    textColor: "#000000"
+    rounded: "{rounded.pill}"
+    padding: "2px 10px"
   card:
     backgroundColor: "{colors.felt}"
     textColor: "{colors.bill-white}"
@@ -128,30 +140,30 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Cash Drawer"**
+**Creative North Star: "The Sticker Ledger"**
 
-vaults.cash looks like the inside of a cash drawer at night: a near-black
-felt bed, one green that reads as money, and every figure printed where a
-teller can read it at a glance. Surfaces are slabs that sit on the felt
-(lifted, not floating), controls are pills you can press, and numbers are
-the loudest thing on any screen. Nothing shouts, because a drawer with real
-money in it doesn't need to.
+vaults.cash is a ledger someone fun keeps: a near-black felt bed, money set
+enormous in a rounded grotesque, and state slapped on as stickers with white
+edges that never sit quite straight. Cards tilt toward you when you reach
+for them, rows nudge over, buttons bounce and then press in, and "+$" pops
+up when money lands. One green still owns every action; yellow and red
+exist only as stickers that say something.
 
-The mood is playful but precise. Motion is allowed to have character (a
-menu pops, a bill escapes, a tick lands with a spring) but only where it
-explains something, and never on a number. The app is phone-first and
-task-first: one bright action per screen, plain words next to every risk,
-and the fee written down before anyone signs.
+The mood is playful but precise. The play lives in type size, stickers and
+motion; the precision lives in the numbers, which stay tabular, exact and
+never animated for effect. Confirm sheets stay calm: the fun stops at the
+door where money moves. Phone-first, one bright action per screen, plain
+words next to every risk, the fee written down before anyone signs.
 
 Confirmed anti-references: no gradient text, no glass-as-decoration, no hype
 metrics, no invented proof, no stock-photo hands holding phones.
 
 **Key Characteristics:**
-- Near-black tonal layering with a single money-green accent
-- Tabular figures everywhere a number lives; mono for prices, ranges, addresses
-- Pills for everything interactive; big radii for everything that contains
-- Lifted cards on a felt bed; stronger lift only for things that float
-- One authored motion moment per surface, spring-eased, reduced-motion safe
+- Bricolage Grotesque at 800 for every heading, pair name, money figure and button
+- Stickers for state: white edge, crooked, green / yellow / red / white by meaning
+- Bouncy easing (`cubic-bezier(.34,1.56,.64,1)`): cards tilt, rows nudge, buttons bounce
+- Numbers are the biggest thing on any screen and stay exact and tabular
+- One green action per screen; confirm sheets stay calm
 
 ## Colors
 
@@ -178,28 +190,36 @@ A drawer palette: black felt, white bills, one green, one red flag.
 - **Ledger Gray** (#8b938b): secondary text, labels, placeholder ink, inactive
   tabs. Never for a number that matters.
 
+### Secondary
+- **Sticker Yellow** (#ffd23f): the chain sticker (Base, Robinhood) and
+  nothing else. Never a button, never text on dark.
+
 ### Semantic
-- **Red Flag** (#ff5c5c): out-of-range, errors, idle pools, log out. Always on
-  a 15% tint of itself, never as a filled button.
+- **Red Flag** (#ff5c5c): the warn sticker (Out of range, No trades in 24h),
+  errors, log out. As a sticker it is a solid fill with white text; as text
+  it sits on a 15% tint.
 
 ### Named Rules
 **The One Green Rule.** Fresh Bill appears on at most one action per screen
 and on figures that represent money earned. If two things are green, one of
 them is wrong.
 
-**The Tinted Semantic Rule.** Red and green state chips sit on a 15% tint of
-their own hue, never on gray. Gray is for things that are merely secondary.
+**The Sticker Rule.** State is a sticker: solid fill, 2.5px Bill White edge,
+a small drop shadow, rotated a few degrees (alternating by position). White
+for facts (fee tier, stock token), green for good, red for warn, yellow for
+the chain. Stickers inform; they are never buttons.
 
 ## Typography
 
-**Display Font:** Geist (with -apple-system, sans-serif)
+**Display Font:** Bricolage Grotesque (with Geist, sans-serif)
 **Body Font:** Geist
 **Figure/Mono Font:** Geist Mono (with ui-monospace)
 
-**Character:** one sans for everything readable, tight and confident at
-display size, neutral at body size; a mono cousin for anything a teller would
-double-check. Tabular numerals are on globally, so columns of money align
-without effort.
+**Character:** a rounded, slightly eccentric grotesque at 800 for everything
+that should feel like a headline (titles, pair names, money, buttons) over a
+neutral Geist body; Geist Mono for anything a teller would double-check.
+Tabular numerals are on globally. The display face is where the fun lives,
+so body copy never borrows it.
 
 ### Hierarchy
 - **Display** (700, clamp(3rem, 6vw, 4.5rem), 1.05, -0.025em): landing
@@ -208,8 +228,9 @@ without effort.
   ("cbETH / ETH", "Account"). The quote symbol sits in Ledger Gray after a
   gray slash.
 - **Title** (600, 1.125rem, 1.3): section headings and sheet titles.
-- **Money** (700, 2.25rem to 2.5rem, tight tracking): the big number on a
-  card or sheet; Geist, not mono, because it is a headline, not a ledger.
+- **Money** (Bricolage 800, 1.875rem on cards up to 3.75rem on the
+  portfolio total, tracking -0.04em): the big number on a card, sheet or
+  page. Always the largest thing in its container.
 - **Body** (400, 0.875rem, 1.5): explanations, notes, disclosures; 65 to
   75 characters per line.
 - **Label** (500, 0.6875rem, 0.04em, uppercase for stat labels): stat
@@ -219,8 +240,8 @@ without effort.
 
 ### Named Rules
 **The Ledger Rule.** A number the user might act on is set in Geist Mono
-with tabular figures. Prose numbers (a "$5 minimum" in a sentence) stay in
-Geist.
+with tabular figures; a number that is the headline of its card is set in
+Bricolage 800. Prose numbers stay in Geist. Numbers never animate.
 
 ## Layout
 
@@ -265,26 +286,42 @@ a circle; pair marks overlap with the base token on top.
 ### Buttons
 - **Shape:** full pill (9999px); primary is 12px tall padding, secondary 8px.
 - **Primary:** Fresh Bill background, black text, 600 weight. One per screen.
-- **Hover / Focus / Press:** hover to Crisp Bill; keyboard focus draws a 2px
-  Fresh Bill ring 2px outside; press scales to 98% for 120ms. Disabled drops
-  to 40% opacity with a not-allowed cursor.
+- **Hover / Focus / Press:** primary buttons bounce to 104% and tilt -1° on
+  hover (bounce ease, 200ms) and press to 96%; keyboard focus draws a 2px
+  Fresh Bill ring 2px outside. Disabled drops to 40% opacity with a
+  not-allowed cursor.
 - **Secondary:** Till background, Bill White text; hover to Seam.
 - **Danger:** Red Flag text on a 15% Red Flag tint; hover to 25%.
 - **Copy:** buttons name the outcome with the amount when there is one
   ("Withdraw $5.79", "Minimum $5.00"), never "Submit".
 
-### Chips
-- **Style:** pill, 11px medium, 2px by 8px padding. Neutral chips are Ledger
-  Gray on Till; outline chips (chain names) are a Seam hairline with gray text.
-- **State:** Fresh Bill on 15% green for earning/steady; Red Flag on 15% red
-  for out-of-range, idle, errors. Chips inform; they are not buttons.
+### Stickers (chips)
+- **Style:** pill, 11px Bricolage 700, 2px by 10px padding, 2.5px Bill White
+  edge, `0 2px 6px rgb(0 0 0 / .45)` shadow, rotated -3° / 2.5° / -1.5° by
+  position in the row.
+- **Meaning:** white (fee tier, stock token), green (Earning, Steady), red
+  (Out of range, No trades in 24h), yellow (chain). Stickers inform; they are
+  not buttons.
 
 ### Cards / Containers
 - **Corner Style:** 24px (cards, sheets); 16px (rows, inner panels).
 - **Background:** Felt at rest; Till for a panel nested inside a card.
-- **Shadow Strategy:** card lift at rest; elevated only when floating.
+- **Shadow Strategy:** card lift at rest; elevated when floating or hovered.
+- **Motion:** position cards and range presets tilt -1° and grow 1.5% on
+  hover (`.tilt`); pool rows nudge 6px right (`.nudge`). Both on the bounce
+  ease, both off under reduced motion.
 - **Border:** none on cards; 1px Seam on menus.
 - **Internal Padding:** 20px cards, 16px rows, 12px inner panels.
+
+### Fee Bar (signature)
+- Under every position: a 10px pill track in Till with a Deep Ink → Fresh
+  Bill fill showing how far the fees traders paid have gone toward covering
+  the 0.6% it cost to enter; "Entry fee covered — every fee from here is
+  profit" at 100%. Honest by construction: it measures money, not vibes.
+
+### Cash Pop (signature)
+- When a deposit is confirmed, four "+$" in Bricolage 800 Fresh Bill float
+  up out of the card (2.2s, staggered). The only decorative motion in the app.
 
 ### Inputs / Fields
 - **Style:** Drawer Black well, 12px corners, no border; the big deposit
@@ -320,8 +357,10 @@ a circle; pair marks overlap with the base token on top.
 - **Do** put the fee, the minimum you receive, and the chain on every confirm
   sheet before the button.
 - **Do** set money in tabular figures and copyable values in Geist Mono.
-- **Do** use one green action per screen and let it be the only saturated
-  thing in view.
+- **Do** use one green action per screen; yellow and red appear only as
+  stickers that mean something.
+- **Do** set the headline number of every card in Bricolage 800 and make it
+  the largest thing in the card.
 - **Do** lift cards with the card-lift shadow and reserve the elevated
   shadow for menus and sheets.
 - **Do** give every custom control keyboard behavior and the accent focus
@@ -338,4 +377,6 @@ a circle; pair marks overlap with the base token on top.
 - **Don't** hide which chain money is on, and don't show an amount without
   its currency.
 - **Don't** put a colored left border on cards or alerts; state lives in the
-  chip, not the frame.
+  sticker, not the frame.
+- **Don't** let the bounce reach a confirm sheet's numbers or buttons after
+  the amount is shown; the moment money moves, motion stops.

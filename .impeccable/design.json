@@ -153,6 +153,21 @@
           "#ff9999",
           "#ffe5e5"
         ]
+      },
+      "sticker-yellow": {
+        "role": "secondary",
+        "displayName": "Sticker Yellow",
+        "canonical": "#ffd23f",
+        "tonalRamp": [
+          "#4d3a00",
+          "#806000",
+          "#b38700",
+          "#e6ad00",
+          "#ffd23f",
+          "#ffdd66",
+          "#ffe98f",
+          "#fff5c7"
+        ]
       }
     },
     "typographyMeta": {
@@ -179,6 +194,10 @@
       "figure": {
         "displayName": "Figure",
         "purpose": "Prices, ranges, addresses; anything copyable."
+      },
+      "money": {
+        "displayName": "Money",
+        "purpose": "The headline number of a card, sheet or page."
       }
     },
     "shadows": [
@@ -195,14 +214,14 @@
     ],
     "motion": [
       {
-        "name": "ease-spring",
-        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Pops, ticks and sheet rises."
+        "name": "ease-bounce",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Tilt, nudge, button bounce, sheet rise, menu pop."
       },
       {
         "name": "press",
-        "value": "transform .12s cubic-bezier(.2,.8,.2,1)",
-        "purpose": "Button press to 98%."
+        "value": "transform .08s",
+        "purpose": "Button press to 96%."
       }
     ],
     "breakpoints": [
@@ -279,14 +298,14 @@
     }
   ],
   "narrative": {
-    "northStar": "The Cash Drawer",
-    "overview": "vaults.cash looks like the inside of a cash drawer at night: a near-black felt bed, one green that reads as money, and every figure printed where a teller can read it at a glance. Surfaces are slabs that sit on the felt (lifted, not floating), controls are pills you can press, and numbers are the loudest thing on any screen. The mood is playful but precise: motion has character only where it explains something, and never on a number.",
+    "northStar": "The Sticker Ledger",
+    "overview": "vaults.cash is a ledger someone fun keeps: a near-black felt bed, money set enormous in a rounded grotesque, and state slapped on as stickers with white edges that never sit quite straight. Cards tilt toward you, rows nudge over, buttons bounce and then press in, and \"+$\" pops up when money lands. One green still owns every action; yellow and red exist only as stickers that say something. The play lives in type size, stickers and motion; the precision lives in the numbers, which stay tabular, exact and never animated.",
     "keyCharacteristics": [
-      "Near-black tonal layering with a single money-green accent",
-      "Tabular figures everywhere a number lives; mono for prices, ranges, addresses",
-      "Pills for everything interactive; big radii for everything that contains",
-      "Lifted cards on a felt bed; stronger lift only for things that float",
-      "One authored motion moment per surface, spring-eased, reduced-motion safe"
+      "Bricolage Grotesque at 800 for every heading, pair name, money figure and button",
+      "Stickers for state: white edge, crooked, green / yellow / red / white by meaning",
+      "Bouncy easing: cards tilt, rows nudge, buttons bounce",
+      "Numbers are the biggest thing on any screen and stay exact and tabular",
+      "One green action per screen; confirm sheets stay calm"
     ],
     "rules": [
       {

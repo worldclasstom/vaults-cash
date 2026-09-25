@@ -64,14 +64,15 @@ export function Chip({
   tone?: "muted" | "accent" | "negative" | "outline";
   title?: string;
 }) {
+  // stickers: white edge, a color per meaning (neutral / good / warn / chain)
   const cls = {
-    muted: "bg-surface-raised text-muted",
-    accent: "bg-accent/15 text-accent",
-    negative: "bg-negative/15 text-negative",
-    outline: "border border-borderline text-muted",
+    muted: "bg-foreground text-background",
+    accent: "bg-accent text-black",
+    negative: "bg-negative text-white",
+    outline: "bg-sticker-yellow text-black",
   }[tone];
   return (
-    <span title={title} className={`inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium leading-4 ${cls}`}>
+    <span title={title} className={`sticker inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] leading-4 ${cls}`}>
       {children}
     </span>
   );

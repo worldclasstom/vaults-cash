@@ -24,7 +24,7 @@ export default function HowItWorksPage() {
     <MarketingShell>
       <div className="mx-auto max-w-2xl animate-rise space-y-8 px-6 py-14">
         <header>
-          <h1 className="text-3xl font-bold">How it works</h1>
+          <h1 className="font-display text-4xl font-extrabold tracking-tight">How it works</h1>
           <p className="pt-2 text-muted">
             No black box: here is exactly what happens to your money, step by
             step — and how to verify every part of it yourself, on-chain.

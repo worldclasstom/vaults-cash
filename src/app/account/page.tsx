@@ -64,7 +64,7 @@ export default function AccountPage() {
         </div>
       ) : (
         <div className="animate-rise space-y-4 py-4">
-          <h1 className="text-2xl font-bold">Account</h1>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight">Account</h1>
 
           <section className="rounded-3xl bg-surface shadow-card p-5">
             <p className="text-sm text-muted">Signed in as</p>

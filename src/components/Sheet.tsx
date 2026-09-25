@@ -75,7 +75,7 @@ export function Sheet({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-borderline sm:hidden" aria-hidden />
-        <h3 id={titleId} className="text-lg font-semibold">
+        <h3 id={titleId} className="font-display text-2xl font-extrabold tracking-tight">
           {title}
         </h3>
         {children}

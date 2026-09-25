@@ -141,20 +141,20 @@ function PoolRow({ q, s }: { q: MarketQuote; s?: MarketStats }) {
     <li>
       <Link
         href={`/market/${m.slug}`}
-        className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl bg-surface p-4 shadow-card transition-[background-color,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-surface-raised hover:shadow-elevated sm:grid-cols-[minmax(0,2.2fr)_1fr_1fr_1fr_0.8fr]"
+        className="grid grid-cols-[auto_1fr_auto] items-center gap-3 nudge rounded-2xl bg-surface p-4 shadow-card hover:bg-surface-raised sm:grid-cols-[minmax(0,2.2fr)_1fr_1fr_1fr_0.8fr]"
       >
         <span className="flex min-w-0 items-center gap-3 sm:col-span-1">
           <PairIcons market={m} size={34} />
-          <span className="hidden min-w-0 flex-col sm:flex">
-            <span className="truncate font-semibold">
+          <span className="hidden min-w-0 flex-col gap-1 sm:flex">
+            <span className="truncate font-display text-lg font-bold">
               {m.base.symbol} <span className="text-muted">/</span> {m.quote.symbol}
             </span>
             <MarketChips market={m} stats={s} />
           </span>
         </span>
         {/* mobile: name + chips in the middle column */}
-        <span className="flex min-w-0 flex-col sm:hidden">
-          <span className="truncate font-semibold">
+        <span className="flex min-w-0 flex-col gap-1 sm:hidden">
+          <span className="truncate font-display text-lg font-bold">
             {m.base.symbol} <span className="text-muted">/</span> {m.quote.symbol}
           </span>
           <MarketChips market={m} stats={s} />
@@ -166,7 +166,7 @@ function PoolRow({ q, s }: { q: MarketQuote; s?: MarketStats }) {
         <span className="hidden text-right text-sm sm:block">{s ? fmtUsd(s.tvlUsd, { compact: true }) : "—"}</span>
         <span className="hidden text-right text-sm sm:block">{s ? fmtUsd(s.vol24hUsd, { compact: true }) : "—"}</span>
         <span className="text-right">
-          <span className="block font-semibold text-accent">{s ? fmtPct(s.estAprPct) : "—"}</span>
+          <span className="block font-display text-2xl font-extrabold tracking-tight text-accent">{s ? fmtPct(s.estAprPct) : "—"}</span>
           <span className="block text-[11px] text-muted sm:hidden">est. APR</span>
         </span>
       </Link>

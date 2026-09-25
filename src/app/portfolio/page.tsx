@@ -123,6 +123,31 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
   );
 }
 
+const FEE_RATE = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 10_000;
+
+/** Fills as trades pay the position back the fee it cost to enter — the
+ *  honest version of a progress bar: once it's full, everything is profit. */
+function FeeBar({ feesUsd, valueUsd }: { feesUsd: number; valueUsd: number }) {
+  const entryFee = valueUsd * FEE_RATE;
+  const pct = entryFee > 0 ? Math.min(100, (feesUsd / entryFee) * 100) : 0;
+  const covered = pct >= 100;
+  return (
+    <div className="pt-3">
+      <div className="h-2.5 overflow-hidden rounded-full bg-surface-raised">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-accent-deep to-accent transition-[width] duration-700 ease-out"
+          style={{ width: `${Math.max(pct, feesUsd > 0 ? 3 : 0)}%` }}
+        />
+      </div>
+      <p className="pt-1.5 text-xs text-muted">
+        {covered
+          ? "Entry fee covered — every fee from here is profit."
+          : `${pct.toFixed(0)}% of the way to covering the ${fmtUsd(entryFee)} entry fee.`}
+      </p>
+    </div>
+  );
+}
+
 function PositionCard({ p }: { p: PositionView }) {
   const { data: stats } = useStats();
   const planWithdraw = usePlanWithdraw();
@@ -151,12 +176,12 @@ function PositionCard({ p }: { p: PositionView }) {
   const priceUsd = sharePrice(m, p.price * p.quoteUsd);
 
   return (
-    <li className="rounded-3xl bg-surface shadow-card p-5">
+    <li className="tilt rounded-3xl bg-surface shadow-card p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <PairIcons market={m} size={38} />
           <div>
-            <p className="font-semibold leading-tight">
+            <p className="font-display text-xl font-bold leading-tight">
               {m.base.symbol} <span className="text-muted">/</span> {m.quote.symbol}
             </p>
             <div className="flex flex-wrap items-center gap-1 pt-1">
@@ -166,11 +191,11 @@ function PositionCard({ p }: { p: PositionView }) {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xl font-bold">{fmtUsd(p.valueUsd)}</p>
+          <p className="font-display text-3xl font-extrabold tracking-tight">{fmtUsd(p.valueUsd)}</p>
           <p className="text-xs text-muted">
-            fees earned{" "}
-            <span className={p.feesUsd > 0 ? "text-accent" : ""}>
-              {p.feesUsd >= 0.01 ? fmtUsd(p.feesUsd) : p.feesUsd > 0 ? "<$0.01" : "$0.00"}
+            traders paid you{" "}
+            <span className={`font-display font-bold ${p.feesUsd > 0 ? "text-accent" : ""}`}>
+              {p.feesUsd >= 0.01 ? `+${fmtUsd(p.feesUsd)}` : p.feesUsd > 0 ? "+<$0.01" : "$0.00"}
             </span>
           </p>
         </div>
@@ -179,6 +204,9 @@ function PositionCard({ p }: { p: PositionView }) {
       <div className="pt-4">
         <RangeBar price={priceUsd} lower={lower} upper={upper} inRange={p.inRange} compact />
       </div>
+
+      {/* the fee bar: how far the fees traders paid have gone toward covering the 0.6% it cost to enter */}
+      <FeeBar feesUsd={p.feesUsd} valueUsd={p.valueUsd} />
 
       <p className="pt-3 text-sm text-muted">
         Holding {fmtAmount(shareAmount(m, p.baseAmount), 5)} {m.base.symbol} + {fmtAmount(p.quoteAmount, m.quoteIsStable ? 2 : 5)}{" "}
@@ -313,19 +341,15 @@ function EmptyPositions() {
   if (justDeposited) {
     return (
       <div className="relative overflow-hidden rounded-3xl bg-surface shadow-card p-8 text-center">
-        {/* the one playful moment: a few bills leave the drawer */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center gap-10">
-          {[-8, 4, -3].map((tilt, i) => (
-            <span
-              key={i}
-              className="animate-bill-escape rounded-md bg-accent/15 px-2 py-0.5 font-mono text-xs font-semibold text-accent"
-              style={{ animationDelay: `${i * 0.7}s`, ["--tilt" as string]: `${tilt}deg` } as React.CSSProperties}
-            >
+        {/* money landing: +$ pops up while the position indexes */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-around px-10">
+          {[0, 0.5, 1, 1.5].map((delay, i) => (
+            <span key={i} className="animate-cash-up font-display text-lg font-extrabold text-accent" style={{ animationDelay: `${delay}s` }}>
               +$
             </span>
           ))}
         </div>
-        <p className="font-semibold text-accent">Deposit confirmed ✓</p>
+        <p className="font-display text-2xl font-extrabold text-accent">Deposit confirmed</p>
         <p className="pt-2 text-sm text-muted">Your position is on-chain and will show here in a few seconds.</p>
         <div className="mx-auto mt-4 h-1.5 w-24 animate-pulse rounded-full bg-accent/40" />
       </div>
@@ -372,7 +396,7 @@ export default function PortfolioPage() {
           <section className="grid grid-cols-2 gap-2 pb-8 sm:grid-cols-4">
             <div className="col-span-2 rounded-3xl bg-surface shadow-card p-5 sm:col-span-2">
               <p className="text-sm text-muted">In positions</p>
-              <p className="py-1 text-4xl font-bold tracking-tight">{fmtUsd(total)}</p>
+              <p className="py-1 font-display text-6xl font-extrabold tracking-tighter">{fmtUsd(total)}</p>
               <p className="text-sm text-muted">
                 + {cash ? fmtUsd(cash.totalUsd) : "—"} cash available
                 {cash && cash.perChain.filter((c) => c.formatted > 0).length > 1 && (
@@ -390,17 +414,17 @@ export default function PortfolioPage() {
             </div>
             <div className="rounded-3xl bg-surface shadow-card p-5">
               <p className="text-sm text-muted">Fees to collect</p>
-              <p className="py-1 text-2xl font-bold text-accent">{fmtUsd(fees)}</p>
+              <p className="py-1 font-display text-3xl font-extrabold tracking-tight text-accent">{fmtUsd(fees)}</p>
             </div>
             <div className="rounded-3xl bg-surface shadow-card p-5">
               <p className="text-sm text-muted">Earning</p>
-              <p className="py-1 text-2xl font-bold">
+              <p className="py-1 font-display text-3xl font-extrabold tracking-tight">
                 {positions ? `${earning}/${positions.length}` : "—"}
               </p>
             </div>
           </section>
           <section>
-            <h2 className="pb-3 text-lg font-semibold">Positions</h2>
+            <h2 className="pb-3 font-display text-2xl font-extrabold tracking-tight">Positions</h2>
             {isLoading ? (
               <div className="h-28 animate-pulse rounded-3xl bg-surface shadow-card" />
             ) : isError ? (

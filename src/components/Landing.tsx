@@ -127,7 +127,7 @@ export function Landing() {
             <p className="rounded-full bg-accent/10 px-4 py-1.5 text-xs font-semibold text-accent">
               Live on Base and Robinhood Chain
             </p>
-            <h1 className="text-balance text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl xl:text-7xl">
+            <h1 className="text-balance font-display text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl">
               Every trade pays a fee. Be the one{" "}
               <span className="text-accent">collecting it</span>.
             </h1>
