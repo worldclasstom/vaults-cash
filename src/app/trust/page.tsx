@@ -3,7 +3,7 @@ import { MarketingShell } from "@/components/MarketingShell";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { CHAINS, CHAIN_IDS, explorerUrl } from "@/lib/chain";
 
-export const metadata = { title: "What vaults.cash can and can't do — vaults.cash" };
+export const metadata = { title: "What vaults.cash can and can't do" };
 
 const FEE_WALLET = process.env.NEXT_PUBLIC_FEE_RECIPIENT;
 const SOURCE_URL = process.env.NEXT_PUBLIC_SOURCE_URL;

@@ -2,7 +2,7 @@ import { MarketingShell } from "@/components/MarketingShell";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { MIN_DEPOSIT_USD } from "@/lib/limits";
 
-export const metadata = { title: "Disclosures — vaults.cash" };
+export const metadata = { title: "Disclosures" };
 
 const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100;
 

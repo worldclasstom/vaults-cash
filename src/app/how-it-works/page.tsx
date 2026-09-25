@@ -4,7 +4,7 @@ import { ChainChip, Chip } from "@/components/TokenIcon";
 import { DepositFlow, RangeDemo, WithdrawFlow } from "@/components/HowItWorksVisuals";
 import { CHAINS, CHAIN_IDS } from "@/lib/chain";
 
-export const metadata = { title: "How it works — vaults.cash" };
+export const metadata = { title: "How it works" };
 
 const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100;
 

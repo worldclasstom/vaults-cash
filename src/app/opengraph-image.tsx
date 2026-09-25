@@ -75,7 +75,7 @@ export default async function OgImage() {
             vaults<span style={{ color: "#7cd44a" }}>.cash</span>
           </div>
           <div style={{ display: "flex", fontSize: 24, fontWeight: 500, color: "#8b938b" }}>
-            Now live on Base
+            Live on Base and Robinhood Chain
           </div>
         </div>
       </div>

@@ -27,9 +27,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://vaults.cash"),
-  title: "vaults.cash — earn on Base",
+  // lead with the product, not the chain: the simple way to earn what traders pay
+  title: { default: "vaults.cash — earn what traders pay", template: "%s — vaults.cash" },
   description:
-    "Every trade pays a fee. Be the one collecting it. Turn your USDC into earning liquidity positions on Base — tokenized stocks and blue-chip crypto, one tap.",
+    "Every trade pays a fee. Be the one collecting it. One tap turns your dollars into an earning position in ETH, Bitcoin or stock tokens — self-custodial, on Base and Robinhood Chain.",
   openGraph: {
     siteName: "vaults.cash",
     type: "website",
