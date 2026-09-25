@@ -2,10 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { AGENT_DOCS, AgentError, requireOwner, serializeCalls } from "@/lib/agent";
 import { fetchPositions } from "@/lib/positions";
 import { buildWithdrawPlan } from "@/lib/withdraw";
+import { referrerWalletForCode } from "@/lib/referral";
 
 /**
  * POST /api/agent/withdraw-plan
- * body: { owner, tokenId, slippageBps? }
+ * body: { owner, tokenId, slippageBps?, ref? }  (`ref` = referral code paid half the fee on-chain)
  * Returns calls that burn the position and convert everything back to USDC.
  */
 export async function POST(req: NextRequest) {
@@ -25,11 +26,13 @@ export async function POST(req: NextRequest) {
     if (!position)
       throw new AgentError(404, `No live position ${tokenId} owned by ${owner} in listed markets`);
 
-    const plan = await buildWithdrawPlan({ position, slippageBps });
+    const referrer = await referrerWalletForCode(body.ref, owner);
+    const plan = await buildWithdrawPlan({ position, slippageBps, owner, referrer });
     return NextResponse.json({
       chainId: plan.chainId,
       market: position.market.slug,
       quote: position.market.quote.symbol,
+      referrer,
       calls: serializeCalls(plan.calls),
       summary: {
         minBaseOut: plan.baseOutMin.toString(),

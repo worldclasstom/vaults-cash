@@ -1,28 +1,34 @@
 # vaults.cash
 
-> One-call Uniswap v4 liquidity positions on Base (chain id 8453).
-> Convert USDC into slippage-bounded, atomic LP position call-batches. Fee
-> 0.60% of converted amounts, embedded in the returned calls. Self-custodial:
-> the executing wallet owns the position NFT; vaults.cash never holds funds.
+> One-call Uniswap v4 liquidity positions on Base (8453) and Robinhood
+> Chain (4663). Convert the chain's stablecoin into slippage-bounded LP
+> position call-batches. Fee 0.60% of converted amounts, embedded in the
+> returned calls; minimum $5. Self-custodial: the executing wallet owns the
+> position NFT; vaults.cash never holds funds or keys.
 
 ## MCP server (recommended for agents)
 
 Streamable HTTP endpoint: https://vaults.cash/api/mcp/mcp
 Tools: list_markets, get_balances, get_deposit_quote, build_deposit_calls,
-list_positions, build_withdraw_calls, build_collect_calls.
+build_add_calls, list_positions, build_withdraw_calls, build_collect_calls.
 Build tools return {to, value, data} call batches you sign with your own wallet.
+Optional `ref` on build tools: a vaults.cash referral code; half the fee is
+paid on-chain to that code's wallet in the same batch (integrators: use yours).
 
 ## REST API (no auth, JSON)
 
 - GET  /api/agent/markets — listed markets, live prices, pool ids, docs
 - GET  /api/agent/quote?market=ETH&amountUsd=100&preset=balanced — read-only deposit split
-- POST /api/agent/zap-plan {market, amountUsd, owner, preset?, widthPct?, slippageBps?} — executable calls: USDC -> LP position
+- POST /api/agent/zap-plan {market, amountUsd, owner, preset?, widthPct?, slippageBps?, ref?, tokenId?} — executable calls: stablecoin -> LP position (tokenId = add to that existing position)
 - GET  /api/agent/positions?owner=0x… — live positions for a wallet
-- POST /api/agent/withdraw-plan {owner, tokenId, slippageBps?} — executable calls: position -> USDC
+- POST /api/agent/withdraw-plan {owner, tokenId, slippageBps?, ref?} — executable calls: position -> stablecoin
 
 Presets: full (never rebalance) | balanced (±30%) | aggressive (±15%).
 Execute calls IN ORDER from `owner`; batch atomically if the wallet supports it
-(ERC-4337/EIP-7702). Plans embed slippage bounds and expire — rebuild after ~60s.
+(ERC-4337/EIP-7702). A plain EOA must send them one by one and stop on any
+revert — a deposit is ~8 transactions and is not atomic that way. The owner
+pays its own gas (ETH on both chains); sponsorship is only in the web app.
+Plans embed slippage bounds and expire — rebuild after ~60s.
 
 ## Important
 

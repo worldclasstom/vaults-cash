@@ -87,6 +87,8 @@ export const AGENT_DOCS = {
   fees: `vaults.cash takes ${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}% of the deposit (and of the converted output on withdraw), included in the returned calls. Minimum deposit or add: $${MIN_DEPOSIT_USD} (plan requests below it are rejected).`,
   markets:
     `Markets are Uniswap v4 pools identified by pair slug: "<chain>/<base>-<quote>", e.g. "base/eth-usdc", "base/cbbtc-eth", "robinhood/tsla-eth". Deposits and withdrawals are always in the chain's stablecoin (${CHAIN_IDS.map((id) => `${CHAINS[id].label} chain ${id}: ${CHAINS[id].quote.symbol}`).join("; ")}); when a market's quote isn't the stablecoin the plan converts through the quote's own stablecoin pool. A bare token ("eth") means that token's stablecoin pair on Base. Every plan reports the chainId its calls must run on. kind=stable pairs and lowIl=true pairs track the same thing on both legs (minimal impermanent loss); kind=stock legs are Robinhood-issued tokens on Robinhood Chain tracking US equities/ETFs (availability depends on the party's jurisdiction; uiMultiplier converts raw units to displayed shares). Markets are listed automatically from every live pool in the registry; check liquidity before sizing a deposit.`,
+  referral:
+    "Pass `ref` (a vaults.cash referral code) on build calls and half of the fee is paid on-chain, in the same batch, to that code's wallet — the same 50% split the web app pays referrers. Integrators: use your own code.",
   slippage:
     "Plans embed amountOutMinimum and amountMax bounds; if a pool moves beyond slippageBps the batch reverts. Quotes expire — rebuild plans older than ~60s.",
 };

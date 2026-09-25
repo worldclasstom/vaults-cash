@@ -72,11 +72,18 @@ legal review before public marketing.
 Agents (MCP hosts, bots, LLM tools) use the same engine without the UI —
 discovery at [/llms.txt](public/llms.txt):
 
-- MCP (Streamable HTTP): `https://vaults.cash/api/mcp/mcp`
+- MCP (Streamable HTTP): `https://vaults.cash/api/mcp/mcp` — eight tools
+  (markets, balances, quote, deposit, add, positions, withdraw, collect)
 - `GET /api/agent/markets` · `GET /api/agent/quote` — read-only
 - `POST /api/agent/zap-plan` · `POST /api/agent/withdraw-plan` — executable,
-  fee-inclusive call batches signed by the agent's own wallet
+  fee-inclusive call batches signed by the agent's own wallet; `ref` pays
+  half the fee on-chain to a referral code's wallet, `tokenId` adds to an
+  existing position
 - `GET /api/agent/positions?owner=0x…`
+
+The agent brings its own wallet and pays its own gas; a plain EOA sends the
+calls sequentially (not atomic), a smart account batches them. End-to-end
+harness: `scripts/agent-e2e.ts` (see its header).
 
 
 ## Security

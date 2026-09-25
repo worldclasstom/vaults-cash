@@ -17,6 +17,7 @@ import { fetchPositions, getUncollectedFees } from "@/lib/positions";
 import { buildZapPlan } from "@/lib/zap";
 import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
 import { serializeCalls, AGENT_DOCS } from "@/lib/agent";
+import { referrerWalletForCode } from "@/lib/referral";
 
 const json = (data: unknown) => ({
   content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
@@ -29,6 +30,12 @@ const ownerSchema = z
 const marketSchema = z
   .string()
   .refine((s) => !!marketBySlug(s), `one of: ${MARKETS.map((m) => m.slug).join(", ")}`);
+
+const refSchema = z
+  .string()
+  .regex(/^[A-Z0-9]{4,16}$/i)
+  .optional()
+  .describe("vaults.cash referral code; half of the fee is paid on-chain to that code's wallet in the same batch (integrators: use your own code)");
 
 const chainSummary = CHAIN_IDS.map((id) => `${CHAINS[id].chain.name} (chain ${id}, deposits in ${CHAINS[id].quote.symbol})`).join(" and ");
 
@@ -145,29 +152,81 @@ const handler = createMcpHandler(
 
     server.tool(
       "build_deposit_calls",
-      "Build the executable call batch converting `amountUsd` of the owner's stablecoin (USDC on Base, USDG on Robinhood Chain) into a Uniswap v4 LP position in the given pair, owned by them. Execute the calls IN ORDER from the owner wallet on the returned chainId (atomically if it supports batching). Includes the 0.6% vaults.cash fee. Calls embed slippage bounds and expire ~20 minutes after building.",
+      "Build the executable call batch converting `amountUsd` of the owner's stablecoin (USDC on Base, USDG on Robinhood Chain) into a NEW Uniswap v4 LP position in the given pair, owned by them. Execute the calls IN ORDER from the owner wallet on the returned chainId (atomically if it supports batching). Includes the 0.6% vaults.cash fee (minimum deposit $5). Calls embed slippage bounds and expire ~20 minutes after building. To grow an existing position use build_add_calls.",
       {
         market: marketSchema,
         amountUsd: z.number().positive(),
         owner: ownerSchema,
         preset: z.enum(["full", "balanced", "aggressive"]).default("full"),
+        widthPct: z.number().positive().max(500).optional().describe("custom ±% range width instead of a preset"),
         slippageBps: z.number().int().min(10).max(1000).default(100),
+        ref: refSchema,
       },
-      async ({ market: sym, amountUsd, owner, preset, slippageBps }) => {
+      async ({ market: sym, amountUsd, owner, preset, widthPct, slippageBps, ref }) => {
         const market = marketBySlug(sym)!;
         const stable = CHAINS[market.chainId].quote;
-        const poolState = await getPoolState(market);
+        const [poolState, referrer] = await Promise.all([getPoolState(market), referrerWalletForCode(ref, owner)]);
         const plan = await buildZapPlan({
           market,
           owner: owner as `0x${string}`,
           usdcAmount: parseUnits(amountUsd.toFixed(stable.decimals), stable.decimals),
           preset,
+          customWidth: widthPct !== undefined ? widthPct / 100 : undefined,
           slippageBps,
           poolState,
+          referrer,
         });
         return json({
           chainId: plan.chainId,
           market: market.slug,
+          referrer,
+          calls: serializeCalls(plan.calls),
+          summary: {
+            fee: `${formatUnits(plan.feeAmount, stable.decimals)} ${stable.symbol}`,
+            minBaseOut: `${formatUnits(plan.swapOutMin, market.base.decimals)} ${market.base.symbol}`,
+            quoteToPosition: `${formatUnits(plan.quoteToPosition, market.quote.decimals)} ${market.quote.symbol}`,
+            range: [plan.tickLower, plan.tickUpper],
+          },
+          docs: AGENT_DOCS,
+        });
+      },
+    );
+
+    server.tool(
+      "build_add_calls",
+      "Build the call batch that adds `amountUsd` of the owner's stablecoin to one of their EXISTING positions, keeping its price range. Same execution rules and fee as build_deposit_calls.",
+      {
+        owner: ownerSchema,
+        tokenId: z.string().regex(/^\d+$/),
+        chainId: z.number().int().optional().describe("disambiguates when the same tokenId exists on both chains"),
+        amountUsd: z.number().positive(),
+        slippageBps: z.number().int().min(10).max(1000).default(100),
+        ref: refSchema,
+      },
+      async ({ owner, tokenId, chainId, amountUsd, slippageBps, ref }) => {
+        const positions = await fetchPositions(owner as `0x${string}`);
+        const position = positions.find(
+          (p) => p.tokenId === BigInt(tokenId) && (chainId === undefined || p.market.chainId === chainId),
+        );
+        if (!position) return json({ error: `no live position ${tokenId} owned by ${owner}` });
+        const market = position.market;
+        const stable = CHAINS[market.chainId].quote;
+        const [poolState, referrer] = await Promise.all([getPoolState(market), referrerWalletForCode(ref, owner)]);
+        const plan = await buildZapPlan({
+          market,
+          owner: owner as `0x${string}`,
+          usdcAmount: parseUnits(amountUsd.toFixed(stable.decimals), stable.decimals),
+          preset: "full",
+          slippageBps,
+          poolState,
+          addTo: { tokenId: position.tokenId, tickLower: position.tickLower, tickUpper: position.tickUpper },
+          referrer,
+        });
+        return json({
+          chainId: plan.chainId,
+          market: market.slug,
+          tokenId,
+          referrer,
           calls: serializeCalls(plan.calls),
           summary: {
             fee: `${formatUnits(plan.feeAmount, stable.decimals)} ${stable.symbol}`,
@@ -221,14 +280,16 @@ const handler = createMcpHandler(
         tokenId: z.string().regex(/^\d+$/),
         chainId: z.number().int().optional().describe("disambiguates when the same tokenId exists on both chains"),
         slippageBps: z.number().int().min(10).max(1000).default(100),
+        ref: refSchema,
       },
-      async ({ owner, tokenId, chainId, slippageBps }) => {
+      async ({ owner, tokenId, chainId, slippageBps, ref }) => {
         const positions = await fetchPositions(owner as `0x${string}`);
         const position = positions.find(
           (p) => p.tokenId === BigInt(tokenId) && (chainId === undefined || p.market.chainId === chainId),
         );
         if (!position) return json({ error: `no live position ${tokenId} owned by ${owner}` });
-        const plan = await buildWithdrawPlan({ position, slippageBps });
+        const referrer = await referrerWalletForCode(ref, owner);
+        const plan = await buildWithdrawPlan({ position, slippageBps, owner: owner as `0x${string}`, referrer });
         const stable = CHAINS[position.market.chainId].quote;
         return json({
           chainId: plan.chainId,
@@ -263,12 +324,12 @@ const handler = createMcpHandler(
     );
   },
   {
-    serverInfo: { name: "vaults-cash", version: "1.1.0" },
+    serverInfo: { name: "vaults-cash", version: "1.2.0" },
     instructions:
       `vaults.cash turns stablecoins into earning Uniswap v4 LP positions on ${chainSummary}; gas is ETH on both. ` +
       "Every market has a slug; every plan returns the chainId its calls must be executed on. " +
       "Build tools return {to, value, data} call batches; execute them in order from the owner's wallet — atomically if it supports batching (EIP-7702/ERC-4337). " +
-      "Plans embed slippage bounds and expire ~20 minutes after building — rebuild stale plans. Positions carry impermanent-loss risk.",
+      "Plans embed slippage bounds and expire ~20 minutes after building — rebuild stale plans. Pass `ref` (a referral code) on build tools to have half the fee paid on-chain to that code's wallet. Positions carry impermanent-loss risk.",
   },
   { basePath: "/api/mcp", maxDuration: 60, disableSse: true },
 );

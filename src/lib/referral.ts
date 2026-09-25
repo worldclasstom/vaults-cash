@@ -1,6 +1,6 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { customAlphabet } from "nanoid";
-import { parseAbiItem } from "viem";
+import { decodeEventLog, parseAbiItem } from "viem";
 import { ensureSchema, sql } from "./db";
 import { CHAINS, CHAIN_IDS, type ChainId } from "./chain";
 import { publicClientFor } from "./onchain";
@@ -122,6 +122,30 @@ export async function referralStats(privyDid: string, wallet: string): Promise<R
 }
 
 const TRANSFER = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
+/** Referral code pattern (matches src/proxy.ts) */
+const REF_CODE_RE = /^[A-Z0-9]{4,16}$/i;
+
+/**
+ * Wallet to pay the referrer share to for a referral code — used by the
+ * agent API / MCP, where the payer has no Privy session and the code arrives
+ * as a plain parameter (an integrator's own code, typically). Unknown codes
+ * and self-referrals resolve to null, which means "no split".
+ */
+export async function referrerWalletForCode(code: unknown, payer: string): Promise<`0x${string}` | null> {
+  if (typeof code !== "string" || !REF_CODE_RE.test(code)) return null;
+  try {
+    await ensureSchema();
+    const rows = await sql()`SELECT wallet FROM users WHERE ref_code = ${code.toUpperCase()}`;
+    if (!rows.length) return null;
+    const wallet = (rows[0].wallet as string).toLowerCase();
+    return wallet === payer.toLowerCase() ? null : (wallet as `0x${string}`);
+  } catch (e) {
+    // a referral lookup must never block a plan — the batch just doesn't split
+    console.warn(`referral lookup failed for ${code}: ${(e as Error).message}`);
+    return null;
+  }
+}
+
 /** Chain block before the first fee ever paid on that chain — Robinhood
  *  Chain went live for us 2026-09-23 around block 70.9M. */
 const SCAN_START: Record<ChainId, bigint> = { 8453: 1_500_000n, 4663: 70_900_000n };
@@ -178,13 +202,24 @@ export async function syncFeeEvents() {
           JOIN users u ON u.privy_did = w.privy_did
           JOIN users r ON r.ref_code = u.referred_by
           WHERE w.wallet = ${payer}`;
-        const referrer = referrerRows.length ? referrerRows[0] : null;
-        const paidOnChain = referrer !== null && log.blockNumber >= SPLIT_FROM[chainId];
+        let referrer = referrerRows.length ? (referrerRows[0] as { privy_did: string; wallet: string }) : null;
+        let referrerAmount = referrer !== null && log.blockNumber >= SPLIT_FROM[chainId] ? amount : 0n;
+        // Payers without a Privy session (agents via the REST/MCP API passing
+        // a referral code) aren't in user_wallets, but the split is still on
+        // chain: the same tx carries a second stablecoin transfer from the
+        // payer to the referrer's wallet. The chain is the ledger's truth.
+        if (referrer === null && log.blockNumber >= SPLIT_FROM[chainId]) {
+          const split = await findSplitInTx(chainId, log.transactionHash, payer, feeWallet).catch(() => null);
+          if (split) {
+            referrer = split.referrer;
+            referrerAmount = split.amount;
+          }
+        }
         const res = await q`
           INSERT INTO fee_events (tx_hash, log_index, payer, amount, block_number, referrer_wallet, referrer_did, referrer_amount, chain_id)
           VALUES (${log.transactionHash}, ${log.logIndex}, ${payer}, ${amount.toString()}, ${log.blockNumber.toString()},
-                  ${referrer ? (referrer.wallet as string) : null}, ${referrer ? (referrer.privy_did as string) : null},
-                  ${paidOnChain ? amount.toString() : "0"}, ${chainId})
+                  ${referrer ? referrer.wallet : null}, ${referrer ? referrer.privy_did : null},
+                  ${referrerAmount.toString()}, ${chainId})
           ON CONFLICT (tx_hash, log_index) DO NOTHING
           RETURNING id`;
         inserted += res.length;
@@ -207,4 +242,35 @@ export async function syncFeeEvents() {
     upToBlock,
     ledger: { events: totals.events as number, feesUsd: (totals.fees as number) / 1e6 },
   };
+}
+
+/** The referrer-share transfer that rides in the same tx as a fee: a
+ *  stablecoin Transfer from the payer to a wallet that belongs to a user. */
+async function findSplitInTx(
+  chainId: ChainId,
+  txHash: `0x${string}`,
+  payer: string,
+  feeWallet: string,
+): Promise<{ referrer: { privy_did: string; wallet: string }; amount: bigint } | null> {
+  const receipt = await publicClientFor(chainId).getTransactionReceipt({ hash: txHash });
+  const stable = CHAINS[chainId].quote.address.toLowerCase();
+  const candidates: Array<{ to: string; amount: bigint }> = [];
+  for (const l of receipt.logs) {
+    if (l.address.toLowerCase() !== stable) continue;
+    let d: { args: { from: string; to: string; value: bigint } };
+    try {
+      d = decodeEventLog({ abi: [TRANSFER], data: l.data, topics: l.topics }) as typeof d;
+    } catch {
+      continue;
+    }
+    const to = d.args.to.toLowerCase();
+    if (d.args.from.toLowerCase() === payer && to !== feeWallet.toLowerCase()) candidates.push({ to, amount: d.args.value });
+  }
+  if (!candidates.length) return null;
+  const q = sql();
+  for (const c of candidates) {
+    const rows = await q`SELECT privy_did, wallet FROM users WHERE wallet = ${c.to}`;
+    if (rows.length) return { referrer: rows[0] as { privy_did: string; wallet: string }, amount: c.amount };
+  }
+  return null;
 }

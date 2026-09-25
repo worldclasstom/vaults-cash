@@ -4,12 +4,16 @@ import { AGENT_DOCS, AgentError, requireMarket, requireOwner, serializeCalls } f
 import { CHAINS } from "@/lib/chain";
 import { getPoolState } from "@/lib/onchain";
 import { buildZapPlan, type RangePreset } from "@/lib/zap";
+import { fetchPositions } from "@/lib/positions";
+import { referrerWalletForCode } from "@/lib/referral";
 
 /**
  * POST /api/agent/zap-plan
- * body: { market, amountUsd, owner, preset?, widthPct?, slippageBps? }
- * Returns the executable call batch that converts `amountUsd` USDC (held by
- * `owner`) into a Uniswap v4 LP position owned by `owner`.
+ * body: { market, amountUsd, owner, preset?, widthPct?, slippageBps?, ref?, tokenId? }
+ * Returns the executable call batch that converts `amountUsd` of the chain's
+ * stablecoin (held by `owner`) into a Uniswap v4 LP position owned by
+ * `owner`. With `tokenId`, adds to that existing position (its range) instead
+ * of minting. `ref` = referral code whose wallet gets half the fee on-chain.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -29,7 +33,14 @@ export async function POST(req: NextRequest) {
       throw new AgentError(400, "slippageBps must be an integer between 10 and 1000");
 
     const stable = CHAINS[market.chainId].quote;
-    const poolState = await getPoolState(market);
+    let addTo: { tokenId: bigint; tickLower: number; tickUpper: number } | undefined;
+    if (body.tokenId !== undefined) {
+      const tokenId = BigInt(body.tokenId);
+      const position = (await fetchPositions(owner)).find((p) => p.tokenId === tokenId && p.market.slug === market.slug);
+      if (!position) throw new AgentError(404, `No live position ${tokenId} owned by ${owner} in ${market.slug}`);
+      addTo = { tokenId, tickLower: position.tickLower, tickUpper: position.tickUpper };
+    }
+    const [poolState, referrer] = await Promise.all([getPoolState(market), referrerWalletForCode(body.ref, owner)]);
     const plan = await buildZapPlan({
       market,
       owner,
@@ -38,12 +49,16 @@ export async function POST(req: NextRequest) {
       customWidth: body.widthPct !== undefined ? Number(body.widthPct) / 100 : undefined,
       slippageBps,
       poolState,
+      addTo,
+      referrer,
     });
 
     return NextResponse.json({
       chainId: plan.chainId,
       market: market.slug,
       stablecoin: stable.symbol,
+      addTo: addTo ? addTo.tokenId.toString() : null,
+      referrer,
       calls: serializeCalls(plan.calls),
       summary: {
         fee: plan.feeAmount.toString(),
