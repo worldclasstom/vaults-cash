@@ -55,8 +55,15 @@ button {
   transition-duration: 0.2s;
   transition-timing-function: var(--ease-bounce);
 }
-button.bg-accent:not(:disabled):hover {
+/* pills bounce and tilt; wide bars (w-full / grow) only lift — a 1° tilt on
+   a full-width button reads as a broken layout, not a wink */
+button.bg-accent:not(:disabled):not(.w-full):not(.grow):hover {
   transform: scale(1.04) rotate(-1deg);
+}
+button.bg-accent.w-full:not(:disabled):hover,
+button.bg-accent.grow:not(:disabled):hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 24px -12px rgb(124 212 74 / 0.6);
 }
 button:not(:disabled):active {
   transform: scale(0.96);
