@@ -111,9 +111,7 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
                 ≈ {fmtUsd(Number(formatUnits(BigInt(q.amountOut), to.quote.decimals)))}{" "}
                 <span className="text-xl text-muted">{q.toSymbol}</span>
               </p>
-              <p className="pt-1 text-xs text-muted">
-                arrives on {to.label}, at least {fmtUsd(Number(formatUnits(BigInt(q.minAmountOut), to.quote.decimals)))}
-              </p>
+              <p className="pt-1 text-xs text-muted">arrives on {to.label}, usually in under a minute</p>
               <dl className="space-y-2 py-4 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-muted">You send</dt>
@@ -122,18 +120,27 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted">Route fees</dt>
-                  <dd className="font-medium">{fmtUsd(q.feesUsd)}</dd>
+                  <dt className="font-semibold text-foreground">Total cost</dt>
+                  <dd className="font-display font-extrabold">{fmtUsd(q.totalCostUsd)}</dd>
+                </div>
+                <div className="flex justify-between pl-4">
+                  <dt className="text-muted">Relay&apos;s route fee</dt>
+                  <dd className="text-muted">{fmtUsd(q.feesUsd)}</dd>
+                </div>
+                <div className="flex justify-between pl-4">
+                  <dt className="text-muted">{q.fromSymbol} → {q.toSymbol} conversion rate</dt>
+                  <dd className="text-muted">{fmtUsd(q.conversionUsd)}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted">Network fee</dt>
                   <dd className="font-medium">{from.gasSponsored ? "Covered by vaults.cash" : "Under a cent, in ETH"}</dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted">Usually takes</dt>
-                  <dd className="font-medium">{q.timeEstimateSec < 60 ? "under a minute" : `about ${Math.round(q.timeEstimateSec / 60)} min`}</dd>
-                </div>
               </dl>
+              <p className="pb-2 text-xs text-muted">
+                Expect about {fmtUsd(Number(formatUnits(BigInt(q.amountOut), to.quote.decimals)))} to arrive. Relay also guarantees a floor of{" "}
+                {fmtUsd(Number(formatUnits(BigInt(q.minAmountOut), to.quote.decimals)))} in case the rate moves during the few seconds it&apos;s in
+                flight. That floor is a safety limit, not the expected amount.
+              </p>
               <p className="pb-4 text-xs text-muted">
                 Moved through Relay, a bridge many wallets use, to this same address on {to.label}. vaults.cash charges nothing for this.
               </p>

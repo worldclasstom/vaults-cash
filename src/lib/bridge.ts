@@ -24,8 +24,12 @@ export type BridgeQuote = {
   minAmountOut: string;
   fromSymbol: string;
   toSymbol: string;
-  /** dollars */
+  /** dollars: relayer + destination gas + app fees */
   feesUsd: number;
+  /** dollars: what you send minus what arrives — fees plus the conversion rate */
+  totalCostUsd: number;
+  /** dollars lost to the USDC⇄USDG rate itself (totalCost − fees) */
+  conversionUsd: number;
   timeEstimateSec: number;
 };
 
@@ -33,7 +37,12 @@ type RelayQuote = {
   requestId: string;
   steps: Array<{ id: string; items: Array<{ data: { to: `0x${string}`; data: `0x${string}`; value: string; chainId: number } }> }>;
   fees: { relayer?: { amountUsd?: string }; gas?: { amountUsd?: string }; app?: { amountUsd?: string } };
-  details: { currencyIn: { amount: string }; currencyOut: { amount: string; minimumAmount: string }; timeEstimate?: number };
+  details: {
+    currencyIn: { amount: string; amountUsd?: string };
+    currencyOut: { amount: string; minimumAmount: string; amountUsd?: string };
+    totalImpact?: { usd?: string };
+    timeEstimate?: number;
+  };
   message?: string;
 };
 
@@ -61,6 +70,10 @@ export async function quoteBridge(params: { from: number; to: number; amount: bi
   const calls = q.steps.flatMap((s) => s.items.map((i) => i.data));
   if (!calls.length || calls.some((c) => c.chainId !== from)) throw new Error("Relay returned a route we can't execute in one batch");
   const usd = (v?: string) => Number(v ?? 0);
+  const feesUsd = usd(q.fees.relayer?.amountUsd) + usd(q.fees.gas?.amountUsd) + usd(q.fees.app?.amountUsd);
+  // Relay's totalImpact is (out − in) in dollars; fall back to the two legs
+  const impact = q.details.totalImpact?.usd !== undefined ? -usd(q.details.totalImpact.usd) : usd(q.details.currencyIn.amountUsd) - usd(q.details.currencyOut.amountUsd);
+  const totalCostUsd = Math.max(0, impact);
   return {
     requestId: q.requestId,
     chainId: from,
@@ -71,7 +84,9 @@ export async function quoteBridge(params: { from: number; to: number; amount: bi
     minAmountOut: q.details.currencyOut.minimumAmount,
     fromSymbol: CHAINS[from].quote.symbol,
     toSymbol: CHAINS[to].quote.symbol,
-    feesUsd: usd(q.fees.relayer?.amountUsd) + usd(q.fees.gas?.amountUsd) + usd(q.fees.app?.amountUsd),
+    feesUsd,
+    totalCostUsd,
+    conversionUsd: Math.max(0, totalCostUsd - feesUsd),
     timeEstimateSec: q.details.timeEstimate ?? 60,
   };
 }
