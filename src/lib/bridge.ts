@@ -52,7 +52,7 @@ export async function quoteBridge(params: { from: number; to: number; amount: bi
       destinationCurrency: CHAINS[to].quote.address,
       amount: amount.toString(),
       tradeType: "EXACT_INPUT",
-      referrer: "vaults.cash",
+      // no `referrer`: Relay demands an API key once one is set
     }),
     signal: AbortSignal.timeout(20_000),
   });
