@@ -265,7 +265,7 @@ export function MarketDetail({ slug }: { slug: string }) {
             <dl className="space-y-2 py-4 text-sm">
               <Row k={`${market.base.symbol} side`} v={`~${fmtUsd(summary.baseUsd)}`} />
               <Row k={`${market.quote.symbol} side`} v={`~${fmtUsd(summary.quoteUsd)}`} />
-              <Row k={`vaults.cash fee (${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}%)`} v={fmtUsd(summary.feeUsd)} />
+              <Row k={`vaults.cash fee (${Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 60) / 100}%)`} v={fmtUsd(summary.feeUsd)} />
               <Row
                 k="Range"
                 v={

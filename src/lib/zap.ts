@@ -187,7 +187,7 @@ export async function buildZapPlan(params: {
     throw new Error(`Minimum deposit is $${MIN_DEPOSIT_USD}`);
   }
   const { posm, router } = contractsOf(market);
-  const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
+  const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "60");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 20 * 60);
   const keep = BigInt(10_000 - slippageBps);

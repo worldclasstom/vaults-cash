@@ -11,7 +11,7 @@ const subscribeReducedMotion = (cb: () => void) => {
 const getReducedMotion = () => window.matchMedia(RM).matches;
 import { Chip } from "./TokenIcon";
 
-const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100;
+const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 60) / 100;
 
 /** A crooked little label in the Sticker Ledger voice. */
 function Tag({ children, tone = "muted", className = "" }: { children: React.ReactNode; tone?: "muted" | "accent" | "negative" | "outline"; className?: string }) {

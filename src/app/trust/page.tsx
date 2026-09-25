@@ -7,7 +7,7 @@ export const metadata = { title: "What vaults.cash can and can't do" };
 
 const FEE_WALLET = process.env.NEXT_PUBLIC_FEE_RECIPIENT;
 const SOURCE_URL = process.env.NEXT_PUBLIC_SOURCE_URL;
-const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100;
+const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 60) / 100;
 
 function Section({ title, sticker, children }: { title: string; sticker?: React.ReactNode; children: React.ReactNode }) {
   return (

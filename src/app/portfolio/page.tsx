@@ -126,7 +126,7 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
   );
 }
 
-const FEE_RATE = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 10_000;
+const FEE_RATE = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 60) / 10_000;
 
 const fmtEarned = (n: number) => (n >= 0.01 ? `+${fmtUsd(n)}` : n > 0 ? "+<$0.01" : "$0.00");
 const ago = (ts: number) => {
@@ -407,7 +407,7 @@ function PositionCard({ p }: { p: PositionView }) {
                   <dd className="font-medium">{p.feesUsd >= 0.01 ? fmtUsd(p.feesUsd) : p.feesUsd > 0 ? "<$0.01" : "$0.00"}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted">vaults.cash fee ({Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}%)</dt>
+                  <dt className="text-muted">vaults.cash fee ({Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 60) / 100}%)</dt>
                   <dd className="font-medium">{fmtUsd(Number(formatUnits(wplan.feeAmount, chain.quote.decimals)))}</dd>
                 </div>
                 <div className="flex justify-between">

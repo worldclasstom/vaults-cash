@@ -5,7 +5,7 @@ import { CHAINS } from "@/lib/chain";
 
 export const metadata = { title: "Disclosures" };
 
-const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100;
+const FEE_PCT = Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 60) / 100;
 
 function Section({ title, sticker, children }: { title: string; sticker?: React.ReactNode; children: React.ReactNode }) {
   return (

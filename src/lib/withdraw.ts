@@ -43,7 +43,7 @@ export async function buildWithdrawPlan(params: {
   const market = position.market;
   const stable = CHAINS[market.chainId].quote.address;
   const { router, posm } = contractsOf(market);
-  const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "30");
+  const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "60");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 20 * 60);
   const slippage = new Percent(slippageBps, 10_000);

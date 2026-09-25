@@ -13,7 +13,7 @@ export function FooterContent() {
       </p>
       <p>
         LP positions carry market &amp; impermanent-loss risk and are not
-        insured. Flat {Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 30) / 100}%
+        insured. Flat {Number(process.env.NEXT_PUBLIC_FEE_BPS ?? 60) / 100}%
         conversion fee — no other charges.
       </p>
       <p className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
