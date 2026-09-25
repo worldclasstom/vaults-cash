@@ -70,7 +70,7 @@ export function AgentAccess() {
 
   return (
     <section className="rounded-3xl bg-surface p-5 shadow-card">
-      <h2 className="font-semibold">Agent access</h2>
+      <h2 className="font-display text-xl font-extrabold">Agent access</h2>
       <p className="pt-1 text-sm text-muted">
         Let an AI agent (Claude, ChatGPT, Cursor…) manage this wallet through vaults.cash: deposit, add, withdraw, collect. It
         gets the same sponsored gas and one-transaction batches as this app, can only act through vaults.cash, and you can
