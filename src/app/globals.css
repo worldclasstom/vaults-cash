@@ -129,7 +129,9 @@ input::placeholder {
     animation: none;
     opacity: 0;
   }
-  .rise {
+  .rise,
+  .sheet-panel,
+  .animate-fade {
     animation: none;
   }
   .tilt,
@@ -221,6 +223,34 @@ body {
 }
 .animate-cash-up {
   animation: cash-up 2.2s ease-out infinite;
+}
+/* sheets: slide up from the bottom edge on phones, rise in place from sm up */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-fade {
+  animation: fade 0.2s ease-out both;
+}
+.sheet-panel {
+  animation: sheet-up 0.42s var(--ease-bounce) both;
+}
+@media (min-width: 640px) {
+  .sheet-panel {
+    animation: rise 0.4s var(--ease-bounce) both;
+  }
 }
 /* diagram pieces land one after another */
 .rise {

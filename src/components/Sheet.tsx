@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
+import { createPortal } from "react-dom";
 
 /**
  * The one dialog surface: a bottom sheet on phones, a centered card from
  * `sm` up. Used for anything that moves money (confirm deposit / withdraw)
  * and for the logout check. Escape and the backdrop dismiss it unless the
  * caller says it's busy; focus moves into the sheet and back out again.
+ *
+ * Rendered through a portal onto <body>: an ancestor with a transform (the
+ * page's entrance animation, a tilting card) would otherwise turn
+ * `position: fixed` into "fixed inside that ancestor", which is exactly the
+ * half-way-up-the-page sheet we shipped once.
  */
 export function Sheet({
   open,
@@ -59,10 +65,10 @@ export function Sheet({
     };
   }, [open, busy, onClose]);
 
-  if (!open) return null;
-  return (
+  if (!open || typeof document === "undefined") return null;
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4"
+      className="animate-fade fixed inset-0 z-[60] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={() => !busy && onClose()}
     >
       <div
@@ -71,7 +77,7 @@ export function Sheet({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="w-full max-w-md animate-rise rounded-t-3xl bg-surface-raised p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-elevated outline-none sm:rounded-3xl sm:pb-6"
+        className="sheet-panel w-full max-w-md rounded-t-3xl bg-surface-raised p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-elevated outline-none sm:rounded-3xl sm:pb-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-borderline sm:hidden" aria-hidden />
@@ -80,6 +86,7 @@ export function Sheet({
         </h3>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
