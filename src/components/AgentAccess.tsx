@@ -82,9 +82,10 @@ export function AgentAccess() {
     <section className="rounded-3xl bg-surface p-5 shadow-card">
       <h2 className="font-display text-xl font-extrabold">Agent access</h2>
       <p className="pt-1 text-sm text-muted">
-        Let an AI agent (Claude, ChatGPT, Cursor…) manage this wallet through vaults.cash: deposit, add, withdraw, collect. It
-        gets the same sponsored gas and one-transaction batches as this app, can only act through vaults.cash, and you can
-        turn it off any time. Your key never leaves Privy.
+        One permission, two uses. It lets vaults.cash close a Targets ladder from your wallet the moment the target prints
+        (the auto-close option when you set a target), and it lets an AI agent you connect (Claude, ChatGPT, Cursor…) manage
+        this wallet through vaults.cash: deposit, add, withdraw, collect. Either way the server can only act through
+        vaults.cash, you can turn it off any time, and your key never leaves Privy.
       </p>
 
       {status.isLoading ? (

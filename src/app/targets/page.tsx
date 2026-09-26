@@ -5,6 +5,9 @@ import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/components/AuthProvider";
 import { Ladder, LadderStickers, ladderTitle } from "@/components/Ladder";
 import { useLadders } from "@/hooks/useTargets";
+import { useMarketQuote } from "@/hooks/useChainData";
+import { InviteCard } from "@/components/InviteCard";
+import { marketBySlug, sharePrice } from "@/lib/markets";
 import { fmtPrice, fmtUsd } from "@/lib/format";
 import type { LadderView } from "@/lib/ladders";
 
@@ -39,9 +42,21 @@ function LadderCard({ v }: { v: LadderView }) {
   );
 }
 
+/** A believable example target: today's TSLA price plus ~15%, rounded to a round number. */
+function useExampleTarget() {
+  const tsla = marketBySlug("robinhood/tsla-usdg");
+  const { data: q } = useMarketQuote(tsla);
+  if (!tsla || !q) return { symbol: "TSLA", target: 420 };
+  const now = sharePrice(tsla, q.priceUsd);
+  const raw = now * 1.15;
+  const step = raw >= 500 ? 25 : raw >= 100 ? 10 : 5;
+  return { symbol: tsla.base.symbol, target: Math.ceil(raw / step) * step };
+}
+
 export default function TargetsPage() {
   const { ready, authenticated, login } = useAuth();
   const { data, isLoading, isError } = useLadders();
+  const example = useExampleTarget();
   const open = (data ?? []).filter((v) => v.status !== "closed" && v.status !== "cancelled");
   const past = (data ?? []).filter((v) => v.status === "closed" || v.status === "cancelled");
   return (
@@ -72,7 +87,7 @@ export default function TargetsPage() {
             <div className="rounded-3xl bg-surface shadow-card p-8 text-center">
               <p className="font-display text-2xl font-extrabold">Pick a price you believe in.</p>
               <p className="pt-2 text-sm text-muted">
-                Think TSLA hits $420? We build a ladder of narrow positions from here to there. Every step it climbs sells a slice and pays
+                Think {example.symbol} hits ${fmtPrice(example.target)}? We build a ladder of narrow positions from here to there. Every step it climbs sells a slice and pays
                 you the trading fee. Think it dips? The same ladder buys on the way down.
               </p>
               <Link href="/targets/new" className="mt-5 inline-block rounded-full bg-accent px-7 py-3 font-display text-base font-extrabold text-black hover:bg-accent-strong">
@@ -86,6 +101,7 @@ export default function TargetsPage() {
               ))}
             </ul>
           )}
+          <InviteCard className="mt-8" />
           {past.length > 0 && (
             <section className="pt-8">
               <h2 className="pb-3 font-display text-xl font-extrabold tracking-tight">Past targets</h2>
