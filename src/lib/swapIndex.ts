@@ -21,7 +21,9 @@ export const SWAP_EVENT = parseAbiItem(
   "event Swap(bytes32 indexed id, address indexed sender, int128 amount0, int128 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick, uint24 fee)",
 );
 export const BLOCKS_PER_DAY: Record<ChainId, bigint> = { 8453: 43_200n, 4663: 345_600n };
-const CHUNK: Record<ChainId, bigint> = { 8453: 50_000n, 4663: 40_000n };
+// Base's RPC (CDP) is slow on wide multi-pool log filters, so its chunks are
+// small; Robinhood's (Alchemy) takes 40k blocks (~3 hours) in one call
+const CHUNK: Record<ChainId, bigint> = { 8453: 4_000n, 4663: 40_000n };
 const KEEP_DAYS = 8n;
 
 export type IndexedSwap = {
@@ -75,9 +77,16 @@ export async function indexSwaps(chainId: ChainId, budgetMs = 20_000): Promise<I
   while (at <= head) {
     if (Date.now() - start > budgetMs) break;
     const to = at + CHUNK[chainId] - 1n < head ? at + CHUNK[chainId] - 1n : head;
-    const logs = pools.length
-      ? await client.getLogs({ address: pm, event: SWAP_EVENT, args: { id: pools }, fromBlock: at, toBlock: to })
-      : [];
+    let logs: Awaited<ReturnType<typeof client.getLogs<typeof SWAP_EVENT>>> = [];
+    if (pools.length) {
+      try {
+        logs = await client.getLogs({ address: pm, event: SWAP_EVENT, args: { id: pools }, fromBlock: at, toBlock: to });
+      } catch (e) {
+        // a slow RPC answer must not kill the run; the cursor stays where it is
+        console.error(`swap index ${chainId} ${at}-${to}: ${(e as Error).message.split("\n")[0].slice(0, 120)}`);
+        break;
+      }
+    }
     for (const l of logs) {
       const r = await q`INSERT INTO swaps (chain_id, pool_id, block, log_index, tx_hash, sender, amount0, amount1, sqrt_price, liquidity, tick, fee)
         VALUES (${chainId}, ${l.args.id!.toLowerCase()}, ${l.blockNumber.toString()}, ${l.logIndex}, ${l.transactionHash}, ${l.args.sender!.toLowerCase()},

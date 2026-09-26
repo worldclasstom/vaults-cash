@@ -63,11 +63,13 @@ export async function GET(req: NextRequest) {
       } catch (e) {
         // a failed close leaves the ladder marked so the user can close by hand
         await setLadderStatus(row.id, "hit").catch(() => undefined);
-        out.push({ id: row.id, result: `error: ${(e as Error).message.slice(0, 160)}` });
+        out.push({ id: row.id, result: "error (see logs)" });
+        console.error(`keeper ladder ${row.id}`, (e as Error).message);
       }
     }
     return NextResponse.json(out, { headers: { "cache-control": "no-store" } });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message, partial: out }, { status: 500 });
+    console.error("cron/targets", (e as Error).message);
+    return NextResponse.json({ error: "keeper run failed", partial: out }, { status: 500 });
   }
 }

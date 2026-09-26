@@ -21,6 +21,8 @@ export async function GET(req: NextRequest) {
       { headers: { "cache-control": "no-store" } },
     );
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    // never echo provider errors: they can carry RPC URLs with keys
+    console.error("cron/swaps", (e as Error).message);
+    return NextResponse.json({ error: "index run failed" }, { status: 500 });
   }
 }
