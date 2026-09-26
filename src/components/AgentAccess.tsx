@@ -37,7 +37,10 @@ export function AgentAccess() {
     return res.json();
   };
   const status = useQuery<Status>({ queryKey: ["agent-access"], queryFn: () => authed(), enabled: !!SIGNER_ID, staleTime: 30_000 });
-  const refresh = () => qc.invalidateQueries({ queryKey: ["agent-access"] });
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["agent-access"] });
+    qc.invalidateQueries({ queryKey: ["agent-access-on"] });
+  };
 
   const grant = useMutation({
     mutationFn: async () => {
@@ -79,7 +82,7 @@ export function AgentAccess() {
   const snippet = JSON.stringify({ mcpServers: { "vaults-cash": { url: MCP_URL, headers: { Authorization: `Bearer ${newKey ?? "vc_…"}` } } } }, null, 2);
 
   return (
-    <section className="rounded-3xl bg-surface p-5 shadow-card">
+    <section id="agent-access" className="scroll-mt-24 rounded-3xl bg-surface p-5 shadow-card">
       <h2 className="font-display text-xl font-extrabold">Agent access</h2>
       <p className="pt-1 text-sm text-muted">
         One permission, two uses. It lets vaults.cash close a Targets ladder from your wallet the moment the target prints

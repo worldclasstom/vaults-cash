@@ -13,6 +13,7 @@ import { Sheet } from "@/components/Sheet";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { useMarketQuote, useQuoteBalance } from "@/hooks/useChainData";
 import { useAgentAccessOn, usePlanLadder, useSendLadder } from "@/hooks/useTargets";
+import { useGrantAgentAccess } from "@/hooks/useAgentAccess";
 import { CHAINS, type ChainId } from "@/lib/chain";
 import { fmtPrice, fmtUsd } from "@/lib/format";
 import { spendableUsd } from "@/lib/gasToken";
@@ -49,7 +50,11 @@ export default function NewTargetPage() {
   const [expiry, setExpiry] = useState("never");
   const [autoClose, setAutoClose] = useState(true);
   const [plan, setPlan] = useState<LadderPlan | null>(null);
+  const keeper = !!process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID;
   const { data: agentOn } = useAgentAccessOn();
+  const grant = useGrantAgentAccess();
+  // the box can only be on when the keeper is configured AND this account granted it
+  const canAutoClose = keeper && !!agentOn;
   const planMutation = usePlanLadder();
   const sendMutation = useSendLadder();
 
@@ -62,7 +67,6 @@ export default function NewTargetPage() {
   const belowMin = amountNum > 0 && amountNum < minDep;
   const canReview = !!priceNow && targetNum > 0 && !wrongWay && amountNum >= minDep && !insufficient;
   const preset = (p: number) => priceNow && setTarget((priceNow * (1 + p / 100)).toFixed(2));
-  const keeper = !!process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID;
   // computed at submit time, not during render
   const expiresAtNow = () => {
     const e = EXPIRY.find((x) => x.value === expiry);
@@ -202,19 +206,42 @@ export default function NewTargetPage() {
               {insufficient && <p className="pt-1 text-xs text-negative">That&apos;s more than you have here.</p>}
             </div>
 
-            <label className="flex items-start gap-3 rounded-2xl bg-surface-raised p-3">
-              <input type="checkbox" checked={autoClose && keeper} disabled={!keeper} onChange={(e) => setAutoClose(e.target.checked)} className="mt-1 accent-[var(--accent)]" />
-              <span className="text-sm">
-                <span className="block font-semibold">Close it for me when the target hits</span>
-                <span className="block pt-0.5 text-xs text-muted">
-                  {!keeper
-                    ? "Coming soon: until then we mark the target hit and you tap Close."
-                    : agentOn
-                      ? "Agent access is on, so vaults.cash can close the ladder from your wallet the moment the target prints. Without this, a price that comes back down re-buys the asset."
-                      : "Needs agent access, which you turn on once under Account. Until then we mark the target hit and you tap Close."}
+            <div className="rounded-2xl bg-surface-raised p-3">
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={autoClose && canAutoClose}
+                  disabled={!canAutoClose}
+                  onChange={(e) => setAutoClose(e.target.checked)}
+                  className="mt-1 accent-[var(--accent)] disabled:opacity-40"
+                />
+                <span className="text-sm">
+                  <span className="block font-semibold">Close it for me when the target hits</span>
+                  <span className="block pt-0.5 text-xs text-muted">
+                    {!keeper
+                      ? "Coming soon: until then we mark the target hit and you tap Close."
+                      : canAutoClose
+                        ? "vaults.cash closes the ladder from your wallet the moment the target prints, so a price that comes back down can't re-buy the asset."
+                        : "Needs a one-time permission so vaults.cash can close the ladder from your wallet when the target prints. Without it we mark the target hit and you tap Close."}
+                  </span>
                 </span>
-              </span>
-            </label>
+              </label>
+              {keeper && !canAutoClose && (
+                <div className="flex flex-wrap items-center gap-2 pt-2 pl-7">
+                  <button
+                    onClick={() => grant.mutate(undefined, { onSuccess: () => setAutoClose(true) })}
+                    disabled={grant.isPending || !authenticated}
+                    className="rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-black hover:bg-accent-strong disabled:opacity-50"
+                  >
+                    {grant.isPending ? "Waiting for Privy…" : "Turn it on now"}
+                  </button>
+                  <Link href="/account#agent-access" className="text-xs text-muted underline-offset-2 hover:underline">
+                    What this permission is
+                  </Link>
+                  {grant.isError && <span className="text-xs text-negative">{(grant.error as Error).message}</span>}
+                </div>
+              )}
+            </div>
 
             <button
               disabled={!canReview || planMutation.isPending}
@@ -243,7 +270,7 @@ export default function NewTargetPage() {
                 {direction === "up" ? `you simply hold ${market.base.symbol}, like buying it outright.` : "your dollars sat there earning on any trade that dipped into a rung."}
               </li>
               <li>
-                <span className="font-semibold text-foreground">Fees:</span> 0.6% in, 0.6% out, plus 8% of the trading fees the ladder earns, taken when you collect or close. Nothing else.
+                <span className="font-semibold text-foreground">Fees:</span> 0.6% in and 0.6% out, like Pools, plus an 8% performance fee: our share of the trading fees the ladder earns for you, for watching it and closing it at the target. It never touches what you put in, and it&apos;s taken only when you collect or close. Nothing else.
               </li>
             </ol>
           </aside>
@@ -304,7 +331,7 @@ export default function NewTargetPage() {
               disabled={sendMutation.isPending}
               onClick={() =>
                 sendMutation.mutate(
-                  { plan, market, amountUsd: amountNum, autoClose: autoClose && keeper, expiresAt: expiresAtNow() },
+                  { plan, market, amountUsd: amountNum, autoClose: autoClose && canAutoClose, expiresAt: expiresAtNow() },
                   { onSuccess: ({ id }) => router.push(`/targets/${id}`) },
                 )
               }
