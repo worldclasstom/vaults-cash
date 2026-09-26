@@ -45,6 +45,16 @@ export default function DevHeader() {
           <LogoMark size={26} />
         </button>
       </Bar>
+      <Bar label="E · Today pill — what traders paid you today is the account button; ka-ching lives here">
+        <button className="flex h-9 items-center gap-2 rounded-full bg-surface pl-1 pr-3 text-sm hover:bg-surface-raised">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-raised font-display text-xs font-extrabold">T</span>
+          <span className="font-display font-extrabold tracking-tight text-accent">+$0.42</span>
+          <span className="text-xs text-muted">today</span>
+        </button>
+      </Bar>
+      <Bar label="F · Plain — Account is just a tab like the others, log out sits in the hover menu under it">
+        <span className="nav-plain rounded-full px-3.5 py-1.5 font-display text-sm font-bold text-muted">Account</span>
+      </Bar>
       <Bar label="D · Cash pill + wallet, one control (what fomo.family does)">
         <button className="flex h-9 items-center gap-3 rounded-full bg-surface pl-3 pr-1 text-sm hover:bg-surface-raised">
           <span className="text-left leading-tight">
