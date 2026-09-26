@@ -57,16 +57,6 @@ export function AgentAccess() {
     },
   });
   const revokeKey = useMutation({ mutationFn: (id: number) => authed({ method: "DELETE", body: JSON.stringify({ id }) }), onSuccess: refresh });
-  // a zero-value call from the smart wallet to itself on Base (gas covered): proves the server can act
-  const test = useMutation({
-    mutationFn: async () => {
-      const token = await getAccessToken();
-      const res = await fetch("/api/agent-access/test", { method: "POST", headers: { authorization: `Bearer ${token}` } });
-      const j = (await res.json().catch(() => ({}))) as { txHash?: string; error?: string };
-      if (!res.ok) throw new Error(j.error ?? `request failed (${res.status})`);
-      return j.txHash!;
-    },
-  });
   const turnOff = useMutation({
     mutationFn: async () => {
       await authed({ method: "DELETE", body: "{}" });
@@ -107,19 +97,7 @@ export function AgentAccess() {
           <div className="rounded-2xl bg-surface-raised p-4">
             <p className="font-semibold">Targets auto-close: ready</p>
             <p className="pt-1 text-xs text-muted">
-              Nothing more to do. When you set a target, leave &ldquo;Close it for me&rdquo; checked and vaults.cash closes the ladder from your wallet the moment the target prints.{" "}
-              <button onClick={() => test.mutate()} disabled={test.isPending} className="text-accent underline-offset-2 hover:underline disabled:opacity-50">
-                {test.isPending ? "Checking…" : "Run a check"}
-              </button>
-              {test.isSuccess && (
-                <>
-                  {" "}
-                  <a href={`https://base.blockscout.com/tx/${test.data}`} target="_blank" rel="noreferrer" className="text-accent underline-offset-2 hover:underline">
-                    Works ↗
-                  </a>
-                </>
-              )}
-              {test.isError && <span className="text-negative"> {(test.error as Error).message}</span>}
+              Nothing more to do. When you set a target, leave &ldquo;Close it for me&rdquo; checked and vaults.cash closes the ladder from your wallet the moment the target prints.
             </p>
           </div>
 

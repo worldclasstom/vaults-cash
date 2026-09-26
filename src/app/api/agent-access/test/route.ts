@@ -9,6 +9,8 @@ export const maxDuration = 60;
  * Proves the whole agent-access path for THIS account with a harmless user
  * operation: a zero-value call from the smart wallet to itself on Base, where
  * gas is covered. If it lands, the keeper and the MCP can act on the wallet.
+ * Internal diagnostic (curl with a Privy access token); no longer linked from
+ * the UI, since a working feature shouldn't ask the user to test it.
  */
 export async function POST(req: NextRequest) {
   try {
