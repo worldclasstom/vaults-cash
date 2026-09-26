@@ -97,6 +97,41 @@ export function ensureSchema(): Promise<void> {
         PRIMARY KEY (chain_id, tx_hash, log_index)
       )`;
       await q`CREATE INDEX IF NOT EXISTS swaps_pool_block_idx ON swaps (chain_id, pool_id, block DESC)`;
+      // Targets: a ladder is a set of rung NFTs plus the user's choices
+      await q`CREATE TABLE IF NOT EXISTS ladders (
+        id serial PRIMARY KEY,
+        privy_did text NOT NULL,
+        wallet text NOT NULL,
+        chain_id int NOT NULL,
+        market_slug text NOT NULL,
+        direction text NOT NULL,
+        target_price numeric NOT NULL,
+        target_tick int NOT NULL,
+        start_tick int NOT NULL,
+        start_price numeric NOT NULL,
+        rungs int NOT NULL,
+        amount_usd numeric NOT NULL,
+        auto_close boolean NOT NULL DEFAULT false,
+        expires_at timestamptz,
+        status text NOT NULL DEFAULT 'open',
+        open_tx text NOT NULL,
+        close_tx text,
+        fees_paid_usd numeric NOT NULL DEFAULT 0,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        hit_at timestamptz,
+        closed_at timestamptz
+      )`;
+      await q`CREATE INDEX IF NOT EXISTS ladders_did_idx ON ladders (privy_did)`;
+      await q`CREATE INDEX IF NOT EXISTS ladders_status_idx ON ladders (status)`;
+      await q`CREATE TABLE IF NOT EXISTS ladder_rungs (
+        ladder_id int NOT NULL REFERENCES ladders(id),
+        idx int NOT NULL,
+        chain_id int NOT NULL,
+        token_id numeric NOT NULL,
+        tick_lower int NOT NULL,
+        tick_upper int NOT NULL,
+        PRIMARY KEY (chain_id, token_id)
+      )`;
       await q`CREATE TABLE IF NOT EXISTS swap_cursor (
         chain_id int PRIMARY KEY,
         head bigint NOT NULL,

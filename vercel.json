@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/referral/sync", "schedule": "0 * * * *" },
-    { "path": "/api/cron/swaps", "schedule": "*/5 * * * *" }
+    { "path": "/api/cron/swaps", "schedule": "*/5 * * * *" },
+    { "path": "/api/cron/targets", "schedule": "*/5 * * * *" }
   ]
 }

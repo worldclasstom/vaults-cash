@@ -16,6 +16,7 @@ July entries at the bottom are kept as history._
 | `NEXT_PUBLIC_FEE_RECIPIENT` | local + Vercel | fee wallet |
 | `NEXT_PUBLIC_FEE_BPS` | local + Vercel | `60` |
 | `NEXT_PUBLIC_GAS_SPONSORED` | Vercel | `1` when the CDP paymaster is live on Base; only changes copy |
+| `CRON_SECRET` | Vercel (optional) | when set, `/api/cron/*` only run for calls carrying `Authorization: Bearer <secret>` (Vercel cron sends it automatically) |
 | `NEXT_PUBLIC_GAS_TOKEN_POLICY_4663` | Vercel | Alchemy *ERC-20 Payments* policy id: users pay Robinhood gas in USDG (no ETH). Browser and server both use it. Privy's Robinhood chain entry needs the Alchemy paymaster URL + this id |
 | `NEXT_PUBLIC_SOURCE_URL` | Vercel | repo URL shown on `/trust`; unset hides the line |
 | `ALCHEMY_API_KEY` | Vercel prod/preview/dev | origin-allowlisted; server sends `Origin: https://vaults.cash` |
@@ -124,4 +125,14 @@ Push to `main` → Vercel production. Before any token/pool change:
 the exact batch the app would send (gas-token approval included) and runs it
 through `eth_simulateV1` from that wallet, printing each call's status. Use it
 before blaming a wallet or a paymaster: a reverting step shows up here first.
+
+## Crons
+
+| Path | Schedule | Does |
+|---|---|---|
+| `/api/referral/sync` | hourly | ledgers fee-wallet inflows |
+| `/api/cron/swaps` | every 5 min | swap index (lib/swapIndex.ts) |
+| `/api/cron/targets` | every 5 min | Targets keeper: marks hit/expired, auto-closes ladders with agent access |
+
+All three are safe to hit by hand (idempotent, work-bounded). `scripts/simulate-ladder.ts` dry-runs a ladder like `simulate-deposit.ts` does a deposit.
 

@@ -16,31 +16,22 @@ that history is in docs/DECISIONS.md._
 
 ## Next
 
-- **Swap indexer cron (before Targets).** The activity engine caches each
-  pool's 24h swaps in serverless memory, so a cold instance re-pays the
-  first-load scan (~9s for a busy pool). Replace with a one-minute cron that
-  appends new Swap events for every listed pool into Neon; page views then
-  read from the table with zero RPC, and the same table is the trigger
-  source for "rung sold" notifications and Targets auto-close.
-
-- **Targets — range orders for people who think in prices.** Buy the asset,
-  set a ladder of rungs from today's price to an exit target, collect fees
-  as price walks through it; the mirror (stable-only rungs below price) is
-  a buy ladder. v1 ships BOTH directions. Maps 1:1 onto single-sided v4
-  positions; the engine already supports custom ticks and single-sided
-  mints. Decisions (2026-09-25): name is "Targets" (rungs inside); rung
-  defaults borrow Uniswap's limit-order controls (price + expiry), four
-  equal rungs, 2–8 allowed; **auto-close** = the account-linked keeper
-  (agent access session signer) closing the whole ladder only once the
-  final target prints — rungs price crosses back into keep earning, and
-  the setup sheet says so plainly; notify-only is the fallback for users
-  who decline the signer; a tiny immutable close contract (anyone may call
-  `close`, proceeds only to the NFT owner) comes later and is the first
-  thing worth an audit. **Performance fee: 8% of trading fees earned, on
-  Targets ladders only, never on Pools**, taken at close and at collect in
-  the same batch as today's fee, with the referrer's 50% paid on-chain
-  alongside it; the 0.6% withdraw fee applies to principal, not to the fee
-  portion.
+- **Swap index — SHIPPED 2026-09-26.** `/api/cron/swaps` every five minutes
+  writes every listed pool's Swap events to Neon (eight days, one cursor per
+  chain); the activity engine reads the index and fetches only the tail.
+- **Targets — v1 SHIPPED 2026-09-26.** Fourth tab. Sell ladders (up) and
+  buy ladders (down), 2–8 equal rungs between today's price and the target,
+  each rung a single-sided v4 position minted in one transaction; live
+  ladder view (waiting / live / done rungs, price line, fees per rung);
+  Cash out, Keep the asset (buy ladders), Collect fees, all through the
+  same batch engine; 8% performance fee on trading fees earned, taken at
+  collect/close with the referrer split; Portfolio hides rungs; MCP
+  position tools refuse them. Keeper `/api/cron/targets` marks targets
+  hit/expired and auto-closes ladders whose owner granted agent access
+  (until the Privy signer is configured every ladder is notify-only).
+  Next: notifications ("Rung 4 sold for $50.9 · +$1.40"), stickers you
+  earn, share card for a hit target, the immutable close contract + audit
+  before marketing it hard, weighting rungs toward the target.
 - **Leverage loop** (Aave/Morpho): supply ETH → borrow USDC → LP,
   atomically; LTV cap ~40–50%, live health factor, one-tap unwind.
 - **Managed "pick an outcome" layer** over the pools (MaxFi-style UX

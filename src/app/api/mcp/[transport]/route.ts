@@ -25,6 +25,7 @@ import { buildZapPlan } from "@/lib/zap";
 import { buildWithdrawPlan, buildCollectPlan } from "@/lib/withdraw";
 import { serializeCalls, AGENT_DOCS } from "@/lib/agent";
 import { referrerWalletForCode } from "@/lib/referral";
+import { isLadderRung } from "@/lib/ladders";
 import { referrerWalletForUser, resolveAgentKey } from "@/lib/agentAccess";
 import { executeForUser } from "@/lib/executor";
 import { explorerUrl, isChainId, type ChainId } from "@/lib/chain";
@@ -450,6 +451,7 @@ const handler = createMcpHandler(
         if (!me) return needKey;
         const position = await findPosition(me.wallet, tokenId, chainId);
         if (!position) return json({ error: `no live position ${tokenId} in this account` });
+        if (await isLadderRung(position.market.chainId, position.tokenId)) return json({ error: `position ${tokenId} is a rung of a Targets ladder — close the ladder from the Targets tab` });
         const referrer = await referrerWalletForUser(me.did);
         const plan = await buildWithdrawPlan({ position, slippageBps, owner: me.wallet, referrer });
         if (!isChainId(plan.chainId)) return json({ error: "unsupported chain" });
@@ -468,6 +470,7 @@ const handler = createMcpHandler(
         if (!me) return needKey;
         const position = await findPosition(me.wallet, tokenId, chainId);
         if (!position) return json({ error: `no live position ${tokenId} in this account` });
+        if (await isLadderRung(position.market.chainId, position.tokenId)) return json({ error: `position ${tokenId} is a rung of a Targets ladder — collect from the Targets tab` });
         const calls = await buildCollectPlan(position, me.wallet);
         const r = await executeForUser(me.did, position.market.chainId as ChainId, calls);
         return done(r, `Collected fees on position #${tokenId} (${position.market.slug})`);

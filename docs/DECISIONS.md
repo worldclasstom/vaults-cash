@@ -152,3 +152,23 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   eth_simulateV1). Also: the Alchemy key is origin-allowlisted, so every
   server-side call to it sends `Origin: https://vaults.cash`.
 
+- **2026-09-26 — Targets v1: ladders of single-sided rungs, keeper via agent access.**
+  A target is N equal, spacing-aligned rungs between the current tick and
+  the target tick, on the side where they are single-sided (asset for a sell
+  ladder, quote for a buy ladder), each minted as its own position NFT in
+  one batch (N `modifyLiquidities` calls — simpler than one multi-mint
+  planner and cheap enough for N ≤ 8). "If it hits" is exact tick math per
+  rung (a crossed rung converts at its band, so it lands near the band's
+  midpoint, not the target). Close-at-target only: rungs price re-enters
+  keep earning, and the setup copy says a retrace re-buys. Performance fee
+  8% of trading fees earned, only on ladders, taken at collect/close in the
+  same batch; the 0.6% applies to converted principal, never to the fee
+  portion. Buy ladders close by keeping the asset (only the fee portion is
+  converted so the performance fee is stablecoin). Rungs are hidden from
+  Portfolio and refused by the plain MCP position tools so the fee can
+  never touch a Pools position.
+- **2026-09-26 — Header account menu; logout lands on home; first-tx gas note.**
+  Every app puts Account and Log out one tap away; ours is a yellow sticker.
+  The first transaction on a chain also deploys the smart wallet, so the
+  review sheet says so instead of letting a 21¢ quote read as "expensive".
+

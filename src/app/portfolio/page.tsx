@@ -20,6 +20,7 @@ import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
 import { CHAINS, explorerNftUrl, uniswapPositionUrl } from "@/lib/chain";
 import { GasLine } from "@/components/GasLine";
 import { InviteCard } from "@/components/InviteCard";
+import { useLadderRungIds } from "@/hooks/useTargets";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { shareAmount, sharePrice } from "@/lib/markets";
 import { tickToPrice } from "@/lib/onchain";
@@ -546,7 +547,10 @@ function EmptyPositions() {
 
 export default function PortfolioPage() {
   const { ready, authenticated, login } = useAuth();
-  const { data: positions, isLoading, isError } = usePositions();
+  const { data: allPositions, isLoading, isError } = usePositions();
+  const { data: rungIds } = useLadderRungIds();
+  // rungs of a Targets ladder live on the Targets tab, not here
+  const positions = allPositions?.filter((p) => !rungIds?.has(`${p.market.chainId}:${p.tokenId.toString()}`));
   const { data: cash } = useCashBalances();
   const router = useRouter();
   // once the deposit shows up, drop ?deposited=1 so a later empty list (after

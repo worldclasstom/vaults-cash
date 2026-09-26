@@ -52,8 +52,19 @@ function AccountIcon({ active }: { active: boolean }) {
   );
 }
 
+function TargetIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth={active ? 2.4 : 1.8} />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth={active ? 2.4 : 1.8} />
+      <circle cx="12" cy="12" r="1.2" fill="currentColor" />
+    </svg>
+  );
+}
+
 const TABS = [
   { href: "/", label: "Pools", Icon: MarketsIcon },
+  { href: "/targets", label: "Targets", Icon: TargetIcon },
   { href: "/portfolio", label: "Portfolio", Icon: PortfolioIcon },
   { href: "/account", label: "Account", Icon: AccountIcon },
 ] as const;
@@ -68,7 +79,7 @@ function BottomNav({ pathname }: { pathname: string }) {
     >
       <div className="mx-auto flex max-w-xl">
         {TABS.map(({ href, label, Icon }) => {
-          const active = pathname === href;
+          const active = href === "/" ? pathname === href : pathname.startsWith(href);
           return (
             <Link
               key={href}
@@ -101,7 +112,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <Link
       href={href}
       className={
-        pathname === href
+        (href === "/" ? pathname === href : pathname.startsWith(href))
           ? "nav-sticker rounded-full bg-accent px-4 py-1.5 font-display text-sm font-extrabold text-black"
           : "nav-plain rounded-full px-3.5 py-1.5 font-display text-sm font-bold text-muted hover:text-foreground"
       }
@@ -120,6 +131,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <nav className="hidden items-center gap-1.5 md:flex">
               {tab("/", "Pools")}
+              {tab("/targets", "Targets")}
               {tab("/portfolio", "Portfolio")}
             </nav>
             <HeaderMenu />
