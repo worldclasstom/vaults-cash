@@ -77,23 +77,57 @@ export async function getOrCreateUser(privyDid: string, wallet: string) {
   return rows[0] as { id: number; privy_did: string; wallet: string; ref_code: string; referred_by: string | null };
 }
 
-/** First-touch, immutable, no self-referral. Returns whether it bound. */
+/** Referral code pattern (matches src/proxy.ts) */
+const REF_CODE_RE = /^[A-Z0-9]{4,16}$/i;
+
+/** The user a code belongs to: the generated code or a vanity one. */
+async function resolveCode(code: string): Promise<{ privy_did: string; wallet: string; ref_code: string } | null> {
+  const c = code.trim().toUpperCase();
+  if (!REF_CODE_RE.test(c)) return null;
+  const rows = await sql()`SELECT privy_did, wallet, ref_code FROM users WHERE ref_code = ${c} OR custom_code = ${c} LIMIT 1`;
+  return rows.length ? (rows[0] as { privy_did: string; wallet: string; ref_code: string }) : null;
+}
+
+/** First-touch, immutable, no self-referral. Returns whether it bound.
+ *  referred_by always stores the referrer's generated code, whatever code
+ *  the link carried, so stats and payouts have one key. */
 export async function bindReferrer(privyDid: string, wallet: string, refCode: string) {
   const user = await getOrCreateUser(privyDid, wallet);
-  const code = refCode.trim().toUpperCase();
-  if (user.referred_by || code === user.ref_code) return false;
+  if (user.referred_by) return false;
+  const ref = await resolveCode(refCode);
+  if (!ref || ref.privy_did === privyDid) return false;
   const q = sql();
   const rows = await q`
-    UPDATE users SET referred_by = ${code}
-    WHERE privy_did = ${privyDid}
-      AND referred_by IS NULL
-      AND EXISTS (SELECT 1 FROM users r WHERE r.ref_code = ${code} AND r.privy_did <> ${privyDid})
+    UPDATE users SET referred_by = ${ref.ref_code}
+    WHERE privy_did = ${privyDid} AND referred_by IS NULL
     RETURNING referred_by`;
   return rows.length > 0;
 }
 
+/** Words nobody gets to claim as an invite code. */
+const RESERVED = ["VAULTS", "VAULTSCASH", "OFFICIAL", "ADMIN", "SUPPORT", "TEAM", "STAFF", "ROBINHOOD", "UNISWAP", "PRIVY", "COINBASE", "BASE"];
+
+/** Claim a vanity invite code, once. Letters and digits, 4–16, unique across generated and vanity codes. */
+export async function claimCustomCode(privyDid: string, wallet: string, raw: string): Promise<string> {
+  const user = await getOrCreateUser(privyDid, wallet);
+  const code = raw.trim().toUpperCase();
+  if (!REF_CODE_RE.test(code)) throw new ReferralError(400, "Use 4 to 16 letters or digits, nothing else.");
+  if (RESERVED.includes(code)) throw new ReferralError(400, "That one's reserved.");
+  const q = sql();
+  const mine = (await q`SELECT custom_code FROM users WHERE privy_did = ${privyDid}`) as Array<{ custom_code: string | null }>;
+  if (mine[0]?.custom_code) throw new ReferralError(409, `You already picked ${mine[0].custom_code}. Codes can be chosen once.`);
+  const taken = await q`SELECT 1 FROM users WHERE (ref_code = ${code} OR custom_code = ${code}) AND privy_did <> ${privyDid} LIMIT 1`;
+  if (taken.length) throw new ReferralError(409, "Someone already has that code.");
+  await q`UPDATE users SET custom_code = ${code} WHERE privy_did = ${privyDid} AND custom_code IS NULL`;
+  void user;
+  return code;
+}
+
 export type ReferralView = {
+  /** generated code, always valid */
   refCode: string;
+  /** vanity code the user picked, if any — the one to show on links */
+  customCode: string | null;
   referredBy: string | null;
   /** current wallet of whoever referred this user — the zap sends the
    *  referrer's fee share straight there */
@@ -112,8 +146,10 @@ export async function referralStats(privyDid: string, wallet: string): Promise<R
   const ref = user.referred_by
     ? await q`SELECT wallet FROM users WHERE ref_code = ${user.referred_by}`
     : [];
+  const mine = (await q`SELECT custom_code FROM users WHERE privy_did = ${privyDid}`) as Array<{ custom_code: string | null }>;
   return {
     refCode: user.ref_code,
+    customCode: mine[0]?.custom_code ?? null,
     referredBy: user.referred_by,
     referrerWallet: ref.length ? (ref[0].wallet as `0x${string}`) : null,
     referredCount: count as number,
@@ -122,8 +158,6 @@ export async function referralStats(privyDid: string, wallet: string): Promise<R
 }
 
 const TRANSFER = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
-/** Referral code pattern (matches src/proxy.ts) */
-const REF_CODE_RE = /^[A-Z0-9]{4,16}$/i;
 
 /**
  * Wallet to pay the referrer share to for a referral code — used by the
@@ -135,9 +169,9 @@ export async function referrerWalletForCode(code: unknown, payer: string): Promi
   if (typeof code !== "string" || !REF_CODE_RE.test(code)) return null;
   try {
     await ensureSchema();
-    const rows = await sql()`SELECT wallet FROM users WHERE ref_code = ${code.toUpperCase()}`;
-    if (!rows.length) return null;
-    const wallet = (rows[0].wallet as string).toLowerCase();
+    const ref = await resolveCode(code);
+    if (!ref) return null;
+    const wallet = ref.wallet.toLowerCase();
     return wallet === payer.toLowerCase() ? null : (wallet as `0x${string}`);
   } catch (e) {
     // a referral lookup must never block a plan — the batch just doesn't split

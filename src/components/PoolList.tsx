@@ -83,50 +83,54 @@ export function PoolList() {
 
   return (
     <div ref={listTop} className="scroll-mt-24">
-      <div className="flex flex-wrap items-center gap-2 pb-3">
-        <label className="relative">
-          <span className="sr-only">Search pools</span>
-          <input
-            value={q}
-            onChange={(e) => pick(setQ)(e.target.value)}
-            placeholder="Search TSLA, ETH, NVDA…"
-            className="w-44 rounded-full bg-surface py-1.5 pl-3.5 pr-8 text-sm outline-none placeholder:text-muted/50 focus:ring-2 focus:ring-accent sm:w-52"
+      <div className="space-y-2 pb-3">
+        {/* phones: search on its own line, the two selects side by side under it; wider: all three on one line */}
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="relative min-w-0 basis-full sm:basis-auto sm:grow">
+            <span className="sr-only">Search pools</span>
+            <input
+              value={q}
+              onChange={(e) => pick(setQ)(e.target.value)}
+              placeholder="Search TSLA, ETH, NVDA…"
+              className="w-full rounded-full bg-surface py-1.5 pl-3.5 pr-8 text-sm outline-none placeholder:text-muted/50 focus:ring-2 focus:ring-accent"
+            />
+            {q && (
+              <button onClick={() => pick(setQ)("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-foreground">
+                ✕
+              </button>
+            )}
+          </label>
+          <Select<ChainId | 0>
+            value={chain}
+            onChange={pick(setChain)}
+            ariaLabel="Network"
+            options={[{ value: 0, label: "All networks" }, ...CHAIN_IDS.map((id) => ({ value: id, label: CHAINS[id].chain.name }))]}
           />
-          {q && (
-            <button onClick={() => pick(setQ)("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-foreground">
-              ✕
+          <Select<Sort>
+            value={sort}
+            onChange={pick(setSort)}
+            ariaLabel="Sort by"
+            options={[
+              { value: "tvl", label: "Most liquid", hint: "Deepest pools first" },
+              { value: "apr", label: "Highest APR", hint: "Best recent fee rate" },
+              { value: "vol", label: "Most traded", hint: "Busiest in 24h" },
+            ]}
+          />
+        </div>
+        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => pick(setCategory)(c.id)}
+              title={c.hint || undefined}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                category === c.id ? "bg-accent text-black" : "bg-surface text-muted hover:text-foreground"
+              }`}
+            >
+              {c.label}
             </button>
-          )}
-        </label>
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => pick(setCategory)(c.id)}
-            title={c.hint || undefined}
-            className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              category === c.id ? "bg-accent text-black" : "bg-surface text-muted hover:text-foreground"
-            }`}
-          >
-            {c.label}
-          </button>
-        ))}
-        <span className="grow" />
-        <Select<ChainId | 0>
-          value={chain}
-          onChange={pick(setChain)}
-          ariaLabel="Network"
-          options={[{ value: 0, label: "All networks" }, ...CHAIN_IDS.map((id) => ({ value: id, label: CHAINS[id].chain.name }))]}
-        />
-        <Select<Sort>
-          value={sort}
-          onChange={pick(setSort)}
-          ariaLabel="Sort by"
-          options={[
-            { value: "tvl", label: "Most liquid", hint: "Deepest pools first" },
-            { value: "apr", label: "Highest APR", hint: "Best recent fee rate" },
-            { value: "vol", label: "Most traded", hint: "Busiest in 24h" },
-          ]}
-        />
+          ))}
+        </div>
       </div>
 
       {isLoading ? (

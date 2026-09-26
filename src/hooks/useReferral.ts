@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAuth } from "@/components/AuthProvider";
 import type { ReferralView } from "@/lib/referral";
@@ -38,3 +38,24 @@ export function useReferral() {
     },
   });
 }
+
+function useReferralPost(path: string) {
+  const { getAccessToken } = usePrivy();
+  const address = useActiveAddress();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (code: string) => {
+      const token = await getAccessToken();
+      const res = await fetch(path, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify({ wallet: address, code }) });
+      const j = (await res.json().catch(() => ({}))) as { error?: string; code?: string };
+      if (!res.ok) throw new Error(j.error ?? `request failed (${res.status})`);
+      return j;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["referral-me"] }),
+  });
+}
+
+/** Pick a vanity invite code (once). */
+export const useClaimInviteCode = () => useReferralPost("/api/referral/code");
+/** Apply someone's invite code by hand. */
+export const useApplyInviteCode = () => useReferralPost("/api/referral/apply");

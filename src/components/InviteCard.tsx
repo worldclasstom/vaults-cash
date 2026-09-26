@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { useReferral } from "@/hooks/useReferral";
+import { useApplyInviteCode, useClaimInviteCode, useReferral } from "@/hooks/useReferral";
 import { fmtUsd } from "@/lib/format";
 import { Chip } from "./TokenIcon";
 
@@ -28,9 +28,14 @@ export function InviteCard({ className = "" }: { className?: string }) {
   const { authenticated } = useAuth();
   const { data, isError, refetch } = useReferral();
   const [copied, setCopied] = useState(false);
+  const [wanted, setWanted] = useState("");
+  const [entered, setEntered] = useState("");
+  const claim = useClaimInviteCode();
+  const apply = useApplyInviteCode();
 
   if (!authenticated) return null;
-  const link = data ? `https://vaults.cash?ref=${data.refCode}` : null;
+  const code = data ? (data.customCode ?? data.refCode) : null;
+  const link = code ? `https://vaults.cash?ref=${code}` : null;
 
   return (
     <section className={`tilt relative overflow-hidden rounded-3xl bg-surface p-5 shadow-card ${className}`}>
@@ -72,6 +77,56 @@ export function InviteCard({ className = "" }: { className?: string }) {
             <Chip>Invited {data.referredCount}</Chip>
             <Chip tone={data.earnedUsd > 0 ? "accent" : "muted"}>Earned {fmtUsd(data.earnedUsd)}</Chip>
           </div>
+          {!data.customCode && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (wanted.trim()) claim.mutate(wanted);
+              }}
+              className="mt-4 flex flex-wrap items-center gap-2"
+            >
+              <label className="text-xs text-muted" htmlFor="invite-wanted">
+                Make it yours:
+              </label>
+              <input
+                id="invite-wanted"
+                value={wanted}
+                onChange={(e) => setWanted(e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 16))}
+                placeholder="YOURNAME"
+                className="w-36 rounded-full bg-surface-raised px-3 py-1.5 font-mono text-sm uppercase outline-none placeholder:text-muted/40 focus:ring-2 focus:ring-accent"
+              />
+              <button type="submit" disabled={claim.isPending || wanted.length < 4} className="rounded-full bg-surface-raised px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-borderline disabled:opacity-40">
+                {claim.isPending ? "Claiming…" : "Claim"}
+              </button>
+              <span className="text-xs text-muted">4–16 letters or digits, picked once. Your old link keeps working.</span>
+              {claim.isError && <span className="w-full text-xs text-negative">{(claim.error as Error).message}</span>}
+            </form>
+          )}
+          {!data.referredBy && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (entered.trim()) apply.mutate(entered);
+              }}
+              className="mt-3 flex flex-wrap items-center gap-2"
+            >
+              <label className="text-xs text-muted" htmlFor="invite-entered">
+                Have a friend&apos;s code?
+              </label>
+              <input
+                id="invite-entered"
+                value={entered}
+                onChange={(e) => setEntered(e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 16))}
+                placeholder="CODE"
+                className="w-32 rounded-full bg-surface-raised px-3 py-1.5 font-mono text-sm uppercase outline-none placeholder:text-muted/40 focus:ring-2 focus:ring-accent"
+              />
+              <button type="submit" disabled={apply.isPending || entered.length < 4} className="rounded-full bg-surface-raised px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-borderline disabled:opacity-40">
+                {apply.isPending ? "Applying…" : "Apply"}
+              </button>
+              {apply.isSuccess && <span className="text-xs text-accent">Linked. Half our fee on your deposits goes to them.</span>}
+              {apply.isError && <span className="w-full text-xs text-negative">{(apply.error as Error).message}</span>}
+            </form>
+          )}
           {data.earnedUsd > 0 && (
             <div aria-hidden className="pointer-events-none absolute bottom-3 right-6 flex gap-6">
               {[0, 0.6].map((delay, i) => (

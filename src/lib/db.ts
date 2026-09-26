@@ -61,6 +61,9 @@ export function ensureSchema(): Promise<void> {
         created_at timestamptz NOT NULL DEFAULT now()
       )`;
       await q`INSERT INTO user_wallets (wallet, privy_did) SELECT wallet, privy_did FROM users ON CONFLICT DO NOTHING`;
+      // a vanity invite code the user picked; the generated ref_code stays
+      // valid forever so old links never break
+      await q`ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_code text UNIQUE`;
       // referrer share: paid on-chain in the same batch as the fee since the
       // fee split shipped (referrer_amount = what the referrer received)
       await q`ALTER TABLE fee_events ADD COLUMN IF NOT EXISTS referrer_did text`;
