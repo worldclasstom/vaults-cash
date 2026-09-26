@@ -222,7 +222,7 @@ function PoolRow({ q, s }: { q: MarketQuote; s?: MarketStats }) {
           </span>
           <MarketChips market={m} stats={s} />
           <span className="pt-1 text-xs text-muted">
-            {s ? `${fmtUsd(s.tvlUsd, { compact: true })} liquidity` : `$${fmtPrice(priceUsd)}`}
+            {s ? `${fmtUsd(s.tvlUsd, { compact: true })} liquidity · ${fmtUsd(s.vol24hUsd, { compact: true })} traded 24h` : `$${fmtPrice(priceUsd)}`}
           </span>
         </span>
         <span className="hidden text-right font-mono text-sm sm:block">${fmtPrice(priceUsd)}</span>
