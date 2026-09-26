@@ -3,6 +3,7 @@
 import { CHAINS, gasMode, type ChainId } from "@/lib/chain";
 import { fmtUsd } from "@/lib/format";
 import { useGasQuote } from "@/hooks/useGasQuote";
+import { useWalletDeployed } from "@/hooks/useWalletDeployed";
 import type { Call } from "@/lib/zap";
 
 /**
@@ -13,10 +14,12 @@ import type { Call } from "@/lib/zap";
 export function GasLine({ chainId, calls }: { chainId: ChainId; calls?: Call[] | null }) {
   const mode = gasMode(chainId);
   const { data: quote } = useGasQuote(chainId, mode === "token" ? calls : null);
+  const deployed = useWalletDeployed(chainId);
   if (mode === "sponsored") return <>Covered by vaults.cash</>;
   if (mode === "token") {
     const sym = CHAINS[chainId].quote.symbol;
-    return quote ? <>about {fmtUsd(quote.usd)} in {sym}</> : <>a few cents, in {sym}</>;
+    const first = deployed === false ? " (first-time wallet setup included)" : "";
+    return quote ? <>about {fmtUsd(quote.usd)} in {sym}{first}</> : <>a few cents, in {sym}{first}</>;
   }
   return <>Under a cent, in ETH</>;
 }

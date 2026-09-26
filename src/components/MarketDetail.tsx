@@ -10,7 +10,8 @@ import { usePlanDeposit, useSendDeposit } from "@/hooks/useDeposit";
 import { fmtPct, fmtPrice, fmtUsd } from "@/lib/format";
 import { CHAINS, chainConfig, gasMode } from "@/lib/chain";
 import { leavesGasReserve, spendableUsd } from "@/lib/gasToken";
-import { GasLine, gasSentence } from "./GasLine";
+import { GasLine } from "./GasLine";
+import { GasNote } from "./GasNote";
 import { planSummary, presetTicks, PRESET_WIDTH, type RangePreset, type ZapPlan } from "@/lib/zap";
 import { tickToPrice } from "@/lib/onchain";
 import { MarketChips, PairIcons } from "./TokenIcon";
@@ -282,7 +283,7 @@ export function MarketDetail({ slug }: { slug: string }) {
             </dl>
             <p className="pb-2 text-xs text-muted">
               {plan.quoteLeg && `Your ${stable.symbol} is converted to ${market.quote.symbol} first. `}
-              {gasSentence(market.chainId)}{" "}
+              <GasNote chainId={market.chainId} />{" "}
               You&apos;ll earn {market.pool.fee / 10_000}% of every trade that crosses your range. Withdraw anytime.{" "}
               <Link href="/trust" className="underline underline-offset-2">
                 What vaults.cash can and can&apos;t do

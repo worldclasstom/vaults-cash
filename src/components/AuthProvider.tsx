@@ -1,6 +1,7 @@
 "use client";
 
 import { usePrivy } from "@privy-io/react-auth";
+import { useRouter } from "next/navigation";
 
 /**
  * Thin auth shim. The rest of the app depends on this `{ ready,
@@ -10,12 +11,14 @@ import { usePrivy } from "@privy-io/react-auth";
  */
 export function useAuth() {
   const { ready, authenticated, login, logout } = usePrivy();
+  const router = useRouter();
   return {
     ready,
     authenticated,
     login: () => login(),
     logout: async () => {
       await logout();
+      router.push("/");
     },
   };
 }

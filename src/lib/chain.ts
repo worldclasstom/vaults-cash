@@ -130,7 +130,7 @@ export const CHAINS: Record<ChainId, ChainConfig> = {
     },
     gecko: "robinhood",
     rpcEnv: "ROBINHOOD_RPC_URL",
-    gasSponsored: process.env.NEXT_PUBLIC_GAS_SPONSORED_4663 === "1",
+    gasSponsored: false,
     legacySwapParams: true,
     gasToken: process.env.NEXT_PUBLIC_GAS_TOKEN_POLICY_4663
       ? { policyId: process.env.NEXT_PUBLIC_GAS_TOKEN_POLICY_4663, paymaster: "0x00000000000667f27d4db42334ec11a25db7ebb4" }

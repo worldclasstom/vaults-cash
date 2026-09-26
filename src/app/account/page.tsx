@@ -4,34 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { usePrivy } from "@privy-io/react-auth";
-import { Sheet } from "@/components/Sheet";
 import { AgentAccess } from "@/components/AgentAccess";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
+import { LogoutConfirm } from "@/components/LogoutConfirm";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { useActiveAddress, useCashBalances, useTokenBalance } from "@/hooks/useChainData";
 import { CHAINS, CHAIN_IDS, explorerUrl, gasMode, type ChainId } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
-
-function LogoutConfirm({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {
-  return (
-    <Sheet open onClose={onCancel} title="Log out?">
-      <p className="pt-2 text-sm text-muted">
-        Your funds stay safe in your wallet — nothing moves. Log back in the same way anytime to pick up where you left
-        off.
-      </p>
-      <div className="mt-5 flex gap-2">
-        <button onClick={onCancel} className="grow rounded-full bg-surface py-3 font-semibold transition-colors hover:bg-borderline">
-          Stay
-        </button>
-        <button onClick={onConfirm} className="grow rounded-full bg-negative/15 py-3 font-semibold text-negative transition-colors hover:bg-negative/25">
-          Log out
-        </button>
-      </div>
-    </Sheet>
-  );
-}
 
 /** One chain's line in the wallet card: stablecoin big, ETH sliver small, explorer link. */
 function ChainRow({ chainId, stable, address }: { chainId: ChainId; stable: number | undefined; address: string }) {

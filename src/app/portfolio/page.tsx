@@ -19,6 +19,7 @@ import type { Activity } from "@/lib/activity";
 import { useCashBalances, useQuoteBalance } from "@/hooks/useChainData";
 import { CHAINS, explorerNftUrl, uniswapPositionUrl } from "@/lib/chain";
 import { GasLine } from "@/components/GasLine";
+import { InviteCard } from "@/components/InviteCard";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { shareAmount, sharePrice } from "@/lib/markets";
 import { tickToPrice } from "@/lib/onchain";
@@ -536,7 +537,7 @@ function EmptyPositions() {
     <div className="rounded-3xl bg-surface shadow-card p-8 text-center">
       <p className="font-display text-2xl font-extrabold">Nothing earning yet</p>
       <p className="pt-2 text-sm text-muted">Pick a pool, type a dollar amount, and traders start paying you on the next trade.</p>
-      <Link href="/pools" className="mt-5 inline-block rounded-full bg-accent px-7 py-3 font-display text-base font-extrabold text-black transition-colors hover:bg-accent-strong">
+      <Link href="/pools" className="attract mt-5 inline-block rounded-full bg-accent px-7 py-3 font-display text-base font-extrabold text-black transition-colors hover:bg-accent-strong">
         Explore pools
       </Link>
     </div>
@@ -620,6 +621,7 @@ export default function PortfolioPage() {
               </Suspense>
             )}
           </section>
+          <InviteCard className="mt-8" />
         </div>
       )}
     </AppShell>

@@ -91,11 +91,9 @@ export async function executeForUser(
   const transport = http(url, url.includes("g.alchemy.com") ? { fetchOptions: { headers: { Origin: "https://vaults.cash" } } } : {});
   // CDP (Base) sponsors from the bundler URL alone. On Robinhood the user pays
   // gas in USDG through Alchemy's ERC-20 paymaster (same context + approval the
-  // browser sends), or a sponsorship policy id when that is what's configured.
-  const sponsorPolicy = chainId === 4663 ? process.env.ALCHEMY_GAS_POLICY_ID_4663 : undefined;
-  const tokenContext = gasTokenContext(chainId, { proceedsPayGas: opts.proceedsPayGas });
-  const paymaster = cfg.gasSponsored || tokenContext ? createPaymasterClient({ transport }) : undefined;
-  const paymasterContext = tokenContext ?? (cfg.gasSponsored && sponsorPolicy ? { policyId: sponsorPolicy } : undefined);
+  // browser sends).
+  const paymasterContext = gasTokenContext(chainId, { proceedsPayGas: opts.proceedsPayGas });
+  const paymaster = cfg.gasSponsored || paymasterContext ? createPaymasterClient({ transport }) : undefined;
   const client = createKernelAccountClient({
     account,
     chain: cfg.chain,

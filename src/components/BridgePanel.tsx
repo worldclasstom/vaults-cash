@@ -4,7 +4,8 @@ import { useState } from "react";
 import { formatUnits, parseUnits } from "viem";
 import { CHAINS, type ChainId } from "@/lib/chain";
 import { spendableUsd } from "@/lib/gasToken";
-import { GasLine, gasSentence } from "./GasLine";
+import { GasLine } from "./GasLine";
+import { GasNote } from "./GasNote";
 import { fmtUsd } from "@/lib/format";
 import { useCashBalances } from "@/hooks/useChainData";
 import { useBridgeQuote, useBridgeStatus, useSendBridge } from "@/hooks/useBridge";
@@ -81,7 +82,7 @@ export function BridgePanel({ toChainId, suggestedUsd }: { toChainId: ChainId; s
       </div>
       <p className="pt-1 text-muted">
         This pool takes {to.quote.symbol} on {to.label}. Move some over and it arrives at this same wallet, usually in under a
-        minute. {gasSentence(source.chainId as ChainId)}
+        minute. <GasNote chainId={source.chainId as ChainId} />
       </p>
       <div className="mt-3 flex items-center gap-2">
         <span className="text-muted">$</span>

@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { captureRefFromUrl } from "./InviteCard";
 import { FooterContent } from "./Footer";
 import { Wordmark } from "./Logo";
+import { HeaderMenu } from "./HeaderMenu";
 
 function MarketsIcon({ active }: { active: boolean }) {
   return (
@@ -72,11 +73,13 @@ function BottomNav({ pathname }: { pathname: string }) {
             <Link
               key={href}
               href={href}
-              className={`flex grow flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors ${
-                active ? "text-accent" : "text-muted hover:text-foreground"
+              className={`flex grow flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors ${
+                active ? "text-foreground" : "text-muted hover:text-foreground"
               }`}
             >
-              <Icon active={active} />
+              <span className={active ? "nav-sticker flex h-7 w-11 items-center justify-center rounded-full bg-accent text-black" : "flex h-7 w-11 items-center justify-center"}>
+                <Icon active={active} />
+              </span>
               {label}
             </Link>
           );
@@ -92,14 +95,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // referral links work on ANY page (vaults.cash/market/eth?ref=… included)
   useEffect(() => captureRefFromUrl(), []);
 
+  // desktop tabs: the active one is a sticker slapped on the bar, the rest
+  // are plain labels that bounce on hover
   const tab = (href: string, label: string) => (
     <Link
       href={href}
-      className={`rounded-full px-4 py-1.5 text-sm transition-colors ${
+      className={
         pathname === href
-          ? "bg-surface-raised text-foreground"
-          : "text-muted hover:text-foreground"
-      }`}
+          ? "nav-sticker rounded-full bg-accent px-4 py-1.5 font-display text-sm font-extrabold text-black"
+          : "nav-plain rounded-full px-3.5 py-1.5 font-display text-sm font-bold text-muted hover:text-foreground"
+      }
     >
       {label}
     </Link>
@@ -112,11 +117,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Wordmark />
         </Link>
         {authenticated && (
-          <nav className="hidden items-center gap-1 md:flex">
-            {tab("/", "Pools")}
-            {tab("/portfolio", "Portfolio")}
-            {tab("/account", "Account")}
-          </nav>
+          <div className="flex items-center gap-3">
+            <nav className="hidden items-center gap-1.5 md:flex">
+              {tab("/", "Pools")}
+              {tab("/portfolio", "Portfolio")}
+            </nav>
+            <HeaderMenu />
+          </div>
         )}
       </header>
       <main className="flex grow flex-col">{children}</main>
