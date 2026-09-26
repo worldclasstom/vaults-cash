@@ -197,8 +197,8 @@ export function useAgentAccessOn() {
     enabled: authenticated && configured,
     staleTime: 30_000,
     queryFn: async () => {
-      const s = await authed<{ wallets?: { embedded?: { delegated?: boolean } } }>("/api/agent-access");
-      return !!s.wallets?.embedded?.delegated;
+      const s = await authed<{ delegated?: boolean }>("/api/agent-access");
+      return !!s.delegated;
     },
   });
 }

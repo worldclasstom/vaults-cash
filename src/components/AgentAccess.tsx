@@ -54,6 +54,16 @@ export function AgentAccess() {
     },
   });
   const revokeKey = useMutation({ mutationFn: (id: number) => authed({ method: "DELETE", body: JSON.stringify({ id }) }), onSuccess: refresh });
+  // a zero-value call from the smart wallet to itself on Base (gas covered): proves the server can act
+  const test = useMutation({
+    mutationFn: async () => {
+      const token = await getAccessToken();
+      const res = await fetch("/api/agent-access/test", { method: "POST", headers: { authorization: `Bearer ${token}` } });
+      const j = (await res.json().catch(() => ({}))) as { txHash?: string; error?: string };
+      if (!res.ok) throw new Error(j.error ?? `request failed (${res.status})`);
+      return j.txHash!;
+    },
+  });
   const turnOff = useMutation({
     mutationFn: async () => {
       await authed({ method: "DELETE", body: "{}" });
@@ -90,6 +100,22 @@ export function AgentAccess() {
       ) : (
         <div className="mt-4 space-y-3 text-sm">
           <p className="text-accent">Agent access is on for this wallet.</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => test.mutate()}
+              disabled={test.isPending}
+              className="rounded-full bg-surface-raised px-4 py-2 text-xs font-semibold transition-colors hover:bg-borderline disabled:opacity-40"
+            >
+              {test.isPending ? "Sending a test…" : "Send a test transaction"}
+            </button>
+            {test.isSuccess && (
+              <a href={`https://base.blockscout.com/tx/${test.data}`} target="_blank" rel="noreferrer" className="text-xs text-accent underline-offset-2 hover:underline">
+                It worked ↗
+              </a>
+            )}
+            {test.isError && <span className="text-xs text-negative">{(test.error as Error).message}</span>}
+            <span className="text-xs text-muted">A free no-op on Base from your wallet, sent by our server. Proves the keeper can close targets for you.</span>
+          </div>
 
           {newKey ? (
             <div className="rounded-2xl bg-surface-raised p-4">
