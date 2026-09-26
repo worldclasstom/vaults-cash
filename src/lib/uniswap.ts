@@ -5,6 +5,7 @@
  * Every contract address is resolved from the market's chain.
  */
 import {
+  encodeAbiParameters,
   encodeFunctionData,
   erc20Abi,
   maxUint160,
@@ -103,18 +104,58 @@ export function buildSwapCall(params: {
   const output = toBase ? market.base.address : market.quote.address;
   const zeroForOne = input.toLowerCase() === market.pool.currency0.toLowerCase();
 
-  const planner = new V4Planner();
-  planner.addAction(Actions.SWAP_EXACT_IN_SINGLE, [
-    {
-      poolKey: poolKeyOf(market),
-      zeroForOne,
-      amountIn: amountIn.toString(),
-      amountOutMinimum: minAmountOut.toString(),
-      hookData: "0x",
-    },
-  ]);
-  planner.addAction(Actions.SETTLE_ALL, [input, amountIn.toString()]);
-  planner.addAction(Actions.TAKE_ALL, [output, minAmountOut.toString()]);
+  let v4Input: `0x${string}`;
+  if (chainConfig(market.chainId).legacySwapParams) {
+    // Same actions (SWAP_EXACT_IN_SINGLE, SETTLE_ALL, TAKE_ALL) as the planner
+    // below, but the swap struct carries sqrtPriceLimitX96 (0 = no limit),
+    // matching the router deployed on this chain.
+    const swap = encodeAbiParameters(
+      [
+        {
+          type: "tuple",
+          components: [
+            {
+              name: "poolKey",
+              type: "tuple",
+              components: [
+                { name: "currency0", type: "address" },
+                { name: "currency1", type: "address" },
+                { name: "fee", type: "uint24" },
+                { name: "tickSpacing", type: "int24" },
+                { name: "hooks", type: "address" },
+              ],
+            },
+            { name: "zeroForOne", type: "bool" },
+            { name: "amountIn", type: "uint128" },
+            { name: "amountOutMinimum", type: "uint128" },
+            { name: "sqrtPriceLimitX96", type: "uint160" },
+            { name: "hookData", type: "bytes" },
+          ],
+        },
+      ],
+      [{ poolKey: poolKeyOf(market), zeroForOne, amountIn, amountOutMinimum: minAmountOut, sqrtPriceLimitX96: 0n, hookData: "0x" }],
+    );
+    const pair = (currency: `0x${string}`, amount: bigint) =>
+      encodeAbiParameters([{ type: "address" }, { type: "uint256" }], [currency, amount]);
+    v4Input = encodeAbiParameters(
+      [{ type: "bytes" }, { type: "bytes[]" }],
+      ["0x060c0f", [swap, pair(input, amountIn), pair(output, minAmountOut)]],
+    );
+  } else {
+    const planner = new V4Planner();
+    planner.addAction(Actions.SWAP_EXACT_IN_SINGLE, [
+      {
+        poolKey: poolKeyOf(market),
+        zeroForOne,
+        amountIn: amountIn.toString(),
+        amountOutMinimum: minAmountOut.toString(),
+        hookData: "0x",
+      },
+    ]);
+    planner.addAction(Actions.SETTLE_ALL, [input, amountIn.toString()]);
+    planner.addAction(Actions.TAKE_ALL, [output, minAmountOut.toString()]);
+    v4Input = planner.finalize() as `0x${string}`;
+  }
 
   return {
     to: contractsOf(market).router,
@@ -122,7 +163,7 @@ export function buildSwapCall(params: {
     data: encodeFunctionData({
       abi: routerAbi,
       functionName: "execute",
-      args: [UR_V4_SWAP_COMMAND, [planner.finalize() as `0x${string}`], deadline],
+      args: [UR_V4_SWAP_COMMAND, [v4Input], deadline],
     }),
   };
 }

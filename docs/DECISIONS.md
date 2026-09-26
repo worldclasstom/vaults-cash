@@ -130,3 +130,25 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   first feature that justifies a small immutable contract.
 - **Shelved:** Rialto propAMM vault (`contracts/`, VAULT_SPEC.md) and the
   1inch Aqua pilot (AQUA.md) — kept as reference, not on the roadmap.
+
+- **2026-09-25 — Robinhood gas is paid in USDG (Alchemy ERC-20 Payments policy).**
+  Users never need ETH on Robinhood Chain: each user op carries a $0.50
+  USDG approval to Alchemy's ERC-20 paymaster (0x00000000000667f2…7ebb4)
+  and the ERC-7677 context `{policyId, erc20Context}`; the paymaster charges
+  the actual gas after the op (post-op mode) into the fee wallet. Base stays
+  on the CDP paymaster (about a cent, covered). The 0.6% fee is untouched.
+  Two things bit on the way in: (1) Privy's smart-wallet `sendTransaction`
+  wrapper rebuilds the request and drops `paymasterContext`, so the
+  dashboard's policy-only context reached Alchemy — `useSendCalls` now calls
+  viem's `sendUserOperation` directly (the wrapper spreads the raw client)
+  whenever a token context exists. (2) The Universal Router deployed on
+  Robinhood Chain (0x8876…0904, the official address) was built from a
+  v4-periphery whose `ExactInputSingleParams` still has `sqrtPriceLimitX96`
+  — 10 head words — while the SDK planner encodes 9; the router's decoder
+  read the token address where it expected an offset and reverted with no
+  data. `legacySwapParams` on the chain config switches `buildSwapCall` to
+  the 10-word struct (verified against successful swaps on chain and by
+  `scripts/simulate-deposit.ts`, which dry-runs a full deposit via
+  eth_simulateV1). Also: the Alchemy key is origin-allowlisted, so every
+  server-side call to it sends `Origin: https://vaults.cash`.
+

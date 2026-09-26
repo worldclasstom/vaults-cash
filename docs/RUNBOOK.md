@@ -119,3 +119,11 @@ Push to `main` → Vercel production. Before any token/pool change:
 - **2026-09-24 — `/api/referral/me` 500.** Column named `amount_usdg` from
   the July schema vs code expecting `amount_usdc`. Migrated to `amount`;
   invite card now shows a retry state instead of vanishing.
+
+## Dry-running a deposit
+
+`npx tsx scripts/simulate-deposit.ts robinhood/tsla-usdg 0xOWNER 10.25` builds
+the exact batch the app would send (gas-token approval included) and runs it
+through `eth_simulateV1` from that wallet, printing each call's status. Use it
+before blaming a wallet or a paymaster: a reverting step shows up here first.
+

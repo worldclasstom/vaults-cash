@@ -71,6 +71,11 @@ export type ChainConfig = {
    *  ERC-20 paymaster (no ETH needed). `paymaster` is the contract the op
    *  approves; Alchemy reports it from pm_getPaymasterStubData. */
   gasToken?: { policyId: string; paymaster: `0x${string}` };
+  /** The Universal Router on this chain was built from a v4-periphery whose
+   *  ExactInputSingleParams still carries `sqrtPriceLimitX96` (10 head words).
+   *  Verified from successful swaps on Robinhood Chain; the SDK's planner
+   *  encodes the newer 9-word struct, which that router rejects. */
+  legacySwapParams?: boolean;
 };
 
 /** How gas is paid on a chain: by us, in the chain's own dollar, or in ETH. */
@@ -126,6 +131,7 @@ export const CHAINS: Record<ChainId, ChainConfig> = {
     gecko: "robinhood",
     rpcEnv: "ROBINHOOD_RPC_URL",
     gasSponsored: process.env.NEXT_PUBLIC_GAS_SPONSORED_4663 === "1",
+    legacySwapParams: true,
     gasToken: process.env.NEXT_PUBLIC_GAS_TOKEN_POLICY_4663
       ? { policyId: process.env.NEXT_PUBLIC_GAS_TOKEN_POLICY_4663, paymaster: "0x00000000000667f27d4db42334ec11a25db7ebb4" }
       : undefined,
