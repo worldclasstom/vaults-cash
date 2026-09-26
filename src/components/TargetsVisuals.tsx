@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Chip } from "./TokenIcon";
+import { TARGETS_LIVE } from "@/lib/flags";
 
 const RM = "(prefers-reduced-motion: reduce)";
 const subscribeReducedMotion = (cb: () => void) => {
@@ -144,6 +145,23 @@ function yOf(price: number) {
   return Math.max(0, Math.min(100, ((price - lo) / (hi - lo)) * 100));
 }
 
+/** The disabled stand-in for every "Set a target" button while Targets is closed. */
+export function ComingSoon({ className = "", size = "base" }: { className?: string; size?: "sm" | "base" }) {
+  return (
+    <span className={`inline-flex items-center gap-2 ${className}`}>
+      <button
+        type="button"
+        disabled
+        aria-disabled
+        className={`rounded-full bg-surface-raised font-display font-extrabold text-muted ${size === "sm" ? "px-5 py-2.5 text-sm" : "px-7 py-3 text-base"}`}
+      >
+        Set a target
+      </button>
+      <Chip tone="accent">Coming soon</Chip>
+    </span>
+  );
+}
+
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <li className="flex gap-3">
@@ -180,11 +198,13 @@ export function TargetsHowItWorks({ cta = true, example }: { cta?: boolean; exam
       <p className="pt-4 text-xs text-muted">
         Fees: 0.6% in and out, like Pools, plus an 8% performance fee, our share of the trading fees the ladder earns for you, never of what you put in.
       </p>
-      {cta && (
+      {cta && (TARGETS_LIVE ? (
         <Link href="/targets/new" className="attract mt-5 inline-block rounded-full bg-accent px-7 py-3 font-display text-base font-extrabold text-black hover:bg-accent-strong">
           Set a target
         </Link>
-      )}
+      ) : (
+        <ComingSoon className="mt-5" />
+      ))}
     </section>
   );
 }

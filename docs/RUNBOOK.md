@@ -26,6 +26,7 @@ July entries at the bottom are kept as history._
 | `NEXT_PUBLIC_PRIVY_SIGNER_POLICY_ID` | Vercel | optional Privy policy scoping that signer to our contracts |
 | `PRIVY_AUTHORIZATION_PRIVATE_KEY` | Vercel (server only) | base64 PKCS8 P-256 key matching the quorum; signs session-signer requests |
 | `BUNDLER_URL_8453`, `BUNDLER_URL_4663` | Vercel (server only) | bundler (+paymaster on Base) URLs the executor sends user ops to; 4663 falls back to Alchemy |
+| `NEXT_PUBLIC_TARGETS_LIVE` | Vercel | `1` opens Targets; unset = every "Set a target" button is a disabled Coming soon. Flip on after the closer is deployed on both chains |
 | `NEXT_PUBLIC_LADDER_CLOSER_8453`, `NEXT_PUBLIC_LADDER_CLOSER_4663` | Vercel | deployed `LadderCloser` per chain. Unset = new ladders on that chain fall back to the legacy agent-access auto-close |
 | `KEEPER_PRIVATE_KEY` | Vercel (server only) | plain EOA that pays gas to call `LadderCloser.close`; no other power. Key file: `~/.config/vaults-cash/keeper.json`. Needs a few dollars of ETH on each chain |
 

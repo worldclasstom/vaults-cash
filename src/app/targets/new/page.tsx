@@ -14,6 +14,7 @@ import { ChainChip, Chip } from "@/components/TokenIcon";
 import { useMarketQuote, useQuoteBalance } from "@/hooks/useChainData";
 import { useAgentAccessOn, usePlanLadder, useSendLadder } from "@/hooks/useTargets";
 import { closerAddress } from "@/lib/ladderCloser";
+import { TARGETS_LIVE } from "@/lib/flags";
 import { useGrantAgentAccess } from "@/hooks/useAgentAccess";
 import { CHAINS, type ChainId } from "@/lib/chain";
 import { fmtPrice, fmtUsd } from "@/lib/format";
@@ -251,12 +252,17 @@ export default function NewTargetPage() {
               )}
             </div>
 
+            {!TARGETS_LIVE && (
+              <p className="rounded-2xl bg-surface-raised p-3 text-sm text-muted">
+                <span className="font-semibold text-foreground">Coming soon.</span> Targets open once the contract that closes ladders is live on both chains.
+              </p>
+            )}
             <button
-              disabled={!canReview || planMutation.isPending}
+              disabled={!TARGETS_LIVE || !canReview || planMutation.isPending}
               onClick={() => planMutation.mutate({ market, amountUsd: amountNum, direction, targetPriceUsd: rawTarget, rungs, slippageBps: 100, autoClose: autoClose && canAutoClose }, { onSuccess: setPlan })}
               className="w-full rounded-full bg-accent py-3.5 font-display text-base font-extrabold text-black hover:bg-accent-strong disabled:opacity-50"
             >
-              {planMutation.isPending ? "Building your ladder…" : "Review target"}
+              {!TARGETS_LIVE ? "Coming soon" : planMutation.isPending ? "Building your ladder…" : "Review target"}
             </button>
             {planMutation.isError && <p className="text-xs text-negative">{(planMutation.error as Error).message}</p>}
           </section>
@@ -336,7 +342,7 @@ export default function NewTargetPage() {
             </button>
           ) : (
             <button
-              disabled={sendMutation.isPending}
+              disabled={!TARGETS_LIVE || sendMutation.isPending}
               onClick={() =>
                 sendMutation.mutate(
                   { plan, market, amountUsd: amountNum, autoClose: autoClose && canAutoClose, expiresAt: expiresAtNow() },
@@ -345,7 +351,7 @@ export default function NewTargetPage() {
               }
               className="mt-4 w-full rounded-full bg-accent py-3.5 font-display text-base font-extrabold text-black hover:bg-accent-strong disabled:opacity-50"
             >
-              {sendMutation.isPending ? "Setting your target…" : "Set target"}
+              {!TARGETS_LIVE ? "Coming soon" : sendMutation.isPending ? "Setting your target…" : "Set target"}
             </button>
           )}
           {sendMutation.isError && <p className="pt-2 text-xs text-negative">{(sendMutation.error as Error).message}</p>}

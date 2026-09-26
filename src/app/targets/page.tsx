@@ -7,7 +7,8 @@ import { Ladder, LadderStickers, ladderTitle } from "@/components/Ladder";
 import { useLadders } from "@/hooks/useTargets";
 import { useMarketQuote } from "@/hooks/useChainData";
 import { InviteCard } from "@/components/InviteCard";
-import { TargetsHowItWorks } from "@/components/TargetsVisuals";
+import { ComingSoon, TargetsHowItWorks } from "@/components/TargetsVisuals";
+import { TARGETS_LIVE } from "@/lib/flags";
 import { marketBySlug, sharePrice } from "@/lib/markets";
 import { fmtPrice, fmtUsd } from "@/lib/format";
 import type { LadderView } from "@/lib/ladders";
@@ -68,9 +69,13 @@ export default function TargetsPage() {
           <p className="pt-1 pb-4 text-sm text-muted">Pick a price you believe in. Earn fees on every step there.</p>
           <TargetsHowItWorks cta={false} example={example} />
           <div className="flex flex-col items-center gap-3 py-8">
-            <button onClick={login} className="attract rounded-full bg-accent px-8 py-3 font-display font-extrabold text-black hover:bg-accent-strong">
-              Log in to set a target
-            </button>
+            {TARGETS_LIVE ? (
+              <button onClick={login} className="attract rounded-full bg-accent px-8 py-3 font-display font-extrabold text-black hover:bg-accent-strong">
+                Log in to set a target
+              </button>
+            ) : (
+              <ComingSoon />
+            )}
           </div>
         </div>
       ) : (
@@ -80,9 +85,13 @@ export default function TargetsPage() {
               <h1 className="font-display text-3xl font-extrabold tracking-tight">Targets</h1>
               <p className="pt-1 text-sm text-muted">Pick a price you believe in. Earn fees on every step there.</p>
             </div>
-            <Link href="/targets/new" className="attract shrink-0 rounded-full bg-accent px-5 py-2.5 font-display text-sm font-extrabold text-black hover:bg-accent-strong">
-              Set a target
-            </Link>
+            {TARGETS_LIVE ? (
+              <Link href="/targets/new" className="attract shrink-0 rounded-full bg-accent px-5 py-2.5 font-display text-sm font-extrabold text-black hover:bg-accent-strong">
+                Set a target
+              </Link>
+            ) : (
+              <ComingSoon size="sm" className="shrink-0" />
+            )}
           </div>
           {isLoading ? (
             <div className="h-40 animate-pulse rounded-3xl bg-surface shadow-card" />
