@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { usePrivy, useLoginWithEmail, useLoginWithOAuth } from "@privy-io/expo";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { usePrivy, useLoginWithEmail, useLoginWithOAuth, useLoginWithSMS } from "@privy-io/expo";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Button, Card, Chip, Loading, Muted, Screen } from "@/components/ui";
 import { shortAddress, useActiveAddress } from "@/lib/wallet";
 import { colors, radius } from "@/theme";
@@ -9,11 +9,21 @@ export default function AccountScreen() {
   const { isReady, user, logout } = usePrivy();
   const address = useActiveAddress();
   const email = useLoginWithEmail();
+  const sms = useLoginWithSMS();
   const oauth = useLoginWithOAuth();
+  const [method, setMethod] = useState<"email" | "sms">("email");
   const [addr, setAddr] = useState("");
+  const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const canSend = method === "email" ? addr.includes("@") : phone.replace(/\D/g, "").length >= 10;
+  const sendCode = () => run(async () => {
+    if (method === "email") await email.sendCode({ email: addr });
+    else await sms.sendCode({ phone });
+    setSent(true);
+  });
+  const loginWithCode = () => run(() => (method === "email" ? email.loginWithCode({ code, email: addr }) : sms.loginWithCode({ code, phone })));
 
   const run = async (fn: () => Promise<unknown>) => {
     setErr(null);
@@ -34,17 +44,30 @@ export default function AccountScreen() {
           <Button tone="ghost" onPress={() => run(() => oauth.login({ provider: "google" }))}>
             Continue with Google
           </Button>
-          <Muted style={{ textAlign: "center" }}>or with email</Muted>
-          <TextInput value={addr} onChangeText={setAddr} placeholder="you@example.com" placeholderTextColor={colors.muted} style={s.input} autoCapitalize="none" keyboardType="email-address" autoCorrect={false} />
+          <View style={s.toggle}>
+            {(["email", "sms"] as const).map((m) => (
+              <Pressable key={m} onPress={() => { setMethod(m); setSent(false); setCode(""); }} style={[s.toggleBtn, method === m && s.toggleOn]}>
+                <Text style={[s.toggleText, method === m && { color: colors.foreground }]}>{m === "email" ? "Email" : "SMS"}</Text>
+              </Pressable>
+            ))}
+          </View>
+          {method === "email" ? (
+            <TextInput value={addr} onChangeText={setAddr} placeholder="you@example.com" placeholderTextColor={colors.muted} style={s.input} autoCapitalize="none" keyboardType="email-address" autoCorrect={false} editable={!sent} />
+          ) : (
+            <TextInput value={phone} onChangeText={setPhone} placeholder="+1 555 123 4567" placeholderTextColor={colors.muted} style={s.input} keyboardType="phone-pad" autoCorrect={false} editable={!sent} />
+          )}
           {sent ? (
             <>
               <TextInput value={code} onChangeText={setCode} placeholder="6-digit code" placeholderTextColor={colors.muted} style={s.input} keyboardType="number-pad" />
-              <Button onPress={() => run(() => email.loginWithCode({ code, email: addr }))} disabled={code.length < 6}>
+              <Button onPress={loginWithCode} disabled={code.length < 6}>
                 Log in
               </Button>
+              <Pressable onPress={() => { setSent(false); setCode(""); }}>
+                <Muted style={{ textAlign: "center" }}>Use a different {method === "email" ? "email" : "number"}</Muted>
+              </Pressable>
             </>
           ) : (
-            <Button tone="ghost" onPress={() => run(async () => { await email.sendCode({ email: addr }); setSent(true); })} disabled={!addr.includes("@")}>
+            <Button tone="ghost" onPress={sendCode} disabled={!canSend}>
               Send code
             </Button>
           )}
@@ -76,4 +99,8 @@ export default function AccountScreen() {
 const s = StyleSheet.create({
   input: { backgroundColor: colors.surfaceRaised, color: colors.foreground, borderRadius: radius.inner, paddingHorizontal: 16, paddingVertical: 12, fontSize: 16 },
   addr: { color: colors.foreground, fontSize: 18, fontWeight: "800", fontFamily: "Menlo" },
+  toggle: { flexDirection: "row", backgroundColor: colors.surfaceRaised, borderRadius: radius.pill, padding: 3, alignSelf: "center" },
+  toggleBtn: { paddingHorizontal: 18, paddingVertical: 6, borderRadius: radius.pill },
+  toggleOn: { backgroundColor: colors.surface },
+  toggleText: { color: colors.muted, fontWeight: "700", fontSize: 13 },
 });
