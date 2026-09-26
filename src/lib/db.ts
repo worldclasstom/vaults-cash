@@ -79,6 +79,29 @@ export function ensureSchema(): Promise<void> {
         revoked_at timestamptz
       )`;
       await q`CREATE INDEX IF NOT EXISTS agent_keys_did_idx ON agent_keys (privy_did)`;
+      // the swap index (lib/swapIndex.ts): every Swap in a listed pool, eight
+      // days deep, one cursor per chain
+      await q`CREATE TABLE IF NOT EXISTS swaps (
+        chain_id int NOT NULL,
+        pool_id text NOT NULL,
+        block bigint NOT NULL,
+        log_index int NOT NULL,
+        tx_hash text NOT NULL,
+        sender text NOT NULL,
+        amount0 numeric NOT NULL,
+        amount1 numeric NOT NULL,
+        sqrt_price numeric NOT NULL,
+        liquidity numeric NOT NULL,
+        tick int NOT NULL,
+        fee int NOT NULL,
+        PRIMARY KEY (chain_id, tx_hash, log_index)
+      )`;
+      await q`CREATE INDEX IF NOT EXISTS swaps_pool_block_idx ON swaps (chain_id, pool_id, block DESC)`;
+      await q`CREATE TABLE IF NOT EXISTS swap_cursor (
+        chain_id int PRIMARY KEY,
+        head bigint NOT NULL,
+        updated_at timestamptz NOT NULL DEFAULT now()
+      )`;
     })();
   }
   return schemaReady;

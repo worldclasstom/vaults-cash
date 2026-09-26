@@ -2,6 +2,7 @@ import { formatUnits, parseAbiItem } from "viem";
 import { CHAINS, type ChainId } from "./chain";
 import { getMarketPricing, publicClientFor } from "./onchain";
 import { feeViewAbi, Q128, wrapSub, type OwnedPosition } from "./positions";
+import { readSwaps, swapCursor } from "./swapIndex";
 
 /**
  * What traders paid a position, and the trades that paid it — the daily
@@ -115,7 +116,15 @@ async function poolSwaps(chainId: ChainId, poolId: `0x${string}`): Promise<PoolS
 
   let logs: SwapLog[];
   let partial: boolean;
-  if (hit && !hit.partial && hit.head >= floor && hit.head < head) {
+  // the swap index (cron, Neon) covers up to its cursor; when that is within
+  // a few minutes of the head, the RPC only has to fetch the tail
+  const STALE = BLOCKS_PER_DAY[chainId] / 96n; // 15 minutes
+  const cursor = process.env.DATABASE_URL ? await swapCursor(chainId).catch(() => null) : null;
+  if (cursor !== null && cursor > floor && head - cursor <= STALE && !(hit && hit.head === head)) {
+    const [indexed, tail] = await Promise.all([readSwaps(chainId, poolId, floor + 1n), cursor < head ? fetchRange(cursor + 1n, head) : Promise.resolve({ logs: [] as SwapLog[], partial: false })]);
+    logs = [...tail.logs, ...indexed.map((s) => ({ txHash: s.txHash, block: s.block, amount0: s.amount0, amount1: s.amount1, tick: s.tick, liquidity: s.liquidity }))];
+    partial = tail.partial;
+  } else if (hit && !hit.partial && hit.head >= floor && hit.head < head) {
     // incremental: only the new blocks, then drop what's older than a day
     const delta = await fetchRange(hit.head + 1n, head);
     logs = [...delta.logs, ...hit.logs.filter((l) => l.block > floor)];
