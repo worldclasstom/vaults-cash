@@ -24,7 +24,7 @@ import { getPoolState, tickToPrice, type PoolState } from "./onchain";
 import { getUncollectedFees, type OwnedPosition } from "./positions";
 import { approvalsFor, buildSwapCall, contractsOf, quoteBaseToQuote, quoteQuoteToBase, type Call } from "./uniswap";
 import { buildPool, feeCalls } from "./zap";
-import { MIN_DEPOSIT_USD } from "./limits";
+import { minDepositUsd } from "./limits";
 
 export type Direction = "up" | "down";
 export const PERFORMANCE_FEE_BPS = 800n;
@@ -152,7 +152,8 @@ export async function buildLadderPlan(params: {
   const rungs = Math.min(MAX_RUNGS, Math.max(MIN_RUNGS, Math.round(params.rungs)));
   const stableToken = CHAINS[market.chainId].quote;
   const stable = stableToken.address;
-  if (usdcAmount < BigInt(MIN_DEPOSIT_USD) * 10n ** BigInt(stableToken.decimals)) throw new Error(`Minimum is $${MIN_DEPOSIT_USD}`);
+  const minDep = minDepositUsd(market.chainId);
+  if (usdcAmount < BigInt(minDep) * 10n ** BigInt(stableToken.decimals)) throw new Error(`Minimum is $${minDep} on ${CHAINS[market.chainId].label}`);
   const { posm, router } = contractsOf(market);
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "60");
   const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT as `0x${string}` | undefined;

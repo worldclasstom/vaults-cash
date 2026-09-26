@@ -20,7 +20,7 @@ import { Sheet } from "./Sheet";
 import { useAuth } from "./AuthProvider";
 import { Select } from "./Select";
 import { SigningSteps } from "./SigningSteps";
-import { MIN_DEPOSIT_USD, poolIdle } from "@/lib/limits";
+import { minDepositUsd, poolIdle } from "@/lib/limits";
 import { BridgePanel } from "./BridgePanel";
 import { useCashBalances } from "@/hooks/useChainData";
 import { RangeBar } from "./RangeBar";
@@ -59,7 +59,8 @@ export function MarketDetail({ slug }: { slug: string }) {
   const s = stats?.[market.slug];
   const amountNum = Number(amount) || 0;
   const insufficient = balance !== undefined && !leavesGasReserve(market.chainId, balance.formatted, amountNum);
-  const belowMin = amountNum > 0 && amountNum < MIN_DEPOSIT_USD;
+  const minDep = minDepositUsd(market.chainId);
+  const belowMin = amountNum > 0 && amountNum < minDep;
   const idle = poolIdle(s);
   const tooThin = s !== undefined && s.tvlUsd > 0 && amountNum > s.tvlUsd * 0.1;
   const noGas = ethBalance !== undefined && ethBalance.raw === 0n;
@@ -155,10 +156,10 @@ export function MarketDetail({ slug }: { slug: string }) {
               </button>
             </div>
             <p className="pb-4 text-xs text-muted">
-              Minimum {fmtUsd(MIN_DEPOSIT_USD)} · Available here: {balance ? fmtUsd(balance.formatted) : "—"}
+              Minimum {fmtUsd(minDep)} · Available here: {balance ? fmtUsd(balance.formatted) : "—"}
               {elsewhere && ` · ${fmtUsd(elsewhere.formatted)} ${elsewhere.symbol} on ${CHAINS[elsewhere.chainId as keyof typeof CHAINS].label}`}
             </p>
-            {authenticated && elsewhere && (balance === undefined || balance.formatted < Math.max(amountNum, MIN_DEPOSIT_USD)) && (
+            {authenticated && elsewhere && (balance === undefined || balance.formatted < Math.max(amountNum, minDep)) && (
               <div className="pb-4">
                 <BridgePanel toChainId={market.chainId} suggestedUsd={amountNum || undefined} />
               </div>
@@ -249,7 +250,7 @@ export function MarketDetail({ slug }: { slug: string }) {
                 : insufficient
                   ? `Insufficient ${stable.symbol}`
                   : belowMin
-                    ? `Minimum ${fmtUsd(MIN_DEPOSIT_USD)}`
+                    ? `Minimum ${fmtUsd(minDep)}`
                     : planMutation.isPending ? "Getting quote…" : "Review deposit"}
             </button>
             {planMutation.isError && (

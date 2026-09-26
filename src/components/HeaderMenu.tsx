@@ -41,16 +41,28 @@ export function HeaderMenu() {
     };
   }, [open]);
 
+  // hover opens (desktop), tap toggles (touch); a short grace period keeps
+  // the menu open while the pointer travels from the button into it
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hoverOpen = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
+  const hoverClose = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpen(false), 180);
+  };
   return (
-    <div ref={root} className="relative">
+    <div ref={root} className="relative" onMouseEnter={hoverOpen} onMouseLeave={hoverClose}>
       <button
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Account menu"
-        className="sticker flex h-9 w-9 items-center justify-center rounded-full bg-sticker-yellow font-display text-sm font-extrabold text-black"
+        className="flex h-9 items-center gap-2 rounded-full bg-surface pl-1 pr-3 text-sm font-semibold transition-colors hover:bg-surface-raised"
       >
-        {initial}
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-raised font-display text-xs font-extrabold">{initial}</span>
+        {cash ? <span className="font-display font-extrabold tracking-tight">{fmtUsd(cash.totalUsd)}</span> : <span className="font-mono text-xs text-muted">{short}</span>}
       </button>
       {open && (
         <div role="menu" className="animate-pop absolute right-0 z-40 mt-2 w-64 origin-top-right rounded-2xl bg-surface p-2 shadow-elevated">

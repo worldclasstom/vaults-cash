@@ -8,6 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { GasLine } from "@/components/GasLine";
 import { GasNote } from "@/components/GasNote";
 import { Select } from "@/components/Select";
+import { AssetPicker } from "@/components/AssetPicker";
 import { Sheet } from "@/components/Sheet";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { useMarketQuote, useQuoteBalance } from "@/hooks/useChainData";
@@ -15,7 +16,7 @@ import { useAgentAccessOn, usePlanLadder, useSendLadder } from "@/hooks/useTarge
 import { CHAINS, type ChainId } from "@/lib/chain";
 import { fmtPrice, fmtUsd } from "@/lib/format";
 import { spendableUsd } from "@/lib/gasToken";
-import { MIN_DEPOSIT_USD } from "@/lib/limits";
+import { minDepositUsd } from "@/lib/limits";
 import { MARKETS, marketBySlug, sharePrice } from "@/lib/markets";
 import { DEFAULT_RUNGS, MAX_RUNGS, MIN_RUNGS, type Direction, type LadderPlan } from "@/lib/targets";
 
@@ -57,8 +58,9 @@ export default function NewTargetPage() {
   const pct = priceNow && targetNum ? ((targetNum - priceNow) / priceNow) * 100 : 0;
   const wrongWay = priceNow !== undefined && targetNum > 0 && (direction === "up" ? targetNum <= priceNow : targetNum >= priceNow);
   const insufficient = balance !== undefined && amountNum > spendableUsd(market.chainId, balance.formatted);
-  const belowMin = amountNum > 0 && amountNum < MIN_DEPOSIT_USD;
-  const canReview = !!priceNow && targetNum > 0 && !wrongWay && amountNum >= MIN_DEPOSIT_USD && !insufficient;
+  const minDep = minDepositUsd(market.chainId);
+  const belowMin = amountNum > 0 && amountNum < minDep;
+  const canReview = !!priceNow && targetNum > 0 && !wrongWay && amountNum >= minDep && !insufficient;
   const preset = (p: number) => priceNow && setTarget((priceNow * (1 + p / 100)).toFixed(2));
   const keeper = !!process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID;
   // computed at submit time, not during render
@@ -83,17 +85,14 @@ export default function NewTargetPage() {
           <section className="space-y-5 rounded-3xl bg-surface p-5 shadow-card">
             <div>
               <p className="pb-2 text-sm font-semibold">Which asset?</p>
-              <Select<string>
-                value={slug}
-                onChange={(v) => {
-                  setSlug(v);
+              <AssetPicker
+                markets={markets}
+                value={market}
+                onChange={(m) => {
+                  setSlug(m.slug);
                   setTarget("");
                   setPlan(null);
                 }}
-                ariaLabel="Asset"
-                align="left"
-                className="w-full"
-                options={markets.map((m) => ({ value: m.slug, label: `${m.base.symbol} / ${m.quote.symbol}`, hint: `${CHAINS[m.chainId].label}${m.kind === "stock" ? " · stock token" : ""}` }))}
               />
               <p className="pt-2 text-sm text-muted">
                 <ChainChip chainId={market.chainId} /> now {priceNow ? `$${fmtPrice(priceNow)}` : "—"}
@@ -196,10 +195,10 @@ export default function NewTargetPage() {
                 </button>
               </div>
               <p className="pt-2 text-xs text-muted">
-                {chain.quote.symbol} on {chain.label} · Minimum {fmtUsd(MIN_DEPOSIT_USD)} · Available: {balance ? fmtUsd(balance.formatted) : "—"}
+                {chain.quote.symbol} on {chain.label} · Minimum {fmtUsd(minDep)} · Available: {balance ? fmtUsd(balance.formatted) : "—"}
                 {amountNum > 0 && ` · ${fmtUsd(amountNum / rungs)} per rung`}
               </p>
-              {belowMin && <p className="pt-1 text-xs text-negative">Minimum is {fmtUsd(MIN_DEPOSIT_USD)}.</p>}
+              {belowMin && <p className="pt-1 text-xs text-negative">Minimum is {fmtUsd(minDep)}.</p>}
               {insufficient && <p className="pt-1 text-xs text-negative">That&apos;s more than you have here.</p>}
             </div>
 

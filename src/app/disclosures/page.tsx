@@ -1,6 +1,6 @@
 import { MarketingShell } from "@/components/MarketingShell";
 import { ChainChip, Chip } from "@/components/TokenIcon";
-import { MIN_DEPOSIT_USD } from "@/lib/limits";
+import { MIN_DEPOSIT_BY_CHAIN } from "@/lib/limits";
 import { CHAINS, gasMode } from "@/lib/chain";
 
 export const metadata = { title: "Disclosures" };
@@ -53,7 +53,7 @@ export default function DisclosuresPage() {
           <p>
             vaults.cash charges {FEE_PCT}% of the amount converted when you enter a position, and {FEE_PCT}% of the amount
             converted back when you exit. It is a plain transfer inside the transaction you review before signing. Pool
-            trading fees you earn are yours entirely. The minimum deposit is ${MIN_DEPOSIT_USD}.
+            trading fees you earn are yours entirely. The minimum deposit is ${MIN_DEPOSIT_BY_CHAIN[8453]} on Base and ${MIN_DEPOSIT_BY_CHAIN[4663]} on Robinhood Chain, where gas is paid in USDG.
           </p>
           <p>
             If you were invited, half of our fee on your deposits is paid to the person who invited you, on-chain, in the

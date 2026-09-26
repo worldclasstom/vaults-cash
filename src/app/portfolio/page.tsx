@@ -25,7 +25,7 @@ import { fmtAmount, fmtUsd } from "@/lib/format";
 import { shareAmount, sharePrice } from "@/lib/markets";
 import { tickToPrice } from "@/lib/onchain";
 import { planSummary } from "@/lib/zap";
-import { MIN_COLLECT_USD, MIN_DEPOSIT_USD } from "@/lib/limits";
+import { MIN_COLLECT_USD, minDepositUsd } from "@/lib/limits";
 import { useStats } from "@/components/PoolList";
 
 function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
@@ -37,7 +37,8 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
 
   const amountNum = Number(amount) || 0;
   const insufficient = balance !== undefined && amountNum > balance.formatted;
-  const belowMin = amountNum > 0 && amountNum < MIN_DEPOSIT_USD;
+  const minDep = minDepositUsd(p.market.chainId);
+  const belowMin = amountNum > 0 && amountNum < minDep;
 
   if (send.isSuccess) {
     return (
@@ -109,7 +110,7 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
         </button>
       </div>
       <p className="pt-1 text-xs text-muted">
-        Minimum {fmtUsd(MIN_DEPOSIT_USD)} · Available: {balance ? fmtUsd(balance.formatted) : "—"} {stable.symbol}
+        Minimum {fmtUsd(minDep)} · Available: {balance ? fmtUsd(balance.formatted) : "—"} {stable.symbol}
         {insufficient && <span className="text-negative"> — not enough</span>}
       </p>
       <div className="mt-3 flex gap-2">
@@ -121,7 +122,7 @@ function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
           disabled={amountNum <= 0 || belowMin || insufficient || plan.isPending}
           className="grow rounded-full bg-accent py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-40"
         >
-          {belowMin ? `Minimum ${fmtUsd(MIN_DEPOSIT_USD)}` : plan.isPending ? "Quoting…" : "Review add"}
+          {belowMin ? `Minimum ${fmtUsd(minDep)}` : plan.isPending ? "Quoting…" : "Review add"}
         </button>
       </div>
       {plan.isError && <p className="pt-2 text-xs text-negative">{(plan.error as Error).message}</p>}
