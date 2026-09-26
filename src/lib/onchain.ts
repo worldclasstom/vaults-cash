@@ -3,6 +3,14 @@ import { CHAINS, chainConfig, type ChainId } from "./chain";
 import { quoteUsdMarket, tickToQuotePrice, type Market } from "./markets";
 
 const isServer = typeof window === "undefined";
+const clients = new Map<ChainId, PublicClient>();
+/** Native app (React Native has a `window` global but no `location`): the
+ *  mobile entrypoint sets these before anything reads a chain. */
+const overrides: Partial<Record<ChainId, string>> = {};
+export function setRpcOverride(chainId: ChainId, url: string) {
+  overrides[chainId] = url;
+  clients.delete(chainId);
+}
 
 /** Where RPC calls go.
  *
@@ -16,15 +24,14 @@ const isServer = typeof window === "undefined";
  *  because the allowlisted keys REJECT origin-less requests. Next inlines
  *  env vars only when the whole `process.env.X` expression is spelled out. */
 function rpcUrl(chainId: ChainId): string | undefined {
-  if (!isServer) return `${window.location.origin}/api/rpc/${chainId}`;
+  if (overrides[chainId]) return overrides[chainId];
+  if (!isServer && typeof window.location?.origin === "string") return `${window.location.origin}/api/rpc/${chainId}`;
   const key = process.env.ALCHEMY_API_KEY;
   const alchemy = key ? `https://${chainConfig(chainId).alchemy}.g.alchemy.com/v2/${key}` : undefined;
   return chainId === 8453
     ? process.env.BASE_RPC_URL || alchemy || undefined
     : process.env.ROBINHOOD_RPC_URL || alchemy || undefined;
 }
-
-const clients = new Map<ChainId, PublicClient>();
 
 export function publicClientFor(chainId: number): PublicClient {
   const cfg = chainConfig(chainId);

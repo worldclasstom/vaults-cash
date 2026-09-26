@@ -33,6 +33,11 @@ that history is in docs/DECISIONS.md._
   verification next, then a small audit/bounty before marketing it hard.
   Next: notifications ("Rung 4 sold for $50.9 · +$1.40"), stickers you
   earn, weighting rungs toward the target.
+- **iPhone app** (mobile/): Expo + Privy, sharing the web lib. Scaffolded
+  2026-09-26 with Pools (live), Portfolio, Account (Apple/Google/email login)
+  and a Coming-soon Targets tab; bundles clean. Blocked on: Xcode on the Mac,
+  a Privy app client id, Apple Developer organization enrollment. Then:
+  deposit/withdraw sheets, targets, share, fonts, icons, TestFlight.
 - **Leverage loop** (Aave/Morpho): supply ETH → borrow USDC → LP,
   atomically; LTV cap ~40–50%, live health factor, one-tap unwind.
 - **Managed "pick an outcome" layer** over the pools (MaxFi-style UX

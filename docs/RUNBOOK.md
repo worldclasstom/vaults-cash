@@ -63,6 +63,13 @@ A replacement is a new deployment: point the env at it, and the app registers
 new ladders there; old ladders stay with the old contract (still only able to
 pay their owner) and can be closed by hand at any time.
 
+### iPhone app (mobile/)
+
+Expo app sharing `src/lib`. Setup, Privy app client and App Store notes in
+`mobile/README.md`. Changing a shared lib file changes the phone app too:
+run `cd mobile && npm run typecheck && npx expo export --platform ios` before
+pushing anything under `src/lib`.
+
 ## Gotchas that already bit us (do not relearn)
 
 - **CDP paymaster "failed to trace calls" on every op** = a stale entry in

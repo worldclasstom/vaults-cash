@@ -11,6 +11,8 @@ const eslintConfig = defineConfig([
     ".next/**",
     // Foundry workspace: Solidity plus vendored JS test files in submodules
     "contracts/**",
+    // Expo app: its own lint config
+    "mobile/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

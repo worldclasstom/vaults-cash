@@ -184,3 +184,9 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   fix means a new deployment; old ladders keep the old contract, which still
   can only pay them, and can be closed by hand at any time. Tom's call:
   build it before any users, not after.
+- **2026-09-26 — iPhone app is native (Expo), not a web wrapper.** Apple
+  rejects thin wrappers and Privy's social logins don't work in embedded web
+  views. Expo + Privy's Expo SDK (native smart-wallet support) reuses every
+  transaction builder in src/lib unchanged, so one bug fix lands on both.
+  Bundle id `cash.vaults.app`. Apple requires an organization account for
+  wallet apps; fomo and Liquid ship the same Privy setup under their LLCs.
