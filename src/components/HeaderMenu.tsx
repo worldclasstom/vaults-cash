@@ -7,6 +7,7 @@ import { useAuth } from "./AuthProvider";
 import { useActiveAddress, useCashBalances } from "@/hooks/useChainData";
 import { fmtUsd } from "@/lib/format";
 import { LogoutConfirm } from "./LogoutConfirm";
+import { LogoMark } from "./Logo";
 
 /**
  * The account sticker in the header: who you are, your cash, and the two
@@ -24,7 +25,6 @@ export function HeaderMenu() {
   const root = useRef<HTMLDivElement>(null);
 
   const loginId = user?.email?.address ?? user?.phone?.number ?? user?.google?.email ?? "";
-  const initial = (loginId || address || "?").replace(/^0x/, "").charAt(0).toUpperCase();
   const short = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : "";
 
   useEffect(() => {
@@ -59,10 +59,15 @@ export function HeaderMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Account menu"
-        className="flex h-9 items-center gap-2 rounded-full bg-surface pl-1 pr-3 text-sm font-semibold transition-colors hover:bg-surface-raised"
+        className="flex h-10 items-center gap-3 rounded-full bg-surface pl-3 pr-1 text-sm transition-colors hover:bg-surface-raised"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-raised font-display text-xs font-extrabold">{initial}</span>
-        {cash ? <span className="font-display font-extrabold tracking-tight">{fmtUsd(cash.totalUsd)}</span> : <span className="font-mono text-xs text-muted">{short}</span>}
+        <span className="text-left leading-tight">
+          <span className="block font-display font-extrabold tracking-tight">{cash ? fmtUsd(cash.totalUsd) : "—"}</span>
+          <span className="block font-mono text-[10px] text-muted">{short || loginId}</span>
+        </span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-raised">
+          <LogoMark size={22} />
+        </span>
       </button>
       {open && (
         <div role="menu" className="animate-pop absolute right-0 z-40 mt-2 w-64 origin-top-right rounded-2xl bg-surface p-2 shadow-elevated">
