@@ -94,11 +94,26 @@ export async function executeForUser(
   // browser sends).
   const paymasterContext = gasTokenContext(chainId, { proceedsPayGas: opts.proceedsPayGas });
   const paymaster = cfg.gasSponsored || paymasterContext ? createPaymasterClient({ transport }) : undefined;
+  // Fee estimation per bundler, the way Privy's browser client does it: the
+  // ZeroDev SDK would otherwise call zd_getUserOperationGasPrice, which only
+  // ZeroDev's own bundler answers (CDP returns "resource not available").
+  const bundler = createPublicClient({ chain: cfg.chain, transport });
+  const estimateFeesPerGas = async () => {
+    if (url.includes("g.alchemy.com")) {
+      const [block, prio] = await Promise.all([publicClient.getBlock({ blockTag: "latest" }), bundler.request({ method: "rundler_maxPriorityFeePerGas" as never, params: [] as never })]);
+      const maxPriorityFeePerGas = BigInt(prio as string);
+      return { maxFeePerGas: (150n * (block.baseFeePerGas ?? 0n)) / 100n + maxPriorityFeePerGas, maxPriorityFeePerGas };
+    }
+    const f = await publicClient.estimateFeesPerGas();
+    const mult = url.includes("api.developer.coinbase.com") ? 175n : 150n;
+    return { maxFeePerGas: (f.maxFeePerGas * mult) / 100n, maxPriorityFeePerGas: (f.maxPriorityFeePerGas * mult) / 100n };
+  };
   const client = createKernelAccountClient({
     account,
     chain: cfg.chain,
     client: publicClient,
     bundlerTransport: transport,
+    userOperation: { estimateFeesPerGas },
     ...(paymaster ? { paymaster } : {}),
     ...(paymaster && paymasterContext ? { paymasterContext } : {}),
   });

@@ -101,6 +101,12 @@ export function AgentAccess() {
       ) : (
         <div className="mt-4 space-y-3 text-sm">
           <p className="text-accent">Agent access is on for this wallet.</p>
+          <div className="rounded-2xl bg-surface-raised p-4">
+            <p className="font-semibold">Targets auto-close: ready</p>
+            <p className="pt-1 text-xs text-muted">
+              Nothing more to do. When you set a target, leave &ldquo;Close it for me&rdquo; checked and vaults.cash closes the ladder from your wallet the moment the target prints.
+            </p>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => test.mutate()}
@@ -118,6 +124,10 @@ export function AgentAccess() {
             <span className="text-xs text-muted">A free no-op on Base from your wallet, sent by our server. Proves the keeper can close targets for you.</span>
           </div>
 
+          <p className="pt-2 font-semibold">AI agents (optional)</p>
+          <p className="text-xs text-muted">
+            Only if you want Claude, ChatGPT or Cursor to manage this wallet: create an account key and paste it into the agent&apos;s MCP config. Targets never need one.
+          </p>
           {newKey ? (
             <div className="rounded-2xl bg-surface-raised p-4">
               <p className="font-semibold">Your new account key</p>

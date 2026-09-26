@@ -20,8 +20,10 @@ export async function POST(req: NextRequest) {
     const r = await executeForUser(did, 8453, [{ to: wallets.smartWallet, value: 0n, data: "0x" }]);
     return NextResponse.json({ txHash: r.txHash, userOpHash: r.userOpHash, smartWallet: r.smartWallet });
   } catch (e) {
-    const msg = (e as Error).message;
-    console.error("agent-access/test", msg);
-    return NextResponse.json({ error: msg.slice(0, 200) }, { status: 500 });
+    const raw = (e as Error).message;
+    console.error("agent-access/test", raw);
+    // first line only, with any URL / request body stripped: provider errors carry keys
+    const msg = raw.split("\n")[0].replace(/https?:\/\/\S+/g, "[url]").replace(/Request body:.*$/i, "").trim().slice(0, 160);
+    return NextResponse.json({ error: msg || "test failed" }, { status: 500 });
   }
 }
