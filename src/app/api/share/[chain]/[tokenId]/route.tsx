@@ -75,7 +75,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ chain: string; 
     const priceLine = `now $${sharePrice(m, priceUsd).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
     return new ImageResponse(
       (
-        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#0b0d0b", color: "#f4f6f4", fontFamily: "Geist", padding: "160px 80px 200px" }}>
+        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#0b0d0b", color: "#f4f6f4", fontFamily: "Geist", padding: "280px 80px 300px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
             <div style={{ display: "flex", fontSize: 56, fontWeight: 700 }}>
               vaults<span style={{ color: "#7cd44a" }}>.cash</span>
