@@ -9,6 +9,8 @@ import { GasLine } from "@/components/GasLine";
 import { Ladder, LadderStickers, ladderTitle } from "@/components/Ladder";
 import { Sheet } from "@/components/Sheet";
 import { Chip } from "@/components/TokenIcon";
+import { ShareCardSheet } from "@/components/ShareCardSheet";
+import { useReferral } from "@/hooks/useReferral";
 import { useLadder, usePlanLadderClose, usePlanLadderCollect, useSendLadderAction } from "@/hooks/useTargets";
 import { CHAINS, explorerUrl, type ChainId } from "@/lib/chain";
 import { fmtPrice, fmtUsd } from "@/lib/format";
@@ -91,6 +93,8 @@ export default function TargetPage() {
   const planClose = usePlanLadderClose();
   const planCollect = usePlanLadderCollect();
   const [pending, setPending] = useState<Pending | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const { data: ref } = useReferral();
   const busy = planClose.isPending || planCollect.isPending;
   const err = (planClose.error ?? planCollect.error) as Error | null;
 
@@ -192,6 +196,28 @@ export default function TargetPage() {
                 Collect fees
               </button>
             </div>
+          )}
+          <div className="pt-2">
+            <button onClick={() => setSharing(true)} className="rounded-full bg-surface px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-borderline">
+              Share this target
+            </button>
+          </div>
+          {sharing && (
+            <ShareCardSheet
+              title="Share this target"
+              img={`/api/share/target/${v.id}`}
+              url={`https://vaults.cash/t/${v.id}${ref?.refCode ? `?ref=${ref.refCode}` : ""}`}
+              alt={`${ladderTitle(v)} target card`}
+              fileBase={`vaults-cash-target-${v.base}-${v.id}`}
+              shareText={v.status === "hit" || v.status === "closed" ? `${v.base} hit my target. Traders paid me on the way up.` : `I set a target on ${v.base}. Every step there pays me.`}
+              note={
+                <>
+                  A live card: the belief, the rungs, and what traders paid on the way. &ldquo;Share image&rdquo; hands a tall version to Instagram or TikTok stories. The link opens a public page with the same numbers
+                  {ref?.refCode ? " and carries your invite code, so anyone who joins from it pays you half our fee" : ""}.
+                </>
+              }
+              onClose={() => setSharing(false)}
+            />
           )}
           {err && <p className="pt-2 text-xs text-negative">{err.message}</p>}
 

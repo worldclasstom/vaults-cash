@@ -7,6 +7,7 @@ import { Ladder, LadderStickers, ladderTitle } from "@/components/Ladder";
 import { useLadders } from "@/hooks/useTargets";
 import { useMarketQuote } from "@/hooks/useChainData";
 import { InviteCard } from "@/components/InviteCard";
+import { TargetsHowItWorks } from "@/components/TargetsVisuals";
 import { marketBySlug, sharePrice } from "@/lib/markets";
 import { fmtPrice, fmtUsd } from "@/lib/format";
 import type { LadderView } from "@/lib/ladders";
@@ -62,11 +63,15 @@ export default function TargetsPage() {
   return (
     <AppShell>
       {!ready ? null : !authenticated ? (
-        <div className="flex grow flex-col items-center justify-center gap-4 py-24">
-          <p className="text-muted">Log in to set a target.</p>
-          <button onClick={login} className="rounded-full bg-accent px-8 py-3 font-semibold text-black hover:bg-accent-strong">
-            Log in
-          </button>
+        <div className="animate-rise py-4">
+          <h1 className="font-display text-3xl font-extrabold tracking-tight">Targets</h1>
+          <p className="pt-1 pb-4 text-sm text-muted">Pick a price you believe in. Earn fees on every step there.</p>
+          <TargetsHowItWorks cta={false} example={example} />
+          <div className="flex flex-col items-center gap-3 py-8">
+            <button onClick={login} className="attract rounded-full bg-accent px-8 py-3 font-display font-extrabold text-black hover:bg-accent-strong">
+              Log in to set a target
+            </button>
+          </div>
         </div>
       ) : (
         <div className="animate-rise py-4">
@@ -84,16 +89,7 @@ export default function TargetsPage() {
           ) : isError ? (
             <p className="rounded-3xl bg-surface shadow-card p-5 text-sm text-muted">Couldn&apos;t load your targets — refresh to retry.</p>
           ) : open.length === 0 ? (
-            <div className="rounded-3xl bg-surface shadow-card p-8 text-center">
-              <p className="font-display text-2xl font-extrabold">Pick a price you believe in.</p>
-              <p className="pt-2 text-sm text-muted">
-                Think {example.symbol} hits ${fmtPrice(example.target)}? We build a ladder of narrow positions from here to there. Every step it climbs sells a slice and pays
-                you the trading fee. Think it dips? The same ladder buys on the way down.
-              </p>
-              <Link href="/targets/new" className="mt-5 inline-block rounded-full bg-accent px-7 py-3 font-display text-base font-extrabold text-black hover:bg-accent-strong">
-                Set a target
-              </Link>
-            </div>
+            <TargetsHowItWorks example={example} />
           ) : (
             <ul className="space-y-3">
               {open.map((v) => (

@@ -46,6 +46,7 @@ export function PoolList() {
   const { data, isLoading, isError } = useMarketQuotes();
   const { data: stats } = useStats();
   const [category, setCategory] = useState<Category>("all");
+  const [q, setQ] = useState("");
   const [chain, setChain] = useState<ChainId | 0>(0);
   const [sort, setSort] = useState<Sort>("tvl");
   // pagination: a page of pools is a screen, not a scroll; filters reset it
@@ -62,8 +63,12 @@ export function PoolList() {
   };
 
   const rows = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    const matches = (m: Market) =>
+      !needle || `${m.base.symbol} ${m.base.name} ${m.quote.symbol} ${m.quote.name} ${CHAINS[m.chainId].label}`.toLowerCase().includes(needle);
     const list = (data ?? []).filter(
       (q) =>
+        matches(q.market) &&
         inCategory(q.market, category) &&
         (chain === 0 || q.market.chainId === chain) &&
         // the indexer says this pool is too thin to LP into sensibly;
@@ -74,11 +79,25 @@ export function PoolList() {
     const key = (q: MarketQuote) =>
       sort === "apr" ? (s(q)?.estAprPct ?? -1) : sort === "tvl" ? (s(q)?.tvlUsd ?? -1) : (s(q)?.vol24hUsd ?? -1);
     return [...list].sort((a, b) => key(b) - key(a));
-  }, [data, stats, category, chain, sort]);
+  }, [data, stats, category, chain, sort, q]);
 
   return (
     <div ref={listTop} className="scroll-mt-24">
       <div className="flex flex-wrap items-center gap-2 pb-3">
+        <label className="relative">
+          <span className="sr-only">Search pools</span>
+          <input
+            value={q}
+            onChange={(e) => pick(setQ)(e.target.value)}
+            placeholder="Search TSLA, ETH, NVDA…"
+            className="w-44 rounded-full bg-surface py-1.5 pl-3.5 pr-8 text-sm outline-none placeholder:text-muted/50 focus:ring-2 focus:ring-accent sm:w-52"
+          />
+          {q && (
+            <button onClick={() => pick(setQ)("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-foreground">
+              ✕
+            </button>
+          )}
+        </label>
         {CATEGORIES.map((c) => (
           <button
             key={c.id}
