@@ -174,7 +174,7 @@ export function TargetsHowItWorks({ cta = true, example }: { cta?: boolean; exam
           A sell ladder holds the asset and sells a slice as price climbs through each rung. A buy ladder holds dollars and buys a slice as it falls. Either way, every trade that crosses a rung pays you the pool fee.
         </Step>
         <Step n={3} title="Target hit, ladder closed">
-          When price clears the last rung, vaults.cash closes the ladder from your own wallet so a retrace can&apos;t undo it. If it never gets there, you simply hold what you bought, like buying it outright.
+          When price clears the last rung, an open contract closes the ladder into your wallet so a retrace can&apos;t undo it. No permissions, no signer: it can only act once every rung is crossed, and only you can receive the proceeds. If it never gets there, you simply hold what you bought, like buying it outright.
         </Step>
       </ol>
       <p className="pt-4 text-xs text-muted">

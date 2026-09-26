@@ -172,3 +172,15 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   The first transaction on a chain also deploys the smart wallet, so the
   review sheet says so instead of letting a 21¢ quote read as "expensive".
 
+- **2026-09-26 — Targets auto-close is a contract, not our signer.** The
+  Privy session signer signs opaque user-operation hashes, so no Privy policy
+  can limit what it does: agent access meant "our server can move your
+  funds, trust us". `LadderCloser` replaces it for Targets: registered from
+  the user's wallet in the mint batch, closable by anyone but only once every
+  rung is crossed, proceeds only to the rung owner less the fixed 0.6%/8%
+  (half to the referrer named at registration). No owner, no upgrade; the fee
+  wallet can hand itself off and nothing else changes. A gas-only keeper EOA
+  calls it (a cent or two per close, covered by the fee in the same tx). A
+  fix means a new deployment; old ladders keep the old contract, which still
+  can only pay them, and can be closed by hand at any time. Tom's call:
+  build it before any users, not after.

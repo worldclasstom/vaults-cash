@@ -37,6 +37,9 @@ export type LadderRow = {
   created_at: string;
   hit_at: string | null;
   closed_at: string | null;
+  /** LadderCloser contract the ladder is registered with, and its id there (null = legacy, closed via agent access) */
+  closer: string | null;
+  closer_ladder_id: string | null;
 };
 
 export type RungRow = { ladder_id: number; idx: number; chain_id: number; token_id: string; tick_lower: number; tick_upper: number };
@@ -76,11 +79,13 @@ export async function createLadder(input: {
   expiresAt: string | null;
   openTx: `0x${string}`;
   rungs: Array<{ idx: number; tokenId: bigint; tickLower: number; tickUpper: number }>;
+  closer?: `0x${string}` | null;
+  closerLadderId?: bigint | null;
 }): Promise<number> {
   await ensureSchema();
   const q = sql();
-  const rows = (await q`INSERT INTO ladders (privy_did, wallet, chain_id, market_slug, direction, target_price, target_tick, start_tick, start_price, rungs, amount_usd, auto_close, expires_at, open_tx)
-    VALUES (${input.did}, ${input.wallet.toLowerCase()}, ${input.chainId}, ${input.marketSlug}, ${input.direction}, ${input.targetPrice}, ${input.targetTick}, ${input.startTick}, ${input.startPrice}, ${input.rungs.length}, ${input.amountUsd}, ${input.autoClose}, ${input.expiresAt}, ${input.openTx})
+  const rows = (await q`INSERT INTO ladders (privy_did, wallet, chain_id, market_slug, direction, target_price, target_tick, start_tick, start_price, rungs, amount_usd, auto_close, expires_at, open_tx, closer, closer_ladder_id)
+    VALUES (${input.did}, ${input.wallet.toLowerCase()}, ${input.chainId}, ${input.marketSlug}, ${input.direction}, ${input.targetPrice}, ${input.targetTick}, ${input.startTick}, ${input.startPrice}, ${input.rungs.length}, ${input.amountUsd}, ${input.autoClose}, ${input.expiresAt}, ${input.openTx}, ${input.closer?.toLowerCase() ?? null}, ${input.closerLadderId?.toString() ?? null})
     RETURNING id`) as Array<{ id: number }>;
   const id = rows[0].id;
   for (const r of input.rungs) {

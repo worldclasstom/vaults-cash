@@ -28,17 +28,27 @@ interface IPosm721 {
     function setApprovalForAll(address, bool) external;
 }
 
-/// Fork tests against the live ETH/USDC 0.05% pool on Base.
-contract LadderCloserBaseTest is Test {
+/// Fork tests against a live hookless v4 pool: currency0 is the asset (native
+/// or ERC-20), currency1 the stablecoin. Concrete chains at the bottom.
+abstract contract LadderCloserForkTest is Test {
     using PoolIdLibrary for PoolKey;
     using StateLibrary for IPoolManager;
     using PositionInfoLibrary for PositionInfo;
 
-    IPositionManager constant POSM = IPositionManager(0x7C5f5A4bBd8fD63184577525326123B519429bDc);
-    IPoolManager constant PM = IPoolManager(0x498581fF718922c3f8e6A244956aF099B2652b2b);
-    address constant USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
     IAllowanceTransfer constant PERMIT2 = IAllowanceTransfer(0x000000000022D473030F116dDEE9F6B43aC78BA3);
-    int24 constant SPACING = 10;
+
+    IPositionManager POSM;
+    IPoolManager PM;
+    address USDC; // the stablecoin (currency1)
+    address ASSET; // currency0; address(0) for native ETH
+    int24 SPACING;
+    uint24 FEE;
+    bytes32 EXPECTED_POOL_ID;
+    string RPC_ALIAS;
+    uint256 SWAP_STEP_STABLE; // stablecoin units per partial nudge
+    uint256 SWAP_BIG_STABLE; // enough to cross three rungs
+    uint256 SWAP_BIG_ASSET; // asset units to cross three rungs downward
+    uint128 LIQ; // liquidity per rung
 
     PoolKey key;
     LadderCloser closer;
@@ -48,29 +58,42 @@ contract LadderCloserBaseTest is Test {
     address feeWallet = makeAddr("feeWallet");
     address stranger = makeAddr("stranger");
 
+    function configure() internal virtual;
+
     function setUp() public {
-        vm.createSelectFork("base");
-        key = PoolKey(Currency.wrap(address(0)), Currency.wrap(USDC), 500, SPACING, IHooks(address(0)));
-        assertEq(PoolId.unwrap(key.toId()), 0x96d4b53a38337a5733179751781178a2613306063c511b78cd02684739288c0a, "pool key");
+        configure();
+        vm.createSelectFork(RPC_ALIAS);
+        key = PoolKey(Currency.wrap(ASSET), Currency.wrap(USDC), FEE, SPACING, IHooks(address(0)));
+        assertEq(PoolId.unwrap(key.toId()), EXPECTED_POOL_ID, "pool key");
         closer = new LadderCloser(POSM, feeWallet, 60, 800);
         router = new PoolSwapTest(PM);
         for (uint256 i = 0; i < 2; i++) {
             address a = i == 0 ? user : stranger;
             vm.deal(a, 1_000 ether);
-            deal(USDC, a, 5_000_000e6);
+            deal(USDC, a, 50_000_000e6);
+            if (ASSET != address(0)) deal(ASSET, a, 1_000_000 ether);
             vm.startPrank(a);
             IERC20(USDC).approve(address(PERMIT2), type(uint256).max);
             IERC20(USDC).approve(address(router), type(uint256).max);
             PERMIT2.approve(USDC, address(POSM), type(uint160).max, type(uint48).max);
+            if (ASSET != address(0)) {
+                IERC20(ASSET).approve(address(PERMIT2), type(uint256).max);
+                IERC20(ASSET).approve(address(router), type(uint256).max);
+                PERMIT2.approve(ASSET, address(POSM), type(uint160).max, type(uint48).max);
+            }
             vm.stopPrank();
         }
+    }
+
+    function assetBalance(address a) internal view returns (uint256) {
+        return ASSET == address(0) ? a.balance : IERC20(ASSET).balanceOf(a);
     }
 
     function tick() internal view returns (int24 t) {
         (, t,,) = PM.getSlot0(key.toId());
     }
 
-    function roundUp(int24 t) internal pure returns (int24) {
+    function roundUp(int24 t) internal view returns (int24) {
         int24 r = t % SPACING;
         if (r < 0) r += SPACING;
         return r == 0 ? t : t + (SPACING - r);
@@ -93,7 +116,7 @@ contract LadderCloserBaseTest is Test {
             uint256 a1 = ethSide ? 0 : SqrtPriceMath.getAmount1Delta(sa, sb, liq, true) + 1;
             actions = abi.encodePacked(actions, uint8(Actions.MINT_POSITION));
             params[i] = abi.encode(key, lo, hi, uint256(liq), uint128(a0), uint128(a1), user, bytes(""));
-            value += a0;
+            if (ASSET == address(0)) value += a0;
             ids[i] = next + i;
         }
         actions = abi.encodePacked(actions, uint8(Actions.SETTLE_PAIR), uint8(Actions.SWEEP));
@@ -109,9 +132,9 @@ contract LadderCloserBaseTest is Test {
         router.swap(key, SwapParams(false, -int256(usdcIn), TickMath.MAX_SQRT_PRICE - 1), PoolSwapTest.TestSettings(false, false), "");
     }
 
-    function sellEth(uint256 ethIn) internal {
+    function sellEth(uint256 assetIn) internal {
         vm.prank(stranger);
-        router.swap{value: ethIn}(key, SwapParams(true, -int256(ethIn), TickMath.MIN_SQRT_PRICE + 1), PoolSwapTest.TestSettings(false, false), "");
+        router.swap{value: ASSET == address(0) ? assetIn : 0}(key, SwapParams(true, -int256(assetIn), TickMath.MIN_SQRT_PRICE + 1), PoolSwapTest.TestSettings(false, false), "");
     }
 
     function principal1(uint256[] memory ids) internal view returns (uint256 p) {
@@ -139,7 +162,7 @@ contract LadderCloserBaseTest is Test {
 
     function test_upLadder_closesOnlyAfterTargetPrints() public {
         int24 first = roundUp(tick() + 1);
-        uint256[] memory ids = mintRungs(first, 3, 2e15, true);
+        uint256[] memory ids = mintRungs(first, 3, LIQ, true);
         vm.startPrank(user);
         IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
         uint256 ladderId = closer.registerLatest(3, true, referrer);
@@ -153,7 +176,7 @@ contract LadderCloserBaseTest is Test {
         closer.close(ladderId);
 
         // part way: nudge price into the ladder but not past the top rung
-        for (uint256 i = 0; i < 60 && tick() < first + SPACING; i++) buyEth(500e6);
+        for (uint256 i = 0; i < 60 && tick() < first + SPACING; i++) buyEth(SWAP_STEP_STABLE);
         assertLt(tick(), first + 3 * SPACING, "swap step too big for this pool depth");
         assertFalse(closer.isClosable(ladderId));
         vm.expectRevert();
@@ -161,7 +184,7 @@ contract LadderCloserBaseTest is Test {
         closer.close(ladderId);
 
         // target prints
-        buyEth(400_000e6);
+        buyEth(SWAP_BIG_STABLE);
         assertGe(tick(), first + 3 * SPACING, "target crossed");
         assertTrue(closer.isClosable(ladderId));
 
@@ -185,7 +208,6 @@ contract LadderCloserBaseTest is Test {
         assertEq(toUser, received - toFee - toRef);
         assertEq(IERC20(USDC).balanceOf(address(closer)), 0, "nothing stays in the contract");
         assertEq(address(closer).balance, 0);
-        assertEq(user.balance, 1_000 ether - (1_000 ether - user.balance), "no ETH movement on close beyond mint");
         for (uint256 i = 0; i < ids.length; i++) {
             vm.expectRevert();
             IPosm721(address(POSM)).ownerOf(ids[i]);
@@ -198,7 +220,7 @@ contract LadderCloserBaseTest is Test {
     function test_downLadder_paysOutEth() public {
         int24 first = roundUp(tick()) - SPACING; // top of the first rung sits at or below price
         if (first + SPACING > tick()) first -= SPACING;
-        uint256[] memory ids = mintRungs(first + SPACING, 3, 2e15, false);
+        uint256[] memory ids = mintRungs(first + SPACING, 3, LIQ, false);
         vm.startPrank(user);
         IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
         uint256 ladderId = closer.registerLatest(3, false, address(0));
@@ -207,21 +229,22 @@ contract LadderCloserBaseTest is Test {
         vm.expectRevert(abi.encodeWithSelector(LadderCloser.NotCrossed.selector, ids[0]));
         closer.close(ladderId);
 
-        sellEth(300 ether);
+        sellEth(SWAP_BIG_ASSET);
         assertLt(tick(), first + SPACING - 3 * SPACING, "target crossed downward");
 
         uint256 p0 = principal0(ids);
-        uint256 uBefore = user.balance;
-        uint256 fBefore = feeWallet.balance;
+        uint256 uBefore = assetBalance(user);
+        uint256 fBefore = assetBalance(feeWallet);
         closer.close(ladderId);
-        uint256 toUser = user.balance - uBefore;
-        uint256 toFee = feeWallet.balance - fBefore;
+        uint256 toUser = assetBalance(user) - uBefore;
+        uint256 toFee = assetBalance(feeWallet) - fBefore;
         uint256 received = toUser + toFee;
         assertGe(received, p0);
         uint256 expectedFee = (p0 * 60) / 10_000 + ((received - p0) * 800) / 10_000;
         assertApproxEqAbs(toFee, expectedFee, 2, "no referrer: whole fee to the fee wallet");
         assertEq(address(closer).balance, 0);
         assertEq(IERC20(USDC).balanceOf(address(closer)), 0);
+        assertEq(assetBalance(address(closer)), 0);
     }
 
     function test_feeRecipient_handoffOnlyByCurrentWallet() public {
@@ -238,7 +261,7 @@ contract LadderCloserBaseTest is Test {
 
     function test_register_needsApproval() public {
         int24 first = roundUp(tick() + 1);
-        mintRungs(first, 2, 1e15, true);
+        mintRungs(first, 2, LIQ / 2, true);
         vm.prank(user);
         vm.expectRevert(LadderCloser.NotApproved.selector);
         closer.registerLatest(2, true, address(0));
@@ -246,7 +269,7 @@ contract LadderCloserBaseTest is Test {
 
     function test_register_rejectsAlreadyCrossedRung() public {
         int24 first = roundUp(tick() + 1);
-        uint256[] memory ids = mintRungs(first, 2, 1e15, true);
+        uint256[] memory ids = mintRungs(first, 2, LIQ / 2, true);
         // a rung above price registered as a "lower" ladder would be closable at once
         vm.startPrank(user);
         IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
@@ -257,7 +280,7 @@ contract LadderCloserBaseTest is Test {
 
     function test_register_rejectsSomeoneElsesRungs() public {
         int24 first = roundUp(tick() + 1);
-        uint256[] memory ids = mintRungs(first, 2, 1e15, true);
+        uint256[] memory ids = mintRungs(first, 2, LIQ / 2, true);
         vm.startPrank(stranger);
         IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
         vm.expectRevert(abi.encodeWithSelector(LadderCloser.NotOwner.selector, ids[0]));
@@ -267,7 +290,7 @@ contract LadderCloserBaseTest is Test {
 
     function test_close_skipsRungsTheOwnerAlreadyBurned() public {
         int24 first = roundUp(tick() + 1);
-        uint256[] memory ids = mintRungs(first, 3, 2e15, true);
+        uint256[] memory ids = mintRungs(first, 3, LIQ, true);
         vm.startPrank(user);
         IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
         uint256 ladderId = closer.registerLatest(3, true, address(0));
@@ -279,7 +302,7 @@ contract LadderCloserBaseTest is Test {
         POSM.modifyLiquidities(abi.encode(actions, params), block.timestamp + 60);
         vm.stopPrank();
 
-        buyEth(450_000e6);
+        buyEth(SWAP_BIG_STABLE);
         assertTrue(closer.isClosable(ladderId));
         uint256 before = IERC20(USDC).balanceOf(user);
         closer.close(ladderId);
@@ -292,7 +315,7 @@ contract LadderCloserBaseTest is Test {
 
     function test_close_revertsWhenEveryRungIsGone() public {
         int24 first = roundUp(tick() + 1);
-        uint256[] memory ids = mintRungs(first, 1, 1e15, true);
+        uint256[] memory ids = mintRungs(first, 1, LIQ / 2, true);
         vm.startPrank(user);
         IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
         uint256 ladderId = closer.registerLatest(1, true, address(0));
@@ -309,15 +332,51 @@ contract LadderCloserBaseTest is Test {
 
     function test_revokedApproval_blocksClose() public {
         int24 first = roundUp(tick() + 1);
-        mintRungs(first, 2, 1e15, true);
+        mintRungs(first, 2, LIQ / 2, true);
         vm.startPrank(user);
         IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
         uint256 ladderId = closer.registerLatest(2, true, address(0));
         IPosm721(address(POSM)).setApprovalForAll(address(closer), false);
         vm.stopPrank();
-        buyEth(450_000e6);
+        buyEth(SWAP_BIG_STABLE);
         assertTrue(closer.isClosable(ladderId));
         vm.expectRevert();
         closer.close(ladderId);
+    }
+}
+
+/// ETH/USDC 0.05% on Base (currency0 = native ETH).
+contract LadderCloserBaseTest is LadderCloserForkTest {
+    function configure() internal override {
+        RPC_ALIAS = "base";
+        POSM = IPositionManager(0x7C5f5A4bBd8fD63184577525326123B519429bDc);
+        PM = IPoolManager(0x498581fF718922c3f8e6A244956aF099B2652b2b);
+        USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+        ASSET = address(0);
+        FEE = 500;
+        SPACING = 10;
+        EXPECTED_POOL_ID = 0x96d4b53a38337a5733179751781178a2613306063c511b78cd02684739288c0a;
+        SWAP_STEP_STABLE = 500e6;
+        SWAP_BIG_STABLE = 400_000e6;
+        SWAP_BIG_ASSET = 300 ether;
+        LIQ = 2e15;
+    }
+}
+
+/// TSLA/USDG 0.3% on Robinhood Chain (currency0 = TSLA, an ERC-20).
+contract LadderCloserRobinhoodTest is LadderCloserForkTest {
+    function configure() internal override {
+        RPC_ALIAS = "robinhood";
+        POSM = IPositionManager(0x58daec3116aae6D93017bAAea7749052E8a04fA7);
+        PM = IPoolManager(0x8366a39CC670B4001A1121B8F6A443A643e40951);
+        USDC = 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168;
+        ASSET = 0x322F0929c4625eD5bAd873c95208D54E1c003b2d;
+        FEE = 3000;
+        SPACING = 60;
+        EXPECTED_POOL_ID = 0x8517f8071ae5b831b738052f12125e8e3d6c158b78728aa44ce3b25e5104d32e;
+        SWAP_STEP_STABLE = 2_000e6;
+        SWAP_BIG_STABLE = 3_000_000e6;
+        SWAP_BIG_ASSET = 20_000 ether;
+        LIQ = 2e17;
     }
 }

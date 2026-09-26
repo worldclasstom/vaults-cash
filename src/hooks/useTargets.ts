@@ -70,6 +70,8 @@ export type LadderInput = {
   targetPriceUsd: number;
   rungs: number;
   slippageBps: number;
+  /** false = leave the ladder out of the auto-close contract */
+  autoClose?: boolean;
 };
 
 export function usePlanLadder() {
@@ -90,6 +92,7 @@ export function usePlanLadder() {
         slippageBps: input.slippageBps,
         poolState,
         referrer: referral?.referrerWallet,
+        autoClose: input.autoClose,
       });
     },
   });

@@ -126,6 +126,8 @@ export function ensureSchema(): Promise<void> {
       )`;
       await q`CREATE INDEX IF NOT EXISTS ladders_did_idx ON ladders (privy_did)`;
       await q`CREATE INDEX IF NOT EXISTS ladders_status_idx ON ladders (status)`;
+      await q`ALTER TABLE ladders ADD COLUMN IF NOT EXISTS closer text`;
+      await q`ALTER TABLE ladders ADD COLUMN IF NOT EXISTS closer_ladder_id bigint`;
       await q`CREATE TABLE IF NOT EXISTS ladder_rungs (
         ladder_id int NOT NULL REFERENCES ladders(id),
         idx int NOT NULL,

@@ -75,10 +75,9 @@ export function AgentAccess() {
     <section id="agent-access" className="scroll-mt-24 rounded-3xl bg-surface p-5 shadow-card">
       <h2 className="font-display text-xl font-extrabold">Agent access</h2>
       <p className="pt-1 text-sm text-muted">
-        One permission, two uses. It lets vaults.cash close a Targets ladder from your wallet the moment the target prints
-        (the auto-close option when you set a target), and it lets an AI agent you connect (Claude, ChatGPT, Cursor…) manage
-        this wallet through vaults.cash: deposit, add, withdraw, collect. Either way the server can only act through
-        vaults.cash, you can turn it off any time, and your key never leaves Privy.
+        Lets an AI agent you connect (Claude, ChatGPT, Cursor…) manage this wallet through vaults.cash: deposit, add,
+        withdraw, collect. The server can only act through vaults.cash, you can turn it off any time, and your key never
+        leaves Privy. Targets don&apos;t need this: their auto-close is an open contract with no signer at all.
       </p>
 
       {status.isLoading ? (
@@ -94,16 +93,10 @@ export function AgentAccess() {
       ) : (
         <div className="mt-4 space-y-3 text-sm">
           <p className="text-accent">Agent access is on for this wallet.</p>
-          <div className="rounded-2xl bg-surface-raised p-4">
-            <p className="font-semibold">Targets auto-close: ready</p>
-            <p className="pt-1 text-xs text-muted">
-              Nothing more to do. When you set a target, leave &ldquo;Close it for me&rdquo; checked and vaults.cash closes the ladder from your wallet the moment the target prints.
-            </p>
-          </div>
 
-          <p className="pt-2 font-semibold">AI agents (optional)</p>
+          <p className="pt-2 font-semibold">Account keys</p>
           <p className="text-xs text-muted">
-            Only if you want Claude, ChatGPT or Cursor to manage this wallet: create an account key and paste it into the agent&apos;s MCP config. Targets never need one.
+            Create an account key and paste it into the agent&apos;s MCP config. Treat it like a password.
           </p>
           {newKey ? (
             <div className="rounded-2xl bg-surface-raised p-4">

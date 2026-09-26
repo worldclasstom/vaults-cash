@@ -76,7 +76,7 @@ export default function DisclosuresPage() {
             Targets only: on top of the entry and exit fee, vaults.cash takes an 8% performance fee on the trading fees a
             ladder earns for you, as payment for building the ladder, watching it and closing it at your target. It is a
             share of your fee gains only, never of what you put in, and it is taken in the same transaction when you
-            collect or close. Pools positions never pay it.
+            collect or close, whether you close by hand or the contract closes it for you. Pools positions never pay it.
           </p>
           <p>
             Moving dollars between chains uses Relay, a third-party bridge. Relay&apos;s route fee and the conversion
@@ -105,10 +105,11 @@ export default function DisclosuresPage() {
         <Section title="Agent access" sticker={<Chip>Optional</Chip>}>
           <p>
             If you turn on agent access, you authorize vaults.cash&apos;s server to sign transactions from your wallet
-            through Privy, limited to depositing, adding, withdrawing, collecting and closing Targets ladders through
-            vaults.cash. That is how a target closes itself when it hits. Anyone holding an account key you create can
-            also trigger those actions from an AI agent. You can revoke keys and turn
-            access off at any time; until you do, treat a key like a password.
+            through Privy, limited to depositing, adding, withdrawing and collecting through vaults.cash, so that an AI
+            agent holding an account key you create can act for you. Targets do not use it: a target closes through the
+            LadderCloser contract, which any account may call but which only succeeds once every rung is crossed and can
+            only send the proceeds to the rung owner, less the fees above. You can revoke keys and turn access off at
+            any time; until you do, treat a key like a password.
           </p>
         </Section>
 

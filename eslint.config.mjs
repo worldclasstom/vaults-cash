@@ -9,6 +9,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    // Foundry workspace: Solidity plus vendored JS test files in submodules
+    "contracts/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

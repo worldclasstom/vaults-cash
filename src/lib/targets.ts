@@ -25,6 +25,7 @@ import { getUncollectedFees, type OwnedPosition } from "./positions";
 import { approvalsFor, buildSwapCall, contractsOf, quoteBaseToQuote, quoteQuoteToBase, type Call } from "./uniswap";
 import { buildPool, feeCalls } from "./zap";
 import { minDepositUsd } from "./limits";
+import { closerAddress, closerCalls } from "./ladderCloser";
 
 export type Direction = "up" | "down";
 export const PERFORMANCE_FEE_BPS = 800n;
@@ -50,6 +51,8 @@ export type LadderPlan = {
   direction: Direction;
   calls: Call[];
   feeAmount: bigint;
+  /** the auto-close contract this batch registers the ladder with (null = none on this chain, or the user opted out) */
+  closer: `0x${string}` | null;
   rungs: RungSpec[];
   startTick: number;
   targetTick: number;
@@ -147,6 +150,8 @@ export async function buildLadderPlan(params: {
   slippageBps: number;
   poolState: PoolState;
   referrer?: `0x${string}` | null;
+  /** false = don't register with the auto-close contract (the user unticked it) */
+  autoClose?: boolean;
 }): Promise<LadderPlan> {
   const { market, owner, usdcAmount, direction, targetPriceUsd, slippageBps, poolState, referrer } = params;
   const rungs = Math.min(MAX_RUNGS, Math.max(MIN_RUNGS, Math.round(params.rungs)));
@@ -238,11 +243,17 @@ export async function buildLadderPlan(params: {
 
   calls.push(...feeCalls(stable, feeAmount, feeRecipient, referrer, owner));
 
+  // hand the ladder to the auto-close contract in the same batch (when deployed on this chain)
+  const higherTick = direction === "up" ? upIsHigherTick(market) : !upIsHigherTick(market);
+  const closer = params.autoClose === false ? undefined : closerAddress(market.chainId);
+  if (closer) calls.push(...(await closerCalls(market.chainId as ChainId, owner, rungs, higherTick, referrer)));
+
   return {
     chainId: market.chainId as ChainId,
     direction,
     calls,
     feeAmount,
+    closer: closer ?? null,
     rungs: specs,
     startTick: poolState.tick,
     targetTick,

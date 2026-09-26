@@ -122,9 +122,9 @@ export default function AccountPage() {
               </div>
               <p className="pt-2 text-sm text-muted">
                 This wallet and its positions belong to you. vaults.cash holds no key to it. Nothing we run can move your
-                funds unless you turn on agent access below, and even then our server can only act through vaults.cash and
-                you can switch it off any time. The signer behind the wallet lives with Privy; you can take its private key
-                with you whenever you like.
+                funds. Targets close through an open contract that can only pay you; the only exception is agent access
+                below, which you turn on yourself and can switch off any time. The signer behind the wallet lives with
+                Privy; you can take its private key with you whenever you like.
               </p>
               <button
                 onClick={() => exportWallet()}

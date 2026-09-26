@@ -4,16 +4,22 @@ import { readPosition, type OwnedPosition } from "@/lib/positions";
 import { buildLadderClosePlan } from "@/lib/targets";
 import { executeForUser } from "@/lib/executor";
 import { referrerWalletForUser } from "@/lib/agentAccess";
+import { isClosable, keeperClose } from "@/lib/ladderCloser";
 import type { ChainId } from "@/lib/chain";
 
 export const maxDuration = 60;
 
 /**
  * The Targets keeper. Every few minutes: for each open ladder, read the pool
- * and decide whether the target has printed or the ladder has expired. If
- * so and the user turned auto-close on (agent access granted), close it from
- * their own wallet through the session signer; otherwise mark it "hit" or
- * "expired" so the app asks them to close it. Nothing here ever holds funds.
+ * and decide whether the target has printed or the ladder has expired.
+ *
+ * Ladders registered with the LadderCloser contract close through it: the
+ * keeper account just pays the gas to call `close`, and the contract itself
+ * enforces "only once every rung is crossed, only to the owner". Older
+ * ladders (no contract on their chain when they were set) still close via
+ * the Privy session signer when the user granted agent access. Anything
+ * else is marked "hit" or "expired" so the app asks the user to close it.
+ * Nothing here ever holds funds.
  */
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -41,13 +47,26 @@ export async function GET(req: NextRequest) {
           out.push({ id: row.id, result: `open ${view.done}/${view.total}` });
           continue;
         }
-        if (!row.auto_close) {
+        const chainId = row.chain_id as ChainId;
+        // registered with the contract: anyone may close it once the target printed; we pay the gas
+        if (hit && row.closer_ladder_id) {
+          const onChainId = BigInt(row.closer_ladder_id);
+          if (!(await isClosable(chainId, onChainId))) {
+            await setLadderStatus(row.id, "hit");
+            out.push({ id: row.id, result: "hit — contract not yet closable" });
+            continue;
+          }
+          const txHash = await keeperClose(chainId, onChainId);
+          await setLadderStatus(row.id, "closed", { closeTx: txHash, feesPaidUsd: view.feesUsd });
+          out.push({ id: row.id, result: `auto-closed ${txHash}` });
+          continue;
+        }
+        if (!row.auto_close || row.closer_ladder_id) {
           await setLadderStatus(row.id, hit ? "hit" : "expired");
           out.push({ id: row.id, result: hit ? "hit — waiting for user" : "expired — waiting for user" });
           continue;
         }
-        // auto-close from the user's own wallet
-        const chainId = row.chain_id as ChainId;
+        // legacy auto-close from the user's own wallet through the session signer
         const positions = (await Promise.all(full.rungs.map((r) => readPosition(chainId, BigInt(r.token_id))))).filter(Boolean) as OwnedPosition[];
         const referrer = await referrerWalletForUser(row.privy_did).catch(() => null);
         const plan = await buildLadderClosePlan({

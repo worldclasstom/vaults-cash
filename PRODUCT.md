@@ -62,8 +62,10 @@ the decoded signing steps, and "Open in Uniswap" links make that checkable.
   review before public marketing is still open.
 - Not a deposit account, not insured; positions carry market and
   impermanent-loss risk. Disclosures at `/disclosures`.
-- Undecided: the account-linked agent access (session signers), "Targets"
-  range orders and their auto-close contract, the leverage loop, iOS app.
+- Targets auto-close is a contract, not a signer: `LadderCloser` can only
+  close a ladder once every rung is crossed, and only into the owner's
+  wallet. Agent access (session signers) is for AI agents only.
+- Undecided: the leverage loop, iOS app.
 
 ## Brand Commitments
 

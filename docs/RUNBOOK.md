@@ -26,6 +26,8 @@ July entries at the bottom are kept as history._
 | `NEXT_PUBLIC_PRIVY_SIGNER_POLICY_ID` | Vercel | optional Privy policy scoping that signer to our contracts |
 | `PRIVY_AUTHORIZATION_PRIVATE_KEY` | Vercel (server only) | base64 PKCS8 P-256 key matching the quorum; signs session-signer requests |
 | `BUNDLER_URL_8453`, `BUNDLER_URL_4663` | Vercel (server only) | bundler (+paymaster on Base) URLs the executor sends user ops to; 4663 falls back to Alchemy |
+| `NEXT_PUBLIC_LADDER_CLOSER_8453`, `NEXT_PUBLIC_LADDER_CLOSER_4663` | Vercel | deployed `LadderCloser` per chain. Unset = new ladders on that chain fall back to the legacy agent-access auto-close |
+| `KEEPER_PRIVATE_KEY` | Vercel (server only) | plain EOA that pays gas to call `LadderCloser.close`; no other power. Key file: `~/.config/vaults-cash/keeper.json`. Needs a few dollars of ETH on each chain |
 
 Privy dashboard: embedded wallets (Ethereum: users without wallets; Solana:
 all users — "SVM wallets" toggle on), smart wallets = Kernel; Base uses the
@@ -42,6 +44,23 @@ Push to `main` → Vercel production. Before any token/pool change:
 (rewrites the registries everything reads from), then
 `npx tsx scripts/test-zap.ts`. `scripts/check-referral-split.ts` and
 `scripts/check-mint-value.ts` re-verify the two on-chain invariants below.
+
+### LadderCloser (contracts/src/targets/LadderCloser.sol)
+
+One deployment per chain, no owner, no upgrade. Tests are fork tests against
+the live pools (`cd contracts && forge test --match-path 'test/targets/*'`
+with `BASE_RPC_URL` and `ROBINHOOD_RPC_URL` exported). Deploy from the keeper
+key, then verify on Blockscout and set `NEXT_PUBLIC_LADDER_CLOSER_<chain>`:
+
+    cd contracts && FEE_RECIPIENT=0x9e240C29c36F774b919dE6DEbA9162fb0ed11edf \
+      forge script script/DeployLadderCloser.s.sol --rpc-url base --broadcast \
+      --private-key "$(python3 -c "import json;print(json.load(open('$HOME/.config/vaults-cash/keeper.json'))[0]['private_key'])")" \
+      --verify --verifier blockscout --verifier-url https://base.blockscout.com/api
+
+Same for `--rpc-url robinhood` with `https://robinhoodchain.blockscout.com/api`.
+A replacement is a new deployment: point the env at it, and the app registers
+new ladders there; old ladders stay with the old contract (still only able to
+pay their owner) and can be closed by hand at any time.
 
 ## Gotchas that already bit us (do not relearn)
 
@@ -132,7 +151,7 @@ before blaming a wallet or a paymaster: a reverting step shows up here first.
 |---|---|---|
 | `/api/referral/sync` | hourly | ledgers fee-wallet inflows |
 | `/api/cron/swaps` | every 5 min | swap index (lib/swapIndex.ts) |
-| `/api/cron/targets` | every 5 min | Targets keeper: marks hit/expired, auto-closes ladders with agent access |
+| `/api/cron/targets` | every 5 min | Targets keeper: marks hit/expired; closes contract-registered ladders via `LadderCloser.close` from the keeper EOA; legacy ladders via agent access |
 
 All three are safe to hit by hand (idempotent, work-bounded). `scripts/simulate-ladder.ts` dry-runs a ladder like `simulate-deposit.ts` does a deposit.
 

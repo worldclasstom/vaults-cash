@@ -1,20 +1,26 @@
 # vaults.cash contracts
 
-> **Shelved (2026-09-24).** Undeployed pilot kept for reference; not part of the product and out of scope for SECURITY.md.
+Foundry workspace. The product contract:
 
-Solidity for The Vault (see ../docs/VAULT_SPEC.md).
+- `src/targets/LadderCloser.sol` — auto-close for Targets ladders. No owner,
+  no upgrade path. `registerLatest` / `register` from the rung owner's wallet
+  (after `setApprovalForAll` on the PositionManager); `close(ladderId)` by
+  anyone, succeeds only once every rung is fully crossed, pays the owner less
+  0.6% of principal + 8% of fees earned (half of the fee to the referrer).
+  The current fee wallet may hand its role to another address; nothing else
+  can change.
 
-- `src/VaultPair.sol` — Rialto propAMM liquidity source implementing the
-  LIFO no-loss grid strategy. Pilot v0: LLC-capital only, no third-party
-  deposits (ERC-4626 wrapper comes after audit + counsel).
+`archive/vaultpair/` is the shelved 2026-09 propAMM pilot, kept for reference
+and not compiled.
 
 ## Test
 
-    forge test          # 13 tests incl. fuzzed no-realize-loss invariant
-    forge test -vvv     # verbose
+Fork tests against the live ETH/USDC pool on Base and TSLA/USDG on Robinhood:
 
-## Not yet done (pre-deploy gates)
+    export BASE_RPC_URL=…            # any Base RPC
+    export ROBINHOOD_RPC_URL=https://rpc.mainnet.chain.robinhood.com
+    forge test --match-path 'test/targets/*' -vv
 
-- Rialto onboarding confirmed for Robinhood Chain (4663)
-- External security audit
-- Securities counsel review before any pooled/user deposits
+## Deploy
+
+See docs/RUNBOOK.md → "LadderCloser".

@@ -13,6 +13,7 @@ import { Sheet } from "@/components/Sheet";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { useMarketQuote, useQuoteBalance } from "@/hooks/useChainData";
 import { useAgentAccessOn, usePlanLadder, useSendLadder } from "@/hooks/useTargets";
+import { closerAddress } from "@/lib/ladderCloser";
 import { useGrantAgentAccess } from "@/hooks/useAgentAccess";
 import { CHAINS, type ChainId } from "@/lib/chain";
 import { fmtPrice, fmtUsd } from "@/lib/format";
@@ -50,11 +51,13 @@ export default function NewTargetPage() {
   const [expiry, setExpiry] = useState("never");
   const [autoClose, setAutoClose] = useState(true);
   const [plan, setPlan] = useState<LadderPlan | null>(null);
+  // the auto-close contract on this chain needs no permission; without it, the
+  // legacy path needs the Privy keeper AND this account's agent access
+  const contract = !!closerAddress(market.chainId);
   const keeper = !!process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID;
   const { data: agentOn } = useAgentAccessOn();
   const grant = useGrantAgentAccess();
-  // the box can only be on when the keeper is configured AND this account granted it
-  const canAutoClose = keeper && !!agentOn;
+  const canAutoClose = contract || (keeper && !!agentOn);
   const planMutation = usePlanLadder();
   const sendMutation = useSendLadder();
 
@@ -212,21 +215,26 @@ export default function NewTargetPage() {
                   type="checkbox"
                   checked={autoClose && canAutoClose}
                   disabled={!canAutoClose}
-                  onChange={(e) => setAutoClose(e.target.checked)}
+                  onChange={(e) => {
+                    setAutoClose(e.target.checked);
+                    setPlan(null); // the batch changes: it registers with the contract or it doesn't
+                  }}
                   className="mt-1 accent-[var(--accent)] disabled:opacity-40"
                 />
                 <span className="text-sm">
                   <span className="block font-semibold">Close it for me when the target hits</span>
                   <span className="block pt-0.5 text-xs text-muted">
-                    {!keeper
-                      ? "Coming soon: until then we mark the target hit and you tap Close."
-                      : canAutoClose
+                    {contract
+                      ? "An open contract closes the ladder the moment the target prints, so a price that comes back down can't re-buy the asset. No permissions: the contract can only act once every rung is crossed, and only your wallet can receive the proceeds."
+                      : !keeper
+                        ? "Coming soon: until then we mark the target hit and you tap Close."
+                        : canAutoClose
                         ? "vaults.cash closes the ladder from your wallet the moment the target prints, so a price that comes back down can't re-buy the asset."
                         : "Needs a one-time permission so vaults.cash can close the ladder from your wallet when the target prints. Without it we mark the target hit and you tap Close."}
                   </span>
                 </span>
               </label>
-              {keeper && !canAutoClose && (
+              {!contract && keeper && !canAutoClose && (
                 <div className="flex flex-wrap items-center gap-2 pt-2 pl-7">
                   <button
                     onClick={() => grant.mutate(undefined, { onSuccess: () => setAutoClose(true) })}
@@ -245,7 +253,7 @@ export default function NewTargetPage() {
 
             <button
               disabled={!canReview || planMutation.isPending}
-              onClick={() => planMutation.mutate({ market, amountUsd: amountNum, direction, targetPriceUsd: rawTarget, rungs, slippageBps: 100 }, { onSuccess: setPlan })}
+              onClick={() => planMutation.mutate({ market, amountUsd: amountNum, direction, targetPriceUsd: rawTarget, rungs, slippageBps: 100, autoClose: autoClose && canAutoClose }, { onSuccess: setPlan })}
               className="w-full rounded-full bg-accent py-3.5 font-display text-base font-extrabold text-black hover:bg-accent-strong disabled:opacity-50"
             >
               {planMutation.isPending ? "Building your ladder…" : "Review target"}

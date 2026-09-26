@@ -5,6 +5,8 @@ import { createLadder, ladderById, laddersFor, ladderTokenIds, ladderView, minte
 import { marketBySlug } from "@/lib/markets";
 import type { ChainId } from "@/lib/chain";
 import { MAX_RUNGS, MIN_RUNGS } from "@/lib/targets";
+import { closerAddress, registeredLadderId } from "@/lib/ladderCloser";
+import { publicClientFor } from "@/lib/onchain";
 
 export const maxDuration = 60;
 
@@ -69,6 +71,13 @@ export async function POST(req: NextRequest) {
     if (minted.length !== b.rungs.length) {
       return NextResponse.json({ error: `expected ${b.rungs.length} rungs in that transaction, found ${minted.length}` }, { status: 409 });
     }
+    // registered with the auto-close contract in the same batch? the receipt says so
+    const closer = closerAddress(chainId);
+    let closerLadderId: bigint | null = null;
+    if (closer) {
+      const rc = await publicClientFor(chainId).getTransactionReceipt({ hash: b.txHash as `0x${string}` });
+      closerLadderId = registeredLadderId(rc.logs, closer);
+    }
     const id = await createLadder({
       did,
       wallet: b.wallet as `0x${string}`,
@@ -80,10 +89,12 @@ export async function POST(req: NextRequest) {
       startTick: Number(b.startTick),
       startPrice: Number(b.startPrice),
       amountUsd: Number(b.amountUsd),
-      autoClose: !!b.autoClose,
+      autoClose: closerLadderId !== null || !!b.autoClose,
       expiresAt: b.expiresAt ?? null,
       openTx: b.txHash as `0x${string}`,
       rungs: b.rungs.map((r, i) => ({ idx: r.idx ?? i, tokenId: minted[i], tickLower: r.tickLower, tickUpper: r.tickUpper })),
+      closer: closerLadderId !== null ? closer : null,
+      closerLadderId,
     });
     return NextResponse.json({ id });
   } catch (e) {

@@ -27,11 +27,12 @@ that history is in docs/DECISIONS.md._
   same batch engine; 8% performance fee on trading fees earned, taken at
   collect/close with the referrer split; Portfolio hides rungs; MCP
   position tools refuse them. Keeper `/api/cron/targets` marks targets
-  hit/expired and auto-closes ladders whose owner granted agent access
-  (until the Privy signer is configured every ladder is notify-only).
+  hit/expired and, for ladders registered with the `LadderCloser`
+  contract, closes them from a gas-only keeper account (no signer, no
+  permission). Contract built + fork-tested 2026-09-26; deploy + Blockscout
+  verification next, then a small audit/bounty before marketing it hard.
   Next: notifications ("Rung 4 sold for $50.9 · +$1.40"), stickers you
-  earn, share card for a hit target, the immutable close contract + audit
-  before marketing it hard, weighting rungs toward the target.
+  earn, weighting rungs toward the target.
 - **Leverage loop** (Aave/Morpho): supply ETH → borrow USDC → LP,
   atomically; LTV cap ~40–50%, live health factor, one-tap unwind.
 - **Managed "pick an outcome" layer** over the pools (MaxFi-style UX
