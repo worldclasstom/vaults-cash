@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 
 const fmtUsd = (n: number) => (n > 0 && n < 0.01 ? "<$0.01" : `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 
-function Sticker({ children, bg, color = "#000", rotate = -3 }: { children: string; bg: string; color?: string; rotate?: number }) {
+function Sticker({ children, bg, color = "#000", rotate = -3, size = 26 }: { children: string; bg: string; color?: string; rotate?: number; size?: number }) {
   return (
     <div
       style={{
@@ -23,8 +23,8 @@ function Sticker({ children, bg, color = "#000", rotate = -3 }: { children: stri
         color,
         border: "4px solid #f4f6f4",
         borderRadius: 999,
-        padding: "8px 20px",
-        fontSize: 26,
+        padding: `${size * 0.3}px ${size * 0.77}px`,
+        fontSize: size,
         fontWeight: 700,
         transform: `rotate(${rotate}deg)`,
         boxShadow: "0 4px 12px rgba(0,0,0,0.45)",
@@ -35,8 +35,11 @@ function Sticker({ children, bg, color = "#000", rotate = -3 }: { children: stri
   );
 }
 
-export async function GET(_req: Request, ctx: { params: Promise<{ chain: string; tokenId: string }> }) {
+export async function GET(req: Request, ctx: { params: Promise<{ chain: string; tokenId: string }> }) {
   const { chain, tokenId } = await ctx.params;
+  // ?format=story → 1080×1920, the size Instagram/TikTok stories expect
+  const story = new URL(req.url).searchParams.get("format") === "story";
+  const size = story ? { width: 1080, height: 1920 } : { width: 1200, height: 630 };
   const cfg = chainBySlug(chain);
   const [bold, medium] = await Promise.all([
     readFile(join(process.cwd(), "assets/Geist-Bold.ttf")),
@@ -55,7 +58,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ chain: string;
           vaults<span style={{ color: "#7cd44a" }}>.cash</span>
         </div>
       ),
-      { width: 1200, height: 630, fonts },
+      { ...size, fonts },
     );
   }
 
@@ -67,6 +70,38 @@ export async function GET(_req: Request, ctx: { params: Promise<{ chain: string;
   const feesUsd = (baseOwed * price + quoteOwed) * quoteUsd;
   const inRange = state.tick >= position.tickLower && state.tick < position.tickUpper;
   const chainSticker = cfg.chain.id === 8453 ? { bg: "#0052ff", color: "#fff" } : { bg: "#00c805", color: "#000" };
+
+  if (story) {
+    const priceLine = `now $${sharePrice(m, priceUsd).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+    return new ImageResponse(
+      (
+        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#0b0d0b", color: "#f4f6f4", fontFamily: "Geist", padding: "160px 80px 200px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
+            <div style={{ display: "flex", fontSize: 56, fontWeight: 700 }}>
+              vaults<span style={{ color: "#7cd44a" }}>.cash</span>
+            </div>
+            <div style={{ display: "flex", gap: 24 }}>
+              <Sticker bg={chainSticker.bg} color={chainSticker.color} rotate={2} size={40}>{cfg.label}</Sticker>
+              <Sticker bg={inRange ? "#7cd44a" : "#ff5c5c"} color={inRange ? "#000" : "#fff"} rotate={-3} size={40}>{inRange ? "Earning" : "Out of range"}</Sticker>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{ display: "flex", fontSize: 60, fontWeight: 500, color: "#8b938b" }}>Traders paid me</div>
+            <div style={{ display: "flex", fontSize: 200, fontWeight: 700, letterSpacing: -10, color: "#7cd44a", lineHeight: 1 }}>+{fmtUsd(feesUsd)}</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 24, fontSize: 84, fontWeight: 700, marginTop: 24 }}>
+              {m.base.symbol} <span style={{ color: "#8b938b" }}>/</span> {m.quote.symbol}
+            </div>
+            <div style={{ display: "flex", fontSize: 40, fontWeight: 500, color: "#8b938b" }}>{priceLine} · Uniswap v4 · held in my own wallet</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, fontSize: 40, color: "#8b938b", fontWeight: 500 }}>
+            <div style={{ display: "flex" }}>Every trade pays a fee. Be the one collecting it.</div>
+            <div style={{ display: "flex", fontSize: 56, fontWeight: 700, color: "#f4f6f4" }}>vaults.cash</div>
+          </div>
+        </div>
+      ),
+      { ...size, fonts, headers: { "cache-control": "public, max-age=60" } },
+    );
+  }
 
   return new ImageResponse(
     (

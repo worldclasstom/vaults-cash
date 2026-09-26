@@ -206,19 +206,62 @@ function TradeFeed({ p, a }: { p: PositionView; a: Activity }) {
 function ShareSheet({ p, onClose }: { p: PositionView; onClose: () => void }) {
   const { data: ref } = useReferral();
   const [copied, setCopied] = useState(false);
+  const [story, setStory] = useState<File | null>(null);
   const slug = CHAINS[p.market.chainId].slug;
   const url = `https://vaults.cash/p/${slug}/${p.tokenId}${ref?.refCode ? `?ref=${ref.refCode}` : ""}`;
   const img = `/api/share/${slug}/${p.tokenId}`;
-  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+  const canShareLink = typeof navigator !== "undefined" && typeof navigator.share === "function";
+  // Prefetch the 9:16 card so the share button can hand a file to the OS
+  // sheet synchronously (Safari only allows navigator.share inside a tap).
+  useEffect(() => {
+    let live = true;
+    fetch(`${img}?format=story`)
+      .then((r) => r.blob())
+      .then((b) => live && setStory(new File([b], `vaults-cash-${p.market.base.symbol}-${p.tokenId}.png`, { type: "image/png" })))
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [img, p.market.base.symbol, p.tokenId]);
+  const canShareImage = !!story && typeof navigator !== "undefined" && typeof navigator.canShare === "function" && navigator.canShare({ files: [story] });
+  const saveImage = () => {
+    if (!story) return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(story);
+    a.download = story.name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5_000);
+  };
   return (
     <Sheet open onClose={onClose} title="Share this position">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={img} alt={`${p.market.base.symbol} / ${p.market.quote.symbol} position card`} className="mt-3 w-full rounded-2xl shadow-elevated" />
       <p className="pt-3 text-xs text-muted">
-        A live card: pair, what traders have paid this position, and where the price sits. The link opens a public page
-        with the same numbers{ref?.refCode ? " and carries your invite code, so anyone who joins from it pays you half our fee" : ""}.
+        A live card: pair, what traders have paid this position, and where the price sits. &ldquo;Share image&rdquo; hands
+        a tall version to Instagram or TikTok stories. The link opens a public page with the same numbers
+        {ref?.refCode ? " and carries your invite code, so anyone who joins from it pays you half our fee" : ""}.
       </p>
-      <div className="mt-4 flex gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
+        {canShareImage ? (
+          <button
+            onClick={() =>
+              navigator
+                .share({ files: [story!], title: "Traders are paying me", text: `Every trade pays a fee. I'm the one collecting it. ${url}` })
+                .catch(() => undefined)
+            }
+            className="grow rounded-full bg-accent px-5 py-3 font-semibold text-black transition-colors hover:bg-accent-strong"
+          >
+            Share image
+          </button>
+        ) : (
+          <button
+            onClick={saveImage}
+            disabled={!story}
+            className="grow rounded-full bg-accent px-5 py-3 font-semibold text-black transition-colors hover:bg-accent-strong disabled:opacity-50"
+          >
+            {story ? "Save image" : "Preparing image…"}
+          </button>
+        )}
         <button
           onClick={() => {
             navigator.clipboard.writeText(url);
@@ -229,12 +272,12 @@ function ShareSheet({ p, onClose }: { p: PositionView; onClose: () => void }) {
         >
           {copied ? "Link copied" : "Copy link"}
         </button>
-        {canShare && (
+        {canShareLink && (
           <button
             onClick={() => navigator.share({ title: "Traders are paying me", text: "Every trade pays a fee. I'm the one collecting it.", url }).catch(() => undefined)}
-            className="grow rounded-full bg-accent py-3 font-semibold text-black transition-colors hover:bg-accent-strong"
+            className="grow rounded-full bg-surface px-5 py-3 font-semibold transition-colors hover:bg-borderline"
           >
-            Share
+            Share link
           </button>
         )}
       </div>
