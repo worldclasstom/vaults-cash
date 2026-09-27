@@ -215,3 +215,9 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   the closer itself is refused as referrer, fee wallet or claim target;
   crossing and single-sidedness use sqrt price, not the stored tick; empty
   positions can't register. 40 fork tests.
+- **2026-09-26 — LadderCloser closure review (Codex v3): 11/12 closed, last
+  one fixed.** Constructor now refuses the contract's own address as fee
+  wallet; natspec states the real invariants (the contract holds exactly
+  what it owes, payouts go to the beneficiary or its claimTo choice,
+  standard tokens only). 42 fork tests. Review loop closed; next step is
+  deployment once the keeper has ETH.

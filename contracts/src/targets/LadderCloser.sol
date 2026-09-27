@@ -38,10 +38,14 @@ interface IPosmNFT {
  * Payouts never block a close: if a recipient can't take a transfer (a
  * contract without receive(), a blacklisted address, a fallback that burns
  * gas), the amount is held for them here and `claim` / `claimTo` pays it
- * out later. Each close distributes only what its own burns produced
- * (balance deltas around the burn), so held amounts are never swept into a
- * later close. Positions with a PositionManager subscriber are refused,
- * because a subscriber runs code between burns.
+ * out later, to the beneficiary or to a destination the beneficiary names.
+ * So the contract may hold balances between transactions: exactly the sum
+ * it owes (plus anything someone sends it for no reason). Each close
+ * distributes only what its own burns produced (balance deltas around the
+ * burn), so held amounts are never swept into a later close. Positions with
+ * a PositionManager subscriber are refused, because a subscriber runs code
+ * between burns. Standard tokens only: a token that lies about a transfer
+ * is outside what any of this can promise.
  *
  * No owner, no upgrade path, no pause, no way to move a rung anywhere but
  * to its owner. The one thing that can change is where the fee goes: the
@@ -70,9 +74,10 @@ contract LadderCloser {
     struct Ladder {
         address owner;
         address referrer;
-        /// @dev true when the target sits at a HIGHER tick than the rungs
+        /// @dev true when the target sits at a HIGHER price than the rungs
         ///      (a sell ladder on a base-is-currency0 pool): a rung is done
-        ///      once tick >= tickUpper. false: done once tick < tickLower.
+        ///      once the pool's sqrt price is at or above its upper edge.
+        ///      false: done once it is at or below the lower edge.
         bool higherTick;
         bool closed;
         uint256[] tokenIds;
@@ -125,6 +130,7 @@ contract LadderCloser {
 
     constructor(IPositionManager _positionManager, address _feeRecipient, uint256 _exitFeeBps, uint256 _perfFeeBps) {
         if (_exitFeeBps > 500 || _perfFeeBps > 2000 || _feeRecipient == address(0)) revert BadFee();
+        if (_feeRecipient == address(this)) revert SelfAsRecipient();
         positionManager = _positionManager;
         poolManager = _positionManager.poolManager();
         feeRecipient = _feeRecipient;

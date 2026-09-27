@@ -613,6 +613,12 @@ abstract contract LadderCloserForkTest is Test {
         vm.stopPrank();
     }
 
+    function test_constructor_rejectsItselfAsFeeWallet() public {
+        address predicted = vm.computeCreateAddress(address(this), vm.getNonce(address(this)));
+        vm.expectRevert(LadderCloser.SelfAsRecipient.selector);
+        new LadderCloser(POSM, predicted, 60, 800);
+    }
+
     function test_pushToken_onlySelf() public {
         vm.expectRevert(LadderCloser.OnlySelf.selector);
         closer.pushToken(USDC, user, 1);
