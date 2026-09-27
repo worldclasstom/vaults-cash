@@ -190,3 +190,10 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   transaction builder in src/lib unchanged, so one bug fix lands on both.
   Bundle id `cash.vaults.app`. Apple requires an organization account for
   wallet apps; fomo and Liquid ship the same Privy setup under their LLCs.
+- **2026-09-26 — LadderCloser review fixes.** Independent adversarial
+  review found no way to take funds or burn an uncrossed rung, but one
+  product-wide failure: a fee wallet or referrer that rejects a transfer
+  would have blocked every close (admin-less, so unrecoverable). Now payouts
+  that fail are held and claimable, the fee wallet handoff is two-step, and
+  each burn passes its principal as the minimum out so the PositionManager
+  itself refuses a rung that moved back into range mid-transaction.

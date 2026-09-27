@@ -247,16 +247,72 @@ abstract contract LadderCloserForkTest is Test {
         assertEq(assetBalance(address(closer)), 0);
     }
 
-    function test_feeRecipient_handoffOnlyByCurrentWallet() public {
+    function test_feeRecipient_twoStepHandoff() public {
         address next = makeAddr("nextFeeWallet");
         vm.expectRevert(LadderCloser.NotFeeRecipient.selector);
-        closer.setFeeRecipient(next);
+        closer.proposeFeeRecipient(next);
         vm.prank(feeWallet);
-        closer.setFeeRecipient(next);
+        closer.proposeFeeRecipient(next);
+        assertEq(closer.feeRecipient(), feeWallet, "unchanged until accepted");
+        vm.expectRevert(LadderCloser.NotPendingFeeRecipient.selector);
+        closer.acceptFeeRecipient();
+        vm.prank(next);
+        closer.acceptFeeRecipient();
         assertEq(closer.feeRecipient(), next);
         vm.prank(feeWallet);
         vm.expectRevert(LadderCloser.NotFeeRecipient.selector);
-        closer.setFeeRecipient(feeWallet);
+        closer.proposeFeeRecipient(feeWallet);
+    }
+
+    function test_register_rejectsDuplicateRung() public {
+        int24 first = roundUp(tick() + 1);
+        uint256[] memory ids = mintRungs(first, 2, LIQ / 2, true);
+        uint256[] memory dup = new uint256[](3);
+        (dup[0], dup[1], dup[2]) = (ids[0], ids[1], ids[0]);
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        vm.expectRevert(abi.encodeWithSelector(LadderCloser.DuplicateRung.selector, ids[0]));
+        closer.register(dup, true, address(0));
+        vm.stopPrank();
+    }
+
+    function test_close_unknownLadderReverts() public {
+        vm.expectRevert(LadderCloser.UnknownLadder.selector);
+        closer.close(999);
+    }
+
+    /// A fee wallet that can't receive the pool's native currency must not block the owner's close.
+    function test_close_holdsFeeForRecipientThatRejects() public {
+        if (ASSET != address(0)) return; // needs a native-ETH pool
+        RejectsEth bad = new RejectsEth();
+        vm.prank(feeWallet);
+        closer.proposeFeeRecipient(address(bad));
+        vm.prank(address(bad));
+        closer.acceptFeeRecipient();
+
+        int24 first = roundUp(tick()) - SPACING;
+        if (first + SPACING > tick()) first -= SPACING;
+        mintRungs(first + SPACING, 2, LIQ, false);
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        uint256 ladderId = closer.registerLatest(2, false, address(0));
+        vm.stopPrank();
+        sellEth(SWAP_BIG_ASSET);
+
+        uint256 uBefore = user.balance;
+        closer.close(ladderId); // does not revert although the fee wallet rejects ETH
+        assertGt(user.balance, uBefore, "owner paid");
+        uint256 held = closer.owed(key.currency0, address(bad));
+        assertGt(held, 0, "fee held for the recipient");
+        assertEq(address(closer).balance, held, "contract holds exactly the held amount");
+
+        // the recipient can still claim later, once it can receive
+        bad.allow();
+        vm.prank(address(bad));
+        uint256 got = closer.claim(key.currency0);
+        assertEq(got, held);
+        assertEq(address(closer).balance, 0);
+        assertEq(closer.owed(key.currency0, address(bad)), 0);
     }
 
     function test_register_needsApproval() public {
@@ -342,6 +398,18 @@ abstract contract LadderCloserForkTest is Test {
         assertTrue(closer.isClosable(ladderId));
         vm.expectRevert();
         closer.close(ladderId);
+    }
+}
+
+contract RejectsEth {
+    bool public open;
+
+    function allow() external {
+        open = true;
+    }
+
+    receive() external payable {
+        require(open, "no");
     }
 }
 
