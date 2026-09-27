@@ -28,6 +28,7 @@ interface IERC20 {
 interface IPosm721 {
     function ownerOf(uint256) external view returns (address);
     function setApprovalForAll(address, bool) external;
+    function transferFrom(address, address, uint256) external;
     function subscribe(uint256 tokenId, address newSubscriber, bytes calldata data) external payable;
     function unsubscribe(uint256 tokenId) external payable;
 }
@@ -566,6 +567,55 @@ abstract contract LadderCloserForkTest is Test {
         vm.prank(user);
         vm.expectRevert(abi.encodeWithSelector(LadderCloser.AlreadyCrossed.selector, ids[0]));
         closer.register(ids, true, address(0));
+    }
+
+    /// R1 regression: a rung sold to someone else can be registered by its new owner,
+    /// and the old ladder can no longer act on it, even if it comes back.
+    function test_transferredRung_newOwnerCanRegister_oldLadderLetsGo() public {
+        int24 first = roundUp(tick() + 1);
+        uint256[] memory ids = mintRungs(first, 2, LIQ / 2, true);
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        uint256 a = closer.registerLatest(2, true, address(0));
+        IPosm721(address(POSM)).transferFrom(user, stranger, ids[0]);
+        vm.stopPrank();
+        uint256[] memory one = new uint256[](1);
+        one[0] = ids[0];
+        vm.startPrank(stranger);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        uint256 b = closer.register(one, true, address(0));
+        vm.stopPrank();
+        assertEq(closer.ladderOf(ids[0]), b, "binding follows the current owner");
+        // the old owner cancelling A must not disturb B's binding
+        vm.prank(user);
+        closer.cancel(a);
+        assertEq(closer.ladderOf(ids[0]), b);
+        // even if the rung goes back to the old owner, A is done and B still owns the binding
+        vm.prank(stranger);
+        IPosm721(address(POSM)).transferFrom(stranger, user, ids[0]);
+        vm.expectRevert(LadderCloser.AlreadyClosed.selector);
+        closer.close(a);
+        assertFalse(closer.isClosable(b), "B's rung no longer belongs to B's owner");
+    }
+
+    function test_closerItself_rejectedAsRecipient() public {
+        vm.prank(feeWallet);
+        vm.expectRevert(LadderCloser.SelfAsRecipient.selector);
+        closer.proposeFeeRecipient(address(closer));
+        vm.expectRevert(LadderCloser.SelfAsRecipient.selector);
+        closer.claimTo(key.currency0, address(closer));
+        int24 first = roundUp(tick() + 1);
+        mintRungs(first, 1, LIQ / 2, true);
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        vm.expectRevert(LadderCloser.SelfAsRecipient.selector);
+        closer.registerLatest(1, true, address(closer));
+        vm.stopPrank();
+    }
+
+    function test_pushToken_onlySelf() public {
+        vm.expectRevert(LadderCloser.OnlySelf.selector);
+        closer.pushToken(USDC, user, 1);
     }
 }
 

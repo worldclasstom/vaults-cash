@@ -13,9 +13,13 @@ Foundry workspace. The product contract:
   balance deltas, so held reserves are never swept. Positions with a
   PositionManager subscriber are refused (owner-installed code between
   burns). One open ladder per position; the owner can `cancel`. The fee
-  wallet changes only by two-step propose/accept. Two independent reviews
-  2026-09-26 (Claude, then ChatGPT/Codex on the first fix); every finding
-  above informational is fixed and regression-tested.
+  wallet changes only by two-step propose/accept. A rung sold to a new
+  owner can be re-registered by them (the old ladder lets go). Token payouts
+  run in a self-call frame that reverts on any non-standard result, so a
+  "failed" payout always means nothing moved. Crossing is judged on the
+  pool's sqrt price, so a rung exactly at its far edge counts as converted.
+  Three independent review rounds 2026-09-26 (Claude, then ChatGPT/Codex
+  twice); every finding above informational is fixed and regression-tested.
 
 `archive/vaultpair/` is the shelved 2026-09 propAMM pilot, kept for reference
 and not compiled.

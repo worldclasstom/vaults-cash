@@ -206,3 +206,12 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   subscribed positions are refused at registration and at close; ladders
   must start single-sided; one open ladder per position; owner `cancel`.
   34 fork tests. Lesson: re-run the review after every fix, not just once.
+- **2026-09-26 — Third LadderCloser review round (Codex v2).** Its medium:
+  a rung transferred to a new owner stayed bound to the old owner's ladder
+  (my one-open-ladder rule, one fix earlier). Now the current owner can
+  register over a stale binding and the old ladder skips that rung. Token
+  payouts are atomic (self-call that reverts on non-standard return data,
+  capped gas, one-word return copy) so a held credit can never double-pay;
+  the closer itself is refused as referrer, fee wallet or claim target;
+  crossing and single-sidedness use sqrt price, not the stored tick; empty
+  positions can't register. 40 fork tests.
