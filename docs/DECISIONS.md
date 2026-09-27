@@ -197,3 +197,12 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   that fail are held and claimable, the fee wallet handoff is two-step, and
   each burn passes its principal as the minimum out so the PositionManager
   itself refuses a rung that moved back into range mid-transaction.
+- **2026-09-26 — Second LadderCloser review (ChatGPT/Codex) caught my
+  regression.** The "hold failed payouts" fix had left `close` distributing
+  the contract's whole balance, so a held reserve would be swept into the
+  next close in that currency (critical). Now each close distributes only
+  the balance delta its burns produced; native sends get a fixed gas
+  stipend; `claimTo` lets a wallet that can't receive redirect its credit;
+  subscribed positions are refused at registration and at close; ladders
+  must start single-sided; one open ladder per position; owner `cancel`.
+  34 fork tests. Lesson: re-run the review after every fix, not just once.

@@ -36,9 +36,12 @@ interface IPosmNFT {
  *   Half of the fee goes to the referrer the owner named at registration.
  *
  * Payouts never block a close: if a recipient can't take a transfer (a
- * contract without receive(), a blacklisted address), the amount is held
- * for them here and `claim` pays it out later. The owner's close goes
- * through regardless.
+ * contract without receive(), a blacklisted address, a fallback that burns
+ * gas), the amount is held for them here and `claim` / `claimTo` pays it
+ * out later. Each close distributes only what its own burns produced
+ * (balance deltas around the burn), so held amounts are never swept into a
+ * later close. Positions with a PositionManager subscriber are refused,
+ * because a subscriber runs code between burns.
  *
  * No owner, no upgrade path, no pause, no way to move a rung anywhere but
  * to its owner. The one thing that can change is where the fee goes: the
@@ -79,12 +82,17 @@ contract LadderCloser {
     mapping(uint256 => Ladder) internal _ladders;
     /// @notice Amounts a payout could not deliver, claimable by the recipient.
     mapping(Currency => mapping(address => uint256)) public owed;
+    /// @notice The open ladder a position belongs to (0 = none). One at a time.
+    mapping(uint256 => uint256) public ladderOf;
+    /// @dev gas handed to a native-currency recipient; enough for any wallet, too little to grief
+    uint256 private constant SEND_GAS = 100_000;
     uint256 private _lock = 1;
 
     event Registered(uint256 indexed ladderId, address indexed owner, address referrer, bool higherTick, uint256[] tokenIds);
     event Closed(uint256 indexed ladderId, address indexed caller, uint256 amount0ToOwner, uint256 amount1ToOwner, uint256 fee0, uint256 fee1);
     event FeeRecipientProposed(address indexed from, address indexed to);
     event FeeRecipientChanged(address indexed from, address indexed to);
+    event Cancelled(uint256 indexed ladderId);
     event Held(Currency indexed currency, address indexed recipient, uint256 amount);
     event Claimed(Currency indexed currency, address indexed recipient, uint256 amount);
 
@@ -92,9 +100,13 @@ contract LadderCloser {
     error NotApproved();
     error BadRungCount();
     error DuplicateRung(uint256 tokenId);
+    error AlreadyRegistered(uint256 tokenId);
+    error SubscribedRung(uint256 tokenId);
+    error NotSingleSided(uint256 tokenId);
     error MixedPools();
     error HookedPool();
     error UnknownLadder();
+    error NotLadderOwner();
     error AlreadyCrossed(uint256 tokenId);
     error NotCrossed(uint256 tokenId);
     error NothingToClose();
@@ -140,12 +152,33 @@ contract LadderCloser {
     }
 
     /// @notice Pay out anything a close could not deliver to the caller.
-    function claim(Currency currency) external nonReentrant returns (uint256 amount) {
+    function claim(Currency currency) external returns (uint256) {
+        return _claim(currency, msg.sender);
+    }
+
+    /// @notice Same, to an address of the caller's choosing (for a wallet that can't take the currency itself).
+    function claimTo(Currency currency, address to) external returns (uint256) {
+        if (to == address(0)) revert BadFee();
+        return _claim(currency, to);
+    }
+
+    function _claim(Currency currency, address to) internal nonReentrant returns (uint256 amount) {
         amount = owed[currency][msg.sender];
         if (amount == 0) return 0;
         owed[currency][msg.sender] = 0;
-        if (!_send(currency, msg.sender, amount)) revert TransferFailed();
+        if (!_send(currency, to, amount)) revert TransferFailed();
         emit Claimed(currency, msg.sender, amount);
+    }
+
+    /// @notice The owner withdraws a ladder from the contract. Its rungs stay in the wallet untouched.
+    function cancel(uint256 ladderId) external {
+        Ladder storage l = _ladders[ladderId];
+        if (l.owner == address(0)) revert UnknownLadder();
+        if (l.owner != msg.sender) revert NotLadderOwner();
+        if (l.closed) revert AlreadyClosed();
+        l.closed = true;
+        _release(l);
+        emit Cancelled(ladderId);
     }
 
     // ---------------------------------------------------------------- views
@@ -191,11 +224,13 @@ contract LadderCloser {
 
     function _register(uint256[] memory ids, bool higherTick, address referrer) internal returns (uint256 ladderId) {
         if (!IPosmNFT(address(positionManager)).isApprovedForAll(msg.sender, address(this))) revert NotApproved();
+        ladderId = nextLadderId++;
         bytes25 poolId;
         for (uint256 i = 0; i < ids.length; i++) {
             uint256 id = ids[i];
             for (uint256 j = 0; j < i; j++) if (ids[j] == id) revert DuplicateRung(id);
             if (_ownerOf(id) != msg.sender) revert NotOwner(id);
+            if (ladderOf[id] != 0) revert AlreadyRegistered(id);
             (PoolKey memory key, PositionInfo info) = positionManager.getPoolAndPositionInfo(id);
             if (i == 0) {
                 poolId = info.poolId();
@@ -203,11 +238,15 @@ contract LadderCloser {
                 // move price or take funds mid-burn
                 if (address(key.hooks) != address(0)) revert HookedPool();
             } else if (info.poolId() != poolId) revert MixedPools();
-            // a rung that is already past the target would be closable at once
+            // a subscriber is owner-installed code that runs between burns
+            if (info.hasSubscriber()) revert SubscribedRung(id);
             (, int24 tick,,) = poolManager.getSlot0(key.toId());
+            // a rung that is already past the target would be closable at once…
             if (_crossed(higherTick, tick, info.tickLower(), info.tickUpper())) revert AlreadyCrossed(id);
+            // …and a rung the price is inside isn't a ladder rung at all
+            if (!(higherTick ? tick < info.tickLower() : tick >= info.tickUpper())) revert NotSingleSided(id);
+            ladderOf[id] = ladderId;
         }
-        ladderId = nextLadderId++;
         Ladder storage l = _ladders[ladderId];
         l.owner = msg.sender;
         l.referrer = referrer;
@@ -229,11 +268,13 @@ contract LadderCloser {
         if (l.closed) revert AlreadyClosed();
         l.closed = true;
 
-        (PoolKey memory key, uint256 principal0, uint256 principal1) = _burnAll(l);
-        (uint256 fee0, uint256 own0) = _split(key.currency0.balanceOfSelf(), principal0);
-        (uint256 fee1, uint256 own1) = _split(key.currency1.balanceOfSelf(), principal1);
-        _payFee(key.currency0, fee0, l);
-        _payFee(key.currency1, fee1, l);
+        (PoolKey memory key, uint256 got0, uint256 got1, uint256 principal0, uint256 principal1) = _burnAll(l);
+        _release(l);
+        (uint256 fee0, uint256 own0) = _split(got0, principal0);
+        (uint256 fee1, uint256 own1) = _split(got1, principal1);
+        address feeTo = feeRecipient;
+        _payFee(key.currency0, fee0, l, feeTo);
+        _payFee(key.currency1, fee1, l, feeTo);
         _pay(key.currency0, l.owner, own0);
         _pay(key.currency1, l.owner, own1);
         emit Closed(ladderId, msg.sender, own0, own1, fee0, fee1);
@@ -241,9 +282,9 @@ contract LadderCloser {
 
     /// @dev Burn every live rung in one PositionManager call, taking both
     ///      currencies here. Reverts unless every live rung is crossed.
-    ///      This contract never holds a balance between transactions, so
-    ///      what it holds afterwards is exactly what the rungs paid out.
-    function _burnAll(Ladder storage l) internal returns (PoolKey memory key, uint256 principal0, uint256 principal1) {
+    ///      Returns what the burns paid (balance deltas), so anything the
+    ///      contract already held, for `owed` or by donation, is untouched.
+    function _burnAll(Ladder storage l) internal returns (PoolKey memory key, uint256 got0, uint256 got1, uint256 principal0, uint256 principal1) {
         uint256 n = l.tokenIds.length;
         bytes memory actions;
         bytes[] memory params = new bytes[](n + 1);
@@ -253,7 +294,10 @@ contract LadderCloser {
             (bool alive, bool crossed, uint256 p0, uint256 p1) = _rungState(l, id);
             if (!alive) continue;
             if (!crossed) revert NotCrossed(id);
-            if (live == 0) (key,) = positionManager.getPoolAndPositionInfo(id);
+            PositionInfo info;
+            if (live == 0) (key, info) = positionManager.getPoolAndPositionInfo(id);
+            else (, info) = positionManager.getPoolAndPositionInfo(id);
+            if (info.hasSubscriber()) revert SubscribedRung(id);
             actions = abi.encodePacked(actions, uint8(Actions.BURN_POSITION));
             // the principal doubles as the minimum out: PositionManager then refuses the
             // burn if anything moved the price back into the rung mid-transaction
@@ -269,7 +313,16 @@ contract LadderCloser {
         assembly ("memory-safe") {
             mstore(params, add(live, 1))
         }
+        uint256 before0 = key.currency0.balanceOfSelf();
+        uint256 before1 = key.currency1.balanceOfSelf();
         positionManager.modifyLiquidities(abi.encode(actions, params), block.timestamp);
+        got0 = key.currency0.balanceOfSelf() - before0;
+        got1 = key.currency1.balanceOfSelf() - before1;
+    }
+
+    /// @dev the ladder is done (closed or cancelled): its rungs may be registered again
+    function _release(Ladder storage l) internal {
+        for (uint256 i = 0; i < l.tokenIds.length; i++) delete ladderOf[l.tokenIds[i]];
     }
 
     // ------------------------------------------------------------ internals
@@ -317,15 +370,15 @@ contract LadderCloser {
         toOwner = received - fee;
     }
 
-    function _payFee(Currency c, uint256 fee, Ladder storage l) internal {
+    function _payFee(Currency c, uint256 fee, Ladder storage l, address feeTo) internal {
         if (fee == 0) return;
         address r = l.referrer;
-        if (r != address(0) && r != l.owner && r != feeRecipient) {
+        if (r != address(0) && r != l.owner && r != feeTo) {
             uint256 share = (fee * REFERRER_SHARE_BPS) / BPS;
             _pay(c, r, share);
             fee -= share;
         }
-        _pay(c, feeRecipient, fee);
+        _pay(c, feeTo, fee);
     }
 
     /// @dev Push the amount; if the recipient can't take it, hold it for `claim`.
@@ -336,14 +389,18 @@ contract LadderCloser {
         emit Held(c, to, amount);
     }
 
-    /// @dev A transfer that reports failure instead of reverting.
+    /// @dev A transfer that reports failure instead of reverting. Native sends
+    ///      get a fixed gas stipend so a recipient can't burn the close's gas;
+    ///      token return data is accepted only in the two standard shapes.
     function _send(Currency c, address to, uint256 amount) internal returns (bool ok) {
         if (c.isAddressZero()) {
-            (ok,) = to.call{value: amount}("");
+            (ok,) = to.call{value: amount, gas: SEND_GAS}("");
         } else {
+            address token = Currency.unwrap(c);
+            if (token.code.length == 0) return false;
             bytes memory ret;
-            (ok, ret) = Currency.unwrap(c).call(abi.encodeWithSelector(0xa9059cbb, to, amount));
-            ok = ok && (ret.length == 0 || abi.decode(ret, (bool))) && Currency.unwrap(c).code.length > 0;
+            (ok, ret) = token.call(abi.encodeWithSelector(0xa9059cbb, to, amount));
+            ok = ok && (ret.length == 0 || (ret.length == 32 && abi.decode(ret, (bool))));
         }
     }
 

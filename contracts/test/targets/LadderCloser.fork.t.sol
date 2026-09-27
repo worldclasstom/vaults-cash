@@ -16,6 +16,8 @@ import {IPositionManager} from "v4-periphery/src/interfaces/IPositionManager.sol
 import {Actions} from "v4-periphery/src/libraries/Actions.sol";
 import {PositionInfo, PositionInfoLibrary} from "v4-periphery/src/libraries/PositionInfoLibrary.sol";
 import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol";
+import {ISubscriber} from "v4-periphery/src/interfaces/ISubscriber.sol";
+import {BalanceDelta} from "@uniswap/v4-core/src/types/BalanceDelta.sol";
 import {LadderCloser} from "../../src/targets/LadderCloser.sol";
 
 interface IERC20 {
@@ -26,6 +28,21 @@ interface IERC20 {
 interface IPosm721 {
     function ownerOf(uint256) external view returns (address);
     function setApprovalForAll(address, bool) external;
+    function subscribe(uint256 tokenId, address newSubscriber, bytes calldata data) external payable;
+    function unsubscribe(uint256 tokenId) external payable;
+}
+
+contract NoopSubscriber is ISubscriber {
+    function notifySubscribe(uint256, bytes memory) external {}
+    function notifyUnsubscribe(uint256) external {}
+    function notifyBurn(uint256, address, PositionInfo, uint256, BalanceDelta) external {}
+    function notifyModifyLiquidity(uint256, int256, BalanceDelta) external {}
+}
+
+contract BurnsGas {
+    receive() external payable {
+        while (true) {}
+    }
 }
 
 /// Fork tests against a live hookless v4 pool: currency0 is the asset (native
@@ -125,6 +142,26 @@ abstract contract LadderCloserForkTest is Test {
         vm.prank(user);
         POSM.modifyLiquidities{value: value}(abi.encode(actions, params), block.timestamp + 60);
         for (uint256 i = 0; i < n; i++) assertEq(IPosm721(address(POSM)).ownerOf(ids[i]), user, "minted to user");
+    }
+
+    /// Mint one position that straddles the current price (both sides), as user.
+    function mintInRange(uint128 liq) internal returns (uint256 id) {
+        int24 lo = roundUp(tick()) - SPACING;
+        if (lo > tick()) lo -= SPACING;
+        int24 hi = lo + 2 * SPACING;
+        (uint160 sp,,,) = PM.getSlot0(key.toId());
+        uint256 a0 = SqrtPriceMath.getAmount0Delta(sp, TickMath.getSqrtPriceAtTick(hi), liq, true) + 1;
+        uint256 a1 = SqrtPriceMath.getAmount1Delta(TickMath.getSqrtPriceAtTick(lo), sp, liq, true) + 1;
+        bytes memory actions = abi.encodePacked(uint8(Actions.MINT_POSITION), uint8(Actions.SETTLE_PAIR), uint8(Actions.SWEEP));
+        bytes[] memory params = new bytes[](3);
+        params[0] = abi.encode(key, lo, hi, uint256(liq), uint128(a0), uint128(a1), user, bytes(""));
+        params[1] = abi.encode(key.currency0, key.currency1);
+        params[2] = abi.encode(key.currency0, user);
+        id = POSM.nextTokenId();
+        vm.prank(user);
+        POSM.modifyLiquidities{value: ASSET == address(0) ? a0 : 0}(abi.encode(actions, params), block.timestamp + 60);
+        assertLe(lo, tick());
+        assertGt(hi, tick());
     }
 
     function buyEth(uint256 usdcIn) internal {
@@ -398,6 +435,137 @@ abstract contract LadderCloserForkTest is Test {
         assertTrue(closer.isClosable(ladderId));
         vm.expectRevert();
         closer.close(ladderId);
+    }
+
+    /// F1 regression: money held for one recipient must survive a later close in the same currency.
+    function test_heldPayout_survivesLaterClose() public {
+        if (ASSET != address(0)) return;
+        RejectsEth bad = new RejectsEth();
+        vm.prank(feeWallet);
+        closer.proposeFeeRecipient(address(bad));
+        vm.prank(address(bad));
+        closer.acceptFeeRecipient();
+
+        // ladder A: down ladder, close with the fee held for `bad`
+        int24 first = roundUp(tick()) - SPACING;
+        if (first + SPACING > tick()) first -= SPACING;
+        mintRungs(first + SPACING, 2, LIQ, false);
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        uint256 a = closer.registerLatest(2, false, address(0));
+        vm.stopPrank();
+        sellEth(SWAP_BIG_ASSET);
+        closer.close(a);
+        uint256 held = closer.owed(key.currency0, address(bad));
+        assertGt(held, 0);
+        assertEq(address(closer).balance, held);
+
+        // ladder B: another down ladder below the new price, closed later
+        int24 first2 = roundUp(tick()) - SPACING;
+        if (first2 + SPACING > tick()) first2 -= SPACING;
+        mintRungs(first2 + SPACING, 2, LIQ, false);
+        vm.prank(user);
+        uint256 b = closer.registerLatest(2, false, address(0));
+        sellEth(SWAP_BIG_ASSET);
+        uint256 uBefore = user.balance;
+        closer.close(b);
+        assertGt(user.balance, uBefore, "B's owner paid");
+        uint256 owedNow = closer.owed(key.currency0, address(bad));
+        assertGe(owedNow, held, "A's held amount untouched (B's fee is held for the same wallet)");
+        assertEq(address(closer).balance, owedNow, "contract holds exactly what it owes");
+
+        // and A's recipient gets exactly what it is owed, to an address of its choosing
+        address other = makeAddr("other");
+        uint256 totalOwed = closer.owed(key.currency0, address(bad));
+        vm.prank(address(bad));
+        closer.claimTo(key.currency0, other);
+        assertEq(other.balance, totalOwed);
+        assertEq(closer.owed(key.currency0, address(bad)), 0);
+        assertEq(address(closer).balance, 0, "nothing left once every reserve is claimed");
+    }
+
+    /// A recipient that burns all the gas it is given must not break the close either.
+    function test_close_survivesGasBurningRecipient() public {
+        if (ASSET != address(0)) return;
+        BurnsGas bad = new BurnsGas();
+        vm.prank(feeWallet);
+        closer.proposeFeeRecipient(address(bad));
+        vm.prank(address(bad));
+        closer.acceptFeeRecipient();
+        int24 first = roundUp(tick()) - SPACING;
+        if (first + SPACING > tick()) first -= SPACING;
+        mintRungs(first + SPACING, 2, LIQ, false);
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        uint256 id = closer.registerLatest(2, false, address(0));
+        vm.stopPrank();
+        sellEth(SWAP_BIG_ASSET);
+        uint256 uBefore = user.balance;
+        closer.close(id);
+        assertGt(user.balance, uBefore);
+        assertGt(closer.owed(key.currency0, address(bad)), 0, "fee held, not lost");
+    }
+
+    function test_subscribedRung_rejectedAtRegistrationAndAtClose() public {
+        NoopSubscriber sub = new NoopSubscriber();
+        int24 first = roundUp(tick() + 1);
+        uint256[] memory ids = mintRungs(first, 2, LIQ / 2, true);
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        IPosm721(address(POSM)).subscribe(ids[0], address(sub), "");
+        vm.expectRevert(abi.encodeWithSelector(LadderCloser.SubscribedRung.selector, ids[0]));
+        closer.registerLatest(2, true, address(0));
+        IPosm721(address(POSM)).unsubscribe(ids[0]);
+        uint256 ladderId = closer.registerLatest(2, true, address(0));
+        // subscribed after registration: the close refuses until the owner unsubscribes
+        IPosm721(address(POSM)).subscribe(ids[1], address(sub), "");
+        vm.stopPrank();
+        buyEth(SWAP_BIG_STABLE);
+        assertTrue(closer.isClosable(ladderId));
+        vm.expectRevert(abi.encodeWithSelector(LadderCloser.SubscribedRung.selector, ids[1]));
+        closer.close(ladderId);
+        vm.prank(user);
+        IPosm721(address(POSM)).unsubscribe(ids[1]);
+        closer.close(ladderId);
+    }
+
+    function test_register_rejectsTwoSidedPosition() public {
+        uint256 id = mintInRange(LIQ / 2);
+        uint256[] memory ids = new uint256[](1);
+        ids[0] = id;
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        vm.expectRevert(abi.encodeWithSelector(LadderCloser.NotSingleSided.selector, id));
+        closer.register(ids, true, address(0));
+        vm.expectRevert(abi.encodeWithSelector(LadderCloser.NotSingleSided.selector, id));
+        closer.register(ids, false, address(0));
+        vm.stopPrank();
+    }
+
+    function test_cancel_andOneOpenLadderPerRung() public {
+        int24 first = roundUp(tick() + 1);
+        uint256[] memory ids = mintRungs(first, 2, LIQ / 2, true);
+        vm.startPrank(user);
+        IPosm721(address(POSM)).setApprovalForAll(address(closer), true);
+        uint256 a = closer.registerLatest(2, true, address(0));
+        assertEq(closer.ladderOf(ids[0]), a);
+        vm.expectRevert(abi.encodeWithSelector(LadderCloser.AlreadyRegistered.selector, ids[0]));
+        closer.register(ids, true, address(0));
+        vm.stopPrank();
+        vm.prank(stranger);
+        vm.expectRevert(LadderCloser.NotLadderOwner.selector);
+        closer.cancel(a);
+        vm.prank(user);
+        closer.cancel(a);
+        assertEq(closer.ladderOf(ids[0]), 0);
+        assertEq(IPosm721(address(POSM)).ownerOf(ids[0]), user, "rungs untouched");
+        buyEth(SWAP_BIG_STABLE);
+        vm.expectRevert(LadderCloser.AlreadyClosed.selector);
+        closer.close(a);
+        // may be registered again afterwards (crossed now, so as a "lower" ladder it is refused, as an "upper" it is AlreadyCrossed)
+        vm.prank(user);
+        vm.expectRevert(abi.encodeWithSelector(LadderCloser.AlreadyCrossed.selector, ids[0]));
+        closer.register(ids, true, address(0));
     }
 }
 
