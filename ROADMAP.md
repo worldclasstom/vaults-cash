@@ -54,3 +54,15 @@ that history is in docs/DECISIONS.md._
 - **The Vault (Rialto propAMM)** and the **1inch Aqua pilot** — research and
   an undeployed contract kept in `contracts/` and `docs/`. Not planned.
 - v4 hooks for custom curves — only if Uniswap-side flow capture ever matters.
+
+## Legal & compliance (2026-09-28)
+- /terms and /privacy shipped (operator Prosperity Labs, LLC; Oklahoma law;
+  AAA arbitration with 30-day opt-out; contact support@prosperitylabs.co,
+  scraper-safe). Counsel review before App Store submission and before
+  marketing Targets.
+- Contact form (bot-safe) once the email sender (Resend) exists; then
+  replace the mailto with /contact everywhere.
+- Decide the tokenized-stock eligibility question: the US geo-gate for
+  Robinhood stock markets was removed when Base went crypto-only, and the
+  stock markets came back with multichain. Terms now put eligibility on the
+  user; counsel should say whether the gate must return.

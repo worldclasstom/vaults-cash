@@ -41,6 +41,8 @@ export const config = {
     "/account",
     "/how-it-works",
     "/disclosures",
+    "/terms",
+    "/privacy",
     "/trust",
     "/p/:path*",
   ],
