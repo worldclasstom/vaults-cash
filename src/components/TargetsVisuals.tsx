@@ -106,7 +106,7 @@ export function LadderDemo() {
         </div>
         <div className="flex w-32 flex-col justify-between">
           <div>
-            <p className="text-xs text-muted">Paid so far</p>
+            <p className="text-xs text-muted">Fees earned</p>
             <p className="font-display text-2xl font-extrabold text-accent">+${paid.toFixed(2)}</p>
           </div>
           <div>
