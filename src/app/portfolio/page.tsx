@@ -28,6 +28,7 @@ import { tickToPrice } from "@/lib/onchain";
 import { planSummary } from "@/lib/zap";
 import { MIN_COLLECT_USD, minDepositUsd } from "@/lib/limits";
 import { useStats } from "@/components/PoolList";
+import { PortfolioSkeleton } from "@/components/Skeleton";
 
 function AddPanel({ p, onClose }: { p: PositionView; onClose: () => void }) {
   const { data: balance } = useQuoteBalance(p.market.chainId);
@@ -510,7 +511,7 @@ export default function PortfolioPage() {
 
   return (
     <AppShell>
-      {!ready ? null : !authenticated ? (
+      {!ready ? <PortfolioSkeleton /> : !authenticated ? (
         <div className="flex grow flex-col items-center justify-center gap-4 py-24">
           <p className="text-muted">Log in to see your portfolio.</p>
           <button onClick={login} className="rounded-full bg-accent px-8 py-3 font-semibold text-black hover:bg-accent-strong">

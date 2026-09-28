@@ -16,6 +16,7 @@ import { CHAINS, explorerUrl, type ChainId } from "@/lib/chain";
 import { fmtPrice, fmtUsd } from "@/lib/format";
 import type { LadderView } from "@/lib/ladders";
 import type { ClosePlan } from "@/lib/targets";
+import { LadderSkeleton } from "@/components/Skeleton";
 
 type Pending = { kind: "cash" | "keep" | "collect"; plan: ClosePlan };
 
@@ -100,7 +101,7 @@ export default function TargetPage() {
 
   return (
     <AppShell>
-      {!ready ? null : !authenticated ? (
+      {!ready ? <LadderSkeleton /> : !authenticated ? (
         <div className="flex grow flex-col items-center justify-center gap-4 py-24">
           <p className="text-muted">Log in to see this target.</p>
           <button onClick={login} className="rounded-full bg-accent px-8 py-3 font-semibold text-black hover:bg-accent-strong">
@@ -108,7 +109,7 @@ export default function TargetPage() {
           </button>
         </div>
       ) : isLoading ? (
-        <div className="my-6 h-64 animate-pulse rounded-3xl bg-surface shadow-card" />
+        <LadderSkeleton />
       ) : isError || !v ? (
         <p className="my-6 rounded-3xl bg-surface shadow-card p-5 text-sm text-muted">Couldn&apos;t load this target.</p>
       ) : (

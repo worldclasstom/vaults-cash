@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { useAddFunds } from "@privy-io/react-auth";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth, useLikelyAuthenticated } from "@/components/AuthProvider";
+import { DashboardSkeleton } from "@/components/Skeleton";
 import { AppShell } from "@/components/AppShell";
 import { InviteCard } from "@/components/InviteCard";
 import { Landing } from "@/components/Landing";
@@ -245,7 +246,16 @@ function Dashboard() {
 
 export default function Home() {
   const { ready, authenticated } = useAuth();
-  if (!ready) return null;
+  const likely = useLikelyAuthenticated();
+  // before Privy answers: the shell this browser saw last time, with a skeleton, never a blank
+  if (!ready)
+    return likely ? (
+      <AppShell>
+        <DashboardSkeleton />
+      </AppShell>
+    ) : (
+      <Landing />
+    );
   if (!authenticated) return <Landing />;
   return (
     <AppShell>

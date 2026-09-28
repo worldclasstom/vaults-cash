@@ -7,6 +7,7 @@ import type { ChainId } from "@/lib/chain";
 import { MAX_RUNGS, MIN_RUNGS } from "@/lib/targets";
 import { closerAddress, registeredLadderId } from "@/lib/ladderCloser";
 import { publicClientFor } from "@/lib/onchain";
+import { cachedLadderList, forgetLadderList, rememberLadderList } from "@/lib/ladderViewCache";
 
 export const maxDuration = 60;
 
@@ -23,6 +24,8 @@ export async function GET(req: NextRequest) {
     if (req.nextUrl.searchParams.get("ids")) {
       return NextResponse.json({ rungs: await ladderTokenIds(did) }, { headers: { "cache-control": "no-store" } });
     }
+    const cached = cachedLadderList(did);
+    if (cached) return NextResponse.json(cached, { headers: { "cache-control": "no-store" } });
     const rows = await laddersFor(did);
     const views = await Promise.all(
       rows.map(async (row) => {
@@ -35,7 +38,9 @@ export async function GET(req: NextRequest) {
         }
       }),
     );
-    return NextResponse.json({ ladders: views.filter(Boolean) }, { headers: { "cache-control": "no-store" } });
+    const body = { ladders: views.filter(Boolean) };
+    rememberLadderList(did, body);
+    return NextResponse.json(body, { headers: { "cache-control": "no-store" } });
   } catch (e) {
     const msg = (e as Error).message;
     return NextResponse.json({ error: msg }, { status: msg === "unauthorized" ? 401 : 500 });
@@ -96,6 +101,7 @@ export async function POST(req: NextRequest) {
       closer: closerLadderId !== null ? closer : null,
       closerLadderId,
     });
+    forgetLadderList(did);
     return NextResponse.json({ id });
   } catch (e) {
     const msg = (e as Error).message;

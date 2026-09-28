@@ -8,6 +8,7 @@ import { useLadders } from "@/hooks/useTargets";
 import { useMarketQuote } from "@/hooks/useChainData";
 import { InviteCard } from "@/components/InviteCard";
 import { ComingSoon, TargetsHowItWorks } from "@/components/TargetsVisuals";
+import { TargetsSkeleton } from "@/components/Skeleton";
 import { TARGETS_LIVE } from "@/lib/flags";
 import { marketBySlug, sharePrice } from "@/lib/markets";
 import { fmtPrice, fmtUsd } from "@/lib/format";
@@ -63,7 +64,7 @@ export default function TargetsPage() {
   const past = (data ?? []).filter((v) => v.status === "closed" || v.status === "cancelled");
   return (
     <AppShell>
-      {!ready ? null : !authenticated ? (
+      {!ready ? <TargetsSkeleton /> : !authenticated ? (
         <div className="animate-rise py-4">
           <h1 className="font-display text-3xl font-extrabold tracking-tight">Targets</h1>
           <p className="pt-1 pb-4 text-sm text-muted">Pick a price you believe in. Earn fees on every step there.</p>
@@ -94,7 +95,7 @@ export default function TargetsPage() {
             )}
           </div>
           {isLoading ? (
-            <div className="h-40 animate-pulse rounded-3xl bg-surface shadow-card" />
+            <TargetsSkeleton />
           ) : isError ? (
             <p className="rounded-3xl bg-surface shadow-card p-5 text-sm text-muted">Couldn&apos;t load your targets — refresh to retry.</p>
           ) : open.length === 0 ? (

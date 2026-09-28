@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
 import { parseUnits } from "viem";
 import { CHAINS, type ChainId } from "@/lib/chain";
@@ -29,10 +29,13 @@ function useAuthedFetch() {
 export function useLadders() {
   const { authenticated } = useAuth();
   const authed = useAuthedFetch();
+  const address = useActiveAddress();
   return useQuery<LadderView[]>({
-    queryKey: ["ladders"],
-    enabled: authenticated,
+    // keyed by wallet so a persisted copy can never show another account's ladders
+    queryKey: ["ladders", address],
+    enabled: authenticated && !!address,
     refetchInterval: 30_000,
+    placeholderData: keepPreviousData,
     queryFn: async () => (await authed<{ ladders: LadderView[] }>("/api/targets")).ladders,
   });
 }
@@ -40,9 +43,10 @@ export function useLadders() {
 export function useLadder(id: number | null) {
   const { authenticated } = useAuth();
   const authed = useAuthedFetch();
+  const address = useActiveAddress();
   return useQuery<LadderView>({
-    queryKey: ["ladder", id],
-    enabled: authenticated && id !== null,
+    queryKey: ["ladder", id, address],
+    enabled: authenticated && id !== null && !!address,
     refetchInterval: 20_000,
     queryFn: async () => (await authed<{ ladder: LadderView }>(`/api/targets/${id}`)).ladder,
   });

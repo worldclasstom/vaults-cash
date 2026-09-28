@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useMarketQuotes, type MarketQuote } from "@/hooks/useChainData";
 import { CHAINS, CHAIN_IDS, type ChainId } from "@/lib/chain";
 import { fmtPct, fmtPrice, fmtUsd } from "@/lib/format";
@@ -39,6 +39,7 @@ export function useStats() {
     queryKey: ["stats"],
     queryFn: async () => (await fetch("/api/stats")).json(),
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 }
 

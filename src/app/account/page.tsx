@@ -13,6 +13,7 @@ import { useActiveAddress, useCashBalances, useTokenBalance } from "@/hooks/useC
 import { CHAINS, CHAIN_IDS, explorerUrl, gasMode, type ChainId } from "@/lib/chain";
 import { fmtAmount, fmtUsd } from "@/lib/format";
 import { NATIVE_ETH } from "@/lib/markets";
+import { AccountSkeleton } from "@/components/Skeleton";
 
 /** One chain's line in the wallet card: stablecoin big, ETH sliver small, explorer link. */
 function ChainRow({ chainId, stable, address }: { chainId: ChainId; stable: number | undefined; address: string }) {
@@ -57,7 +58,7 @@ export default function AccountPage() {
 
   return (
     <AppShell>
-      {!ready ? null : !authenticated ? (
+      {!ready ? <AccountSkeleton /> : !authenticated ? (
         <div className="flex grow flex-col items-center justify-center gap-4 py-24">
           <p className="text-muted">Log in to manage your account.</p>
           <button onClick={login} className="rounded-full bg-accent px-8 py-3 font-semibold text-black hover:bg-accent-strong">

@@ -2,10 +2,12 @@
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { SmartWalletsProvider } from "@privy-io/react-auth/smart-wallets";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { useState } from "react";
 import { AuthProvider } from "@/components/AuthProvider";
 import { baseChain, robinhoodChain } from "@/lib/chain";
+import { PERSIST_BUSTER, PERSIST_MAX_AGE, createPersister, shouldPersistQuery } from "@/lib/queryPersist";
 
 /**
  * Privy embedded wallets + Privy smart wallets (back from CDP, 2026-09-23).
@@ -25,9 +27,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
-        defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false } },
+        // gcTime must outlive the persisted copy or restored queries are dropped at once
+        defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false, gcTime: PERSIST_MAX_AGE } },
       }),
   );
+  const [persister] = useState(createPersister);
 
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
   if (!appId) {
@@ -65,9 +69,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
       }}
     >
       <SmartWalletsProvider>
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister, maxAge: PERSIST_MAX_AGE, buster: PERSIST_BUSTER, dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery } }}
+        >
           <AuthProvider>{children}</AuthProvider>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </SmartWalletsProvider>
     </PrivyProvider>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Position } from "@uniswap/v4-sdk";
 import { getMarketPricing } from "@/lib/onchain";
 import { fetchPositions, getUncollectedFees, type OwnedPosition } from "@/lib/positions";
@@ -34,6 +34,7 @@ export function usePositions() {
   return useQuery({
     queryKey: ["positions", owner],
     enabled: !!owner,
+    placeholderData: keepPreviousData,
     // poll fast while empty — that's the window where a just-minted
     // position is still being indexed
     refetchInterval: (q) => (q.state.data && q.state.data.length === 0 ? 5_000 : 20_000),

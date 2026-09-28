@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
 import { erc20Abi, formatUnits } from "viem";
 import { CHAIN_IDS, chainConfig } from "@/lib/chain";
@@ -50,6 +50,7 @@ export function useCashBalances() {
   return useQuery({
     queryKey: ["cash-balances", address],
     enabled: !!address,
+    placeholderData: keepPreviousData,
     refetchInterval: 12_000,
     queryFn: async () => {
       const perChain = await Promise.all(
@@ -139,6 +140,7 @@ export function useMarketQuotes() {
   return useQuery({
     queryKey: ["market-quotes"],
     refetchInterval: 15_000,
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<MarketQuote[]> => {
       // one read per pool across both chains; a chain's RPC hiccup only
       // blanks that chain's markets
@@ -159,6 +161,7 @@ export function useMarketQuote(market: Market | undefined) {
     queryKey: ["market-quote", market?.slug],
     enabled: !!market,
     refetchInterval: 15_000,
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const { state, price, quoteUsd, priceUsd } = await getMarketPricing(market!);
       return {

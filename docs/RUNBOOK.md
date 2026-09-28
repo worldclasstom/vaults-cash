@@ -72,6 +72,14 @@ pushing anything under `src/lib`.
 
 ## Gotchas that already bit us (do not relearn)
 
+- **Persisted query cache (lib/queryPersist.ts).** React Query's cache is
+  saved to localStorage so reloads paint last-known data. Any per-user query
+  that should survive a reload MUST carry the wallet address in its key
+  (`["ladders", address]`), or a shared browser would show the previous
+  account's data until refetch. Add new keys to the allowlist in
+  `shouldPersistQuery` deliberately; transient ones (quotes, agent access)
+  stay out. Bump `PERSIST_BUSTER` when a persisted shape changes.
+
 - **CDP paymaster "failed to trace calls" on every op** = a stale entry in
   the CDP contract allowlist. Kernel factory deployments get rejected when
   the allowlist is non-empty. Keep it empty.

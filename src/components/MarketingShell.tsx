@@ -29,7 +29,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
             >
               How it works
             </Link>
-            {!ready ? null : authenticated ? (
+            {!ready ? <span aria-hidden className="h-9 w-40 animate-pulse rounded-full bg-surface" /> : authenticated ? (
               <Link
                 href="/"
                 className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-accent-strong"

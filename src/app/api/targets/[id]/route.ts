@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isHex } from "viem";
 import { verifyPrivyToken } from "@/lib/referral";
 import { addFeesPaid, ladderById, ladderView, setLadderStatus } from "@/lib/ladders";
+import { forgetLadderList } from "@/lib/ladderViewCache";
 
 export const maxDuration = 60;
 
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     } else {
       return NextResponse.json({ error: "unknown action" }, { status: 400 });
     }
+    forgetLadderList(full.ladder.privy_did);
     return NextResponse.json({ ok: true });
   } catch (e) {
     const msg = (e as Error).message;

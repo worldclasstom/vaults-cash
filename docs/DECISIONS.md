@@ -221,3 +221,10 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   what it owes, payouts go to the beneficiary or its claimTo choice,
   standard tokens only). 42 fork tests. Review loop closed; next step is
   deployment once the keeper has ETH.
+- **2026-09-28 — No blank first paint.** Every app page rendered nothing
+  until Privy restored the session, then a flat grey block. Now: shaped
+  skeletons during that window, the home page picks app shell vs landing
+  from a remembered hint, the React Query cache persists to localStorage
+  (allowlisted read models, per-wallet keys, BigInt-safe, wiped on logout),
+  lists keep previous data across key changes, and the ladders API caches
+  each user's list for 15 s server-side (invalidated on every write).
