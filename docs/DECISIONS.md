@@ -228,3 +228,10 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   (allowlisted read models, per-wallet keys, BigInt-safe, wiped on logout),
   lists keep previous data across key changes, and the ladders API caches
   each user's list for 15 s server-side (invalidated on every write).
+- **2026-09-28 — Fourth LadderCloser review (independent, fresh context):
+  no critical/high/medium.** Verified the tick-vs-sqrt-price boundary
+  states pay exactly the assumed composition (0 wei divergence), that gas
+  starvation of payouts is infeasible by the 63/64 rule, and the two-owner
+  rebinding sequences. Applied its two lows: isClosable now mirrors close
+  (approval + subscriber), registerLatest rejects count >= nextTokenId
+  cleanly. Verdict: deploy as is. 42 fork tests.

@@ -201,14 +201,20 @@ contract LadderCloser {
     }
 
     /// @notice True once every live rung is fully crossed: the target printed.
+    /// @dev Mirrors every check `close` makes, so a true answer means a close
+    ///      will go through: crossing, approval still granted, no subscriber.
     function isClosable(uint256 ladderId) public view returns (bool) {
         Ladder storage l = _ladders[ladderId];
         if (l.closed || l.owner == address(0)) return false;
+        if (!IPosmNFT(address(positionManager)).isApprovedForAll(l.owner, address(this))) return false;
         uint256 live;
         for (uint256 i = 0; i < l.tokenIds.length; i++) {
-            (bool alive, bool crossed,,) = _rungState(l, ladderId, l.tokenIds[i]);
+            uint256 id = l.tokenIds[i];
+            (bool alive, bool crossed,,) = _rungState(l, ladderId, id);
             if (!alive) continue;
             if (!crossed) return false;
+            (, PositionInfo info) = positionManager.getPoolAndPositionInfo(id);
+            if (info.hasSubscriber()) return false;
             live++;
         }
         return live > 0;
@@ -224,6 +230,7 @@ contract LadderCloser {
     function registerLatest(uint256 count, bool higherTick, address referrer) external returns (uint256 ladderId) {
         if (count == 0 || count > MAX_RUNGS) revert BadRungCount();
         uint256 next = positionManager.nextTokenId();
+        if (count >= next) revert BadRungCount();
         uint256[] memory ids = new uint256[](count);
         for (uint256 i = 0; i < count; i++) ids[i] = next - count + i;
         return _register(ids, higherTick, referrer);

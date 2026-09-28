@@ -433,7 +433,7 @@ abstract contract LadderCloserForkTest is Test {
         IPosm721(address(POSM)).setApprovalForAll(address(closer), false);
         vm.stopPrank();
         buyEth(SWAP_BIG_STABLE);
-        assertTrue(closer.isClosable(ladderId));
+        assertFalse(closer.isClosable(ladderId), "isClosable mirrors the approval check");
         vm.expectRevert();
         closer.close(ladderId);
     }
@@ -522,11 +522,12 @@ abstract contract LadderCloserForkTest is Test {
         IPosm721(address(POSM)).subscribe(ids[1], address(sub), "");
         vm.stopPrank();
         buyEth(SWAP_BIG_STABLE);
-        assertTrue(closer.isClosable(ladderId));
+        assertFalse(closer.isClosable(ladderId), "isClosable mirrors the subscriber check");
         vm.expectRevert(abi.encodeWithSelector(LadderCloser.SubscribedRung.selector, ids[1]));
         closer.close(ladderId);
         vm.prank(user);
         IPosm721(address(POSM)).unsubscribe(ids[1]);
+        assertTrue(closer.isClosable(ladderId));
         closer.close(ladderId);
     }
 
