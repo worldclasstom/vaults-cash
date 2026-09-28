@@ -40,7 +40,7 @@ export function FooterContent() {
         >
           Explorer
         </a>
-        <span className="text-muted/60">© 2026 vaults.cash</span>
+        <span className="text-muted/60">© {new Date().getFullYear()} vaults.cash</span>
       </p>
     </div>
   );
