@@ -32,7 +32,9 @@ that history is in docs/DECISIONS.md._
   permission). Contract built + fork-tested 2026-09-26; deploy + Blockscout
   verification next, then a small audit/bounty before marketing it hard.
   Next: notifications ("Rung 4 sold for $50.9 · +$1.40"), stickers you
-  earn, weighting rungs toward the target.
+  earn, rung-weight presets on Set a target (even / toward the target /
+  away from it; the contract already takes any per-rung size, only the
+  plan builder splits evenly today).
 - **iPhone app** (mobile/): Expo + Privy, sharing the web lib. Scaffolded
   2026-09-26 with Pools (live), Portfolio, Account (Apple/Google/email login)
   and a Coming-soon Targets tab; bundles clean. Blocked on: Xcode on the Mac,

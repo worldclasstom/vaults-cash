@@ -60,5 +60,9 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "ws": "^8.21.0",
+    "uuid": "^11.1.1"
+  }
 }
