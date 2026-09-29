@@ -52,6 +52,10 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint": "^10.11.0",
+    "eslint-config-expo": "~57.0.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "typescript": "~6.0.3"
   },
   "scripts": {

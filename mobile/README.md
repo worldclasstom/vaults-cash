@@ -25,7 +25,14 @@ Privy SDK has native modules, so Expo Go does not work.
     npx expo start --dev-client     # afterwards, JS only
 
 Checks that need no Xcode: `npm run typecheck`, `npx expo export --platform ios`,
-`npx expo-doctor`.
+`npx expo-doctor`. (`npx expo lint` is wired up but eslint-plugin-react does not
+yet support the ESLint that ships with SDK 57; typecheck is the gate for now.)
+
+Native build on this Mac (Expo's `run:ios` mistakes the simulator for a
+device): `cd ios && xcodebuild -workspace vaultscash.xcworkspace -scheme
+vaultscash -sdk iphonesimulator -destination "platform=iOS Simulator,id=<udid>"
+-derivedDataPath build CODE_SIGN_IDENTITY="-" CODE_SIGNING_REQUIRED=NO build`,
+then install the .app from `ios/build/Build/Products/Debug-iphonesimulator/`.
 
 ## Privy
 
