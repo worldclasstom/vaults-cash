@@ -58,7 +58,19 @@ key, then verify on Blockscout and set `NEXT_PUBLIC_LADDER_CLOSER_<chain>`:
       --private-key "$(python3 -c "import json;print(json.load(open('$HOME/.config/vaults-cash/keeper.json'))[0]['private_key'])")" \
       --verify --verifier blockscout --verifier-url https://base.blockscout.com/api
 
-Same for `--rpc-url robinhood` with `https://robinhoodchain.blockscout.com/api`.
+Same for `--rpc-url robinhood`, but Robinhood's Blockscout API sits behind a
+Cloudflare challenge that rejects Foundry, so verify there through Sourcify
+(`forge verify-contract <addr> src/targets/LadderCloser.sol:LadderCloser
+--chain 4663 --verifier sourcify --constructor-args $(cast abi-encode
+'constructor(address,address,uint256,uint256)' <posm> <feeWallet> 60 800)`);
+Blockscout and Etherscan import from it.
+
+**Deployed 2026-09-29, same address on both chains (same deployer nonce):
+`0xcF5b6aCaf67FB8154D84Ae6155f29d7941348Ffc`**, fee wallet
+0x9e240C29c36F774b919dE6DEbA9162fb0ed11edf, 60 / 800 bps, deployer = keeper
+0x503A0d463BAdE7774dE181d09dCE20804b55e834. Sourcify exact match on 8453
+and 4663; Base Blockscout verified directly.
+
 A replacement is a new deployment: point the env at it, and the app registers
 new ladders there; old ladders stay with the old contract (still only able to
 pay their owner) and can be closed by hand at any time.

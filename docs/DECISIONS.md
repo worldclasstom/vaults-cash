@@ -235,3 +235,8 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   rebinding sequences. Applied its two lows: isClosable now mirrors close
   (approval + subscriber), registerLatest rejects count >= nextTokenId
   cleanly. Verdict: deploy as is. 42 fork tests.
+- **2026-09-29 — LadderCloser deployed.** Same address on both chains,
+  `0xcF5b6aCaf67FB8154D84Ae6155f29d7941348Ffc`; fee wallet, fees and
+  PositionManager read back correct on chain. Robinhood Blockscout's API is
+  Cloudflare-gated, so verification there went through Sourcify (exact
+  match on both chains). App picks it up via NEXT_PUBLIC_LADDER_CLOSER_*.

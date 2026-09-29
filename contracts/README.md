@@ -24,6 +24,12 @@ Foundry workspace. The product contract:
 `archive/vaultpair/` is the shelved 2026-09 propAMM pilot, kept for reference
 and not compiled.
 
+## Deployed
+
+`LadderCloser` is at `0xcF5b6aCaf67FB8154D84Ae6155f29d7941348Ffc` on both Base
+(8453) and Robinhood Chain (4663), deployed 2026-09-29 from the keeper
+account, source verified (Base Blockscout; Sourcify exact match on both).
+
 ## Test
 
 Fork tests against the live ETH/USDC pool on Base and TSLA/USDG on Robinhood:
