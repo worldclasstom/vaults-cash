@@ -59,13 +59,13 @@ export function LadderDemo() {
   const price = reduced ? 397 : priceAt(t);
   const hit = price >= TARGET;
   const sold = RUNGS.filter(([, hi]) => price >= hi).length;
-  const soldUsd = 50 * sold + 0.9 * sold; // $50 per rung, plus a little from rung-to-rung drift
-  const paid = sold * 0.62 + (hit ? 0.62 : 0);
+  const soldUsd = 500 * sold + 9 * sold; // $500 per rung, plus a little from rung-to-rung drift
+  const paid = sold * 6.2 + (hit ? 6.2 : 0);
 
   return (
     <div className="rounded-3xl bg-background p-5 sm:p-6">
       <div className="flex items-center justify-between pb-4">
-        <p className="font-display text-lg font-extrabold">TSLA → $420 · 4 rungs · $200</p>
+        <p className="font-display text-lg font-extrabold">TSLA → $420 · 4 rungs · $2,000</p>
         <Chip tone={hit ? "accent" : "outline"}>{hit ? "Target hit" : sold > 0 ? "Climbing" : "Waiting"}</Chip>
       </div>
       <div className="grid grid-cols-[1fr_auto] gap-4">
@@ -86,7 +86,7 @@ export function LadderDemo() {
                 <span>
                   ${lo}–${hi}
                 </span>
-                <span className="truncate">{state === "sold" ? "sold → $50.9" : state === "live" ? "selling now" : "0.13 TSLA waiting"}</span>
+                <span className="truncate">{state === "sold" ? "sold → $509" : state === "live" ? "selling now" : "1.34 TSLA waiting"}</span>
               </div>
             );
           })}
@@ -111,7 +111,8 @@ export function LadderDemo() {
           </div>
           <div>
             <p className="text-xs text-muted">Locked in</p>
-            <p className="font-display text-xl font-extrabold">${soldUsd.toFixed(0)}</p>
+            <p className="font-display text-xl font-extrabold">${soldUsd.toLocaleString("en-US", { maximumFractionDigits: 0 })}</p>
+            <p className="text-xs font-semibold text-accent">(+${paid.toFixed(2)} in fees)</p>
           </div>
           <div>
             <p className="text-xs text-muted">{hit ? "Done" : "Rungs sold"}</p>
@@ -196,7 +197,10 @@ export function TargetsHowItWorks({ cta = true, example }: { cta?: boolean; exam
         </Step>
       </ol>
       <p className="pt-4 text-xs text-muted">
-        Fees: 0.6% in and out, like Pools, plus an 8% performance fee, our share of the trading fees the ladder earns for you, never of what you put in.
+        Fees: 0.6% in and out, like Pools, plus an 8% performance fee, our share of the trading fees the ladder earns for you, never of what you put in.{" "}
+        <Link href="/trust#targets" className="text-accent underline-offset-2 hover:underline">
+          How auto-close works, and what happens if we vanish
+        </Link>
       </p>
       {cta && (TARGETS_LIVE ? (
         <Link href="/targets/new" className="attract mt-5 inline-block rounded-full bg-accent px-7 py-3 font-display text-base font-extrabold text-black hover:bg-accent-strong">

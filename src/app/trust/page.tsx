@@ -79,6 +79,32 @@ export default function TrustPage() {
           </p>
         </Section>
 
+
+        <Section title="Targets auto-close" sticker={<Chip tone="accent">One open contract</Chip>}>
+          <p id="targets" className="scroll-mt-24 text-sm leading-relaxed text-muted">
+            A target closes through a small public contract, LadderCloser, at the same address on Base and Robinhood
+            Chain: <span className="font-mono text-xs">0xcF5b6aCaf67FB8154D84Ae6155f29d7941348Ffc</span>. Anyone can
+            read it, and anyone can call it, but it only works once every rung is fully past the target, and it can
+            only send the proceeds to the rung owner, less the fees on the Disclosures page. Questions we get:
+          </p>
+          <dl className="mt-4 space-y-4 text-sm leading-relaxed">
+            {[
+              ["What if vaults.cash goes down?", "Anyone can call close once the target has printed, including you, and you can always close a ladder by hand from your own wallet. Nothing depends on our servers being up."],
+              ["What if the price hits the target and falls back before the close?", "The contract has no memory. It closes only if the price is past the target at that moment. If it retraced, the ladder keeps earning and closes on the next cross. Our keeper checks every five minutes."],
+              ["Can I get out early?", "Yes, any time, from the app, with your own signature. The contract can\u2019t stop you."],
+              ["What can vaults.cash change after the fact?", "Only where our fee is sent, and only by the fee wallet proposing a new one that must accept. Fees, rules and behaviour are fixed forever."],
+              ["What if there\u2019s a bug?", "We deploy a fixed version. Existing ladders keep the old one, which still can only pay their owners, and anyone can close by hand. Funds are never trapped by a bug in this contract."],
+              ["Which pools does it cover?", "Plain Uniswap v4 pools, which is every pool the app lists, and standard tokens. It refuses pools with hooks."],
+              ["What is outside our control?", "If a stablecoin issuer ever froze the contract\u2019s address, payouts through it in that token would stall until we deployed a replacement. Your positions would be untouched, and you could still close by hand."],
+            ].map(([q, a]) => (
+              <div key={q}>
+                <dt className="font-display font-extrabold text-foreground">{q}</dt>
+                <dd className="pt-1 text-muted">{a}</dd>
+              </div>
+            ))}
+          </dl>
+        </Section>
+
         <Section title="Check it yourself" sticker={<Chip>Public ledger</Chip>}>
           <ul className="space-y-3">
             <Item tone="muted">

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MarketingShell } from "@/components/MarketingShell";
 import { ChainChip, Chip } from "@/components/TokenIcon";
 import { MIN_DEPOSIT_BY_CHAIN } from "@/lib/limits";
@@ -108,7 +109,11 @@ export default function DisclosuresPage() {
             through Privy, limited to depositing, adding, withdrawing and collecting through vaults.cash, so that an AI
             agent holding an account key you create can act for you. Targets do not use it: a target closes through the
             LadderCloser contract, which any account may call but which only succeeds once every rung is crossed and can
-            only send the proceeds to the rung owner, less the fees above. You can revoke keys and turn access off at
+            only send the proceeds to the rung owner, less the fees above. Common questions about it are answered on the{" "}
+            <Link href="/trust#targets" className="text-accent underline-offset-2 hover:underline">
+              trust page
+            </Link>
+            . You can revoke keys and turn access off at
             any time; until you do, treat a key like a password.
           </p>
         </Section>
