@@ -170,6 +170,19 @@ export function PoolList() {
   );
 }
 
+/** Which page numbers to show: first, last, and the current page's neighbours,
+ *  with gaps for the rest, so 14 pages still fit a phone. */
+function pageItems(page: number, pages: number): Array<number | "gap"> {
+  if (pages <= 7) return Array.from({ length: pages }, (_, i) => i);
+  const keep = new Set([0, pages - 1, page - 1, page, page + 1].filter((i) => i >= 0 && i < pages));
+  const out: Array<number | "gap"> = [];
+  for (let i = 0; i < pages; i++) {
+    if (keep.has(i)) out.push(i);
+    else if (out[out.length - 1] !== "gap") out.push("gap");
+  }
+  return out;
+}
+
 /** Page pills: the current one green, the rest quiet; arrows at both ends. */
 function Pager({ page, pages, total, per, onChange }: { page: number; pages: number; total: number; per: number; onChange: (p: number) => void }) {
   const first = page * per + 1;
@@ -181,15 +194,21 @@ function Pager({ page, pages, total, per, onChange }: { page: number; pages: num
       <p className="text-xs text-muted">
         Showing {first}–{last} of {total} pools
       </p>
-      <div className="flex items-center gap-1.5">
+      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
         <button onClick={() => onChange(page - 1)} disabled={page === 0} className={pill(false)} aria-label="Previous page">
           ‹
         </button>
-        {Array.from({ length: pages }, (_, i) => (
-          <button key={i} onClick={() => onChange(i)} className={pill(i === page)} aria-current={i === page ? "page" : undefined}>
-            {i + 1}
-          </button>
-        ))}
+        {pageItems(page, pages).map((item, k) =>
+          item === "gap" ? (
+            <span key={`gap-${k}`} className="px-1 text-sm text-muted" aria-hidden>
+              …
+            </span>
+          ) : (
+            <button key={item} onClick={() => onChange(item)} className={pill(item === page)} aria-current={item === page ? "page" : undefined}>
+              {item + 1}
+            </button>
+          ),
+        )}
         <button onClick={() => onChange(page + 1)} disabled={page >= pages - 1} className={pill(false)} aria-label="Next page">
           ›
         </button>

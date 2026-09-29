@@ -93,6 +93,16 @@ const s = StyleSheet.create({
   bar: { flexDirection: "row", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border, backgroundColor: colors.background, paddingTop: 8 },
   tab: { flex: 1, alignItems: "center", gap: 2 },
   pill: { height: 28, width: 44, alignItems: "center", justifyContent: "center", borderRadius: 999 },
-  pillActive: { backgroundColor: colors.accent, transform: [{ rotate: "-2deg" }] },
+  // the web's .nav-sticker: green pill, 2px light outline, a soft drop shadow, a slight tilt
+  pillActive: {
+    backgroundColor: colors.accent,
+    borderWidth: 2,
+    borderColor: colors.foreground,
+    transform: [{ rotate: "-2deg" }],
+    shadowColor: "#000",
+    shadowOpacity: 0.45,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+  },
   label: { fontSize: 10, fontWeight: "600", color: colors.muted },
 });

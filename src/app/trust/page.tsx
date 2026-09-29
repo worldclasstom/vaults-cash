@@ -83,7 +83,7 @@ export default function TrustPage() {
         <Section title="Targets auto-close" sticker={<Chip tone="accent">One open contract</Chip>}>
           <p id="targets" className="scroll-mt-24 text-sm leading-relaxed text-muted">
             A target closes through a small public contract, LadderCloser, at the same address on Base and Robinhood
-            Chain: <span className="font-mono text-xs">0xcF5b6aCaf67FB8154D84Ae6155f29d7941348Ffc</span>. Anyone can
+            Chain: <span className="break-all font-mono text-xs">0xcF5b6aCaf67FB8154D84Ae6155f29d7941348Ffc</span>. Anyone can
             read it, and anyone can call it, but it only works once every rung is fully past the target, and it can
             only send the proceeds to the rung owner, less the fees on the Disclosures page. Questions we get:
           </p>
@@ -114,7 +114,7 @@ export default function TrustPage() {
             <Item tone="muted">On Portfolio, open any position in Uniswap or on the block explorer. The owner shown there is your wallet.</Item>
             {FEE_WALLET && (
               <Item tone="muted">
-                The fee wallet is <span className="font-mono text-foreground">{FEE_WALLET}</span>:{" "}
+                The fee wallet is <span className="break-all font-mono text-foreground">{FEE_WALLET}</span>:{" "}
                 {CHAIN_IDS.map((id, i) => (
                   <span key={id}>
                     {i > 0 && " · "}
