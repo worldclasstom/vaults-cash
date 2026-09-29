@@ -1,6 +1,5 @@
 /** The web app's bottom tab bar, ported: same four icons (same SVG paths),
  *  the active tab a green sticker pill with a black icon, labels below. */
-import { type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Path } from "react-native-svg";
@@ -50,11 +49,20 @@ const TABS: Record<string, { label: string; Icon: (p: IconProps) => React.JSX.El
   account: { label: "Account", Icon: AccountIcon },
 };
 
-export function TabBar({ state, navigation }: BottomTabBarProps) {
+/** The slice of React Navigation's tab-bar props this bar uses (no extra dependency). */
+type TabBarProps = {
+  state: { index: number; routes: Array<{ key: string; name: string }> };
+  navigation: {
+    emit: (e: { type: "tabPress"; target: string; canPreventDefault: true }) => { defaultPrevented: boolean };
+    navigate: (name: string) => void;
+  };
+};
+
+export function TabBar({ state, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
   return (
     <View style={[s.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-      {state.routes.map((route, i) => {
+      {state.routes.map((route: { key: string; name: string }, i: number) => {
         const tab = TABS[route.name];
         if (!tab) return null;
         const active = state.index === i;
