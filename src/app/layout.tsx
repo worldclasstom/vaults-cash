@@ -1,23 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// Fonts ship with the app: Geist from Vercel's package, Bricolage from a
+// bundled file. Fetching them from Google at build time failed twice.
+const geistSans = GeistSans; // exposes --font-geist-sans
+const geistMono = GeistMono; // exposes --font-geist-mono
 
 // the Sticker Ledger's display voice: headings, pair names, money, buttons
-const bricolage = Bricolage_Grotesque({
+const bricolage = localFont({
+  src: "./fonts/BricolageGrotesque.ttf",
   variable: "--font-bricolage",
-  subsets: ["latin"],
-  weight: ["500", "700", "800"],
+  weight: "200 800",
+  display: "swap",
 });
 
 export const viewport: Viewport = {

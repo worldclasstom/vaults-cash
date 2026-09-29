@@ -84,6 +84,12 @@ pushing anything under `src/lib`.
 
 ## Gotchas that already bit us (do not relearn)
 
+- **Fonts are bundled, never fetched at build.** `next/font/google` pulled
+  Bricolage Grotesque from Google during every Vercel build and that fetch
+  failed twice (2026-09-26, 2026-09-29: "next/font/google queries have
+  exactly one entry"). Geist comes from the `geist` package, Bricolage from
+  `src/app/fonts/BricolageGrotesque.ttf` via `next/font/local`. Keep it so.
+
 - **Persisted query cache (lib/queryPersist.ts).** React Query's cache is
   saved to localStorage so reloads paint last-known data. Any per-user query
   that should survive a reload MUST carry the wallet address in its key

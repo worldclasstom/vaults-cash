@@ -19,6 +19,7 @@
     "@uniswap/v4-sdk": "^2.3.0",
     "@zerodev/ecdsa-validator": "^5.4.9",
     "@zerodev/sdk": "^5.5.10",
+    "geist": "^1.7.2",
     "jose": "^6.2.3",
     "mcp-handler": "^1.1.0",
     "nanoid": "^5.1.16",
