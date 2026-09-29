@@ -55,6 +55,10 @@ const SPECS: Record<string, ChainSpec> = {
       WETH: "0x4200000000000000000000000000000000000006",
       cbBTC: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
       cbXRP: "0xcb585250f852C6c6bf90434AB21A00f02833a4af",
+      CRV: "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415",
+      ETHFI: "0x6C240DDA6b5c336DF09A4D011139beAAa1eA2Aa2",
+      ZRO: "0x6985884C4392D348587B19cb9eAAf157F13271cd",
+      TEL: "0x09bE1692ca16e06f536F0038fF11D1dA8524AdB1",
       cbETH: "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
       wstETH: "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
       rETH: "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c",
@@ -352,6 +356,77 @@ async function main() {
   }
   if (confirmedPools.length === 0) fail("no v4 pools confirmed on-chain");
 
+  console.log("\n— 6. Uniswap v3 / Aerodrome pool confirmation (factories) —");
+  type V3Out = { address: string; pair: string; fee: number; tickSpacing: number; tick: number; liquidity: string; token0: string; token1: string };
+  const v3Pools: V3Out[] = [];
+  const aeroPools: V3Out[] = [];
+  const v3FactoryAbi = parseAbi(["function getPool(address, address, uint24) view returns (address)"]);
+  const aeroFactoryAbi = parseAbi(["function getPool(address, address, int24) view returns (address)"]);
+  const v3PoolAbi = parseAbi([
+    "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 a, uint16 b, uint16 c, uint8 d, bool e)",
+    "function liquidity() view returns (uint128)",
+  ]);
+  const aeroPoolAbi = parseAbi([
+    "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 a, uint16 b, uint16 c, bool e)",
+    "function liquidity() view returns (uint128)",
+    "function fee() view returns (uint24)",
+  ]);
+  // v3-style venues hold WETH, so the ETH leg is the WETH token here
+  const wethAddr = tokens.WETH?.address;
+  const v3Pairs: Array<[string, string, string]> = [];
+  if (wethAddr && quoteAddr) v3Pairs.push([`WETH/${QUOTE}`, wethAddr, quoteAddr]);
+  for (const [sym, t] of Object.entries(tokens)) {
+    if (sym === QUOTE || sym === "WETH") continue;
+    if (wethAddr) v3Pairs.push([`${sym}/WETH`, t.address, wethAddr]);
+    if (quoteAddr) v3Pairs.push([`${sym}/${QUOTE}`, t.address, quoteAddr]);
+  }
+  const sorted = (a: string, b: string) => (a.toLowerCase() < b.toLowerCase() ? [getAddress(a), getAddress(b)] : [getAddress(b), getAddress(a)]);
+  if (UNISWAP.v3) {
+    const v3 = UNISWAP.v3;
+    const V3_SPACING: Record<number, number> = { 100: 1, 500: 10, 3000: 60, 10000: 200 };
+    for (const [pair, a, b] of v3Pairs) {
+      for (const fee of [100, 500, 3000, 10000]) {
+        try {
+          const addr = await client.readContract({ address: getAddress(v3.factory), abi: v3FactoryAbi, functionName: "getPool", args: [getAddress(a), getAddress(b), fee] });
+          if (addr === zeroAddress) continue;
+          const [slot0, liquidity] = await Promise.all([
+            client.readContract({ address: addr, abi: v3PoolAbi, functionName: "slot0" }),
+            client.readContract({ address: addr, abi: v3PoolAbi, functionName: "liquidity" }),
+          ]);
+          if (slot0[0] === 0n) continue;
+          const [token0, token1] = sorted(a, b);
+          ok(`v3 ${pair} @ ${fee / 10000}%`, `tick ${slot0[1]}, liquidity ${liquidity}`);
+          v3Pools.push({ address: addr.toLowerCase(), pair, fee, tickSpacing: V3_SPACING[fee], tick: Number(slot0[1]), liquidity: liquidity.toString(), token0, token1 });
+        } catch {
+          /* not deployed at this tier */
+        }
+      }
+    }
+  }
+  if (cfg.aerodrome) {
+    const aero = cfg.aerodrome;
+    for (const [pair, a, b] of v3Pairs) {
+      for (const spacing of [1, 50, 100, 200, 2000]) {
+        try {
+          const addr = await client.readContract({ address: getAddress(aero.factory), abi: aeroFactoryAbi, functionName: "getPool", args: [getAddress(a), getAddress(b), spacing] });
+          if (addr === zeroAddress) continue;
+          const [slot0, liquidity, fee] = await Promise.all([
+            client.readContract({ address: addr, abi: aeroPoolAbi, functionName: "slot0" }),
+            client.readContract({ address: addr, abi: aeroPoolAbi, functionName: "liquidity" }),
+            client.readContract({ address: addr, abi: aeroPoolAbi, functionName: "fee" }),
+          ]);
+          if (slot0[0] === 0n) continue;
+          const [token0, token1] = sorted(a, b);
+          ok(`aero ${pair} @ spacing ${spacing}`, `fee ${Number(fee) / 10000}%, tick ${slot0[1]}, liquidity ${liquidity}`);
+          aeroPools.push({ address: addr.toLowerCase(), pair, fee: Number(fee), tickSpacing: spacing, tick: Number(slot0[1]), liquidity: liquidity.toString(), token0, token1 });
+        } catch {
+          /* not deployed at this spacing */
+        }
+      }
+    }
+  }
+  ok(`${v3Pools.length} Uniswap v3 pools, ${aeroPools.length} Aerodrome pools`);
+
   console.log("\n— Registry —");
   const registry = {
     generatedAt: new Date().toISOString(),
@@ -360,6 +435,8 @@ async function main() {
     uniswap: UNISWAP,
     tokens,
     v4Pools: confirmedPools,
+    v3Pools,
+    aeroPools,
     geckoTopPools: discovered.slice(0, 25),
   };
   const out = join(import.meta.dirname, "../src/lib/registries", spec.file);

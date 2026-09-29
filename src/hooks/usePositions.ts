@@ -46,16 +46,22 @@ export function usePositions() {
             getMarketPricing(p.market),
             getUncollectedFees(p).catch(() => ({ owed0: 0n, owed1: 0n })),
           ]);
-          const pool = buildPool(p.market, state.sqrtPriceX96, state.tick, state.liquidity);
-          const sdkPos = new Position({
-            pool,
-            tickLower: p.tickLower,
-            tickUpper: p.tickUpper,
-            liquidity: p.liquidity.toString(),
-          });
           const c0 = p.market.baseIsCurrency0;
-          const baseAmount = Number((c0 ? sdkPos.amount0 : sdkPos.amount1).toExact());
-          const quoteAmount = Number((c0 ? sdkPos.amount1 : sdkPos.amount0).toExact());
+          let amount0: bigint;
+          let amount1: bigint;
+          if (p.market.venue === "uniswap-v4") {
+            const pool = buildPool(p.market, state.sqrtPriceX96, state.tick, state.liquidity);
+            const sdkPos = new Position({ pool, tickLower: p.tickLower, tickUpper: p.tickUpper, liquidity: p.liquidity.toString() });
+            amount0 = BigInt(sdkPos.amount0.quotient.toString());
+            amount1 = BigInt(sdkPos.amount1.quotient.toString());
+          } else {
+            const { positionAmountsV3 } = await import("@/lib/v3core");
+            ({ amount0, amount1 } = positionAmountsV3(p, state));
+          }
+          const dec0 = c0 ? p.market.base.decimals : p.market.quote.decimals;
+          const dec1 = c0 ? p.market.quote.decimals : p.market.base.decimals;
+          const baseAmount = Number(c0 ? amount0 : amount1) / 10 ** (c0 ? dec0 : dec1);
+          const quoteAmount = Number(c0 ? amount1 : amount0) / 10 ** (c0 ? dec1 : dec0);
           const baseOwed = Number(c0 ? fees.owed0 : fees.owed1) / 10 ** p.market.base.decimals;
           const quoteOwed = Number(c0 ? fees.owed1 : fees.owed0) / 10 ** p.market.quote.decimals;
           return {

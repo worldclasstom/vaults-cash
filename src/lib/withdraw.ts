@@ -41,6 +41,10 @@ export async function buildWithdrawPlan(params: {
 }): Promise<WithdrawPlan> {
   const { position, slippageBps, owner, referrer } = params;
   const market = position.market;
+  if (market.venue !== "uniswap-v4") {
+    const { buildWithdrawPlanV3 } = await import("./v3plan");
+    return buildWithdrawPlanV3(params);
+  }
   const stable = CHAINS[market.chainId].quote.address;
   const { router, posm } = contractsOf(market);
   const feeBps = BigInt(process.env.NEXT_PUBLIC_FEE_BPS ?? "60");
@@ -117,6 +121,10 @@ export async function buildWithdrawPlan(params: {
 /** Collect accrued fees without touching principal. */
 export async function buildCollectPlan(position: OwnedPosition, owner: `0x${string}`): Promise<Call[]> {
   const market = position.market;
+  if (market.venue !== "uniswap-v4") {
+    const { collectCallV3 } = await import("./v3core");
+    return [collectCallV3(market, position.tokenId, owner)];
+  }
   const poolState = await getPoolState(market);
   const pool = buildPool(market, poolState.sqrtPriceX96, poolState.tick, poolState.liquidity);
   const sdkPosition = new Position({

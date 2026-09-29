@@ -146,6 +146,9 @@ async function poolSwaps(chainId: ChainId, poolId: `0x${string}`): Promise<PoolS
 export async function positionActivity(position: OwnedPosition): Promise<Activity> {
   const { market, tickLower, tickUpper, liquidity } = position;
   const chainId = market.chainId as ChainId;
+  // the swap index and fee-growth reads are v4 PoolManager specific; v3-style
+  // venues get no per-position activity feed yet (fees still show)
+  if (market.venue !== "uniswap-v4") return { todayUsd: 0, weekUsd: null, tradesToday: 0, tradesInRangeToday: 0, partial: true, recent: [], asOf: Date.now() };
   const client = publicClientFor(chainId);
   const stateView = CHAINS[chainId].uniswap.v4.stateView;
   const [scan, pricing] = await Promise.all([poolSwaps(chainId, market.pool.poolId), getMarketPricing(market)]);

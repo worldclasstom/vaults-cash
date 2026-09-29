@@ -35,7 +35,8 @@ export default function NewTargetPage() {
   const { ready, authenticated, login } = useAuth();
   // stock tokens front and center, then the rest, stablecoin-quoted pairs only (rungs are priced in dollars)
   const markets = useMemo(() => {
-    const list = MARKETS.filter((m) => m.quoteIsStable);
+    // Targets are v4 only: the auto-close contract reads the v4 PositionManager
+    const list = MARKETS.filter((m) => m.quoteIsStable && m.venue === "uniswap-v4");
     return [...list.filter((m) => m.kind === "stock"), ...list.filter((m) => m.kind !== "stock")];
   }, []);
   const [slug, setSlug] = useState(markets[0]?.slug ?? "");

@@ -240,3 +240,21 @@ retune. 24 tests pass incl. divergence/stale/pool-mid-source guardrails.
   PositionManager read back correct on chain. Robinhood Blockscout's API is
   Cloudflare-gated, so verification there went through Sourcify (exact
   match on both chains). App picks it up via NEXT_PUBLIC_LADDER_CLOSER_*.
+- **2026-09-29 — Pools on three venues: Uniswap v4, Uniswap v3, Aerodrome
+  Slipstream.** Tom asked for more choices; the depth lives on v3 (ETH/USDC
+  $150M on Base, Robinhood's v3 stock pools) and Aerodrome (Coinbase's
+  tokenized stocks trade there). No contract involved: `src/lib/v3core.ts`
+  (reads, quotes, swaps, position encoders for both venues) and
+  `src/lib/v3plan.ts` (deposit/withdraw plans) mirror the v4 flows; the v4
+  entry points dispatch on `market.venue`. WETH stands in for ETH and is shown
+  as ETH; plain ERC-20 approvals instead of Permit2; fees owed read via a
+  simulated `collect`; Aerodrome positions are never staked (unstaked earns
+  the trading fees). Withdraws do not burn the empty NFT: one Robinhood pool
+  refuses over rounding dust ("Not cleared") and an empty position is
+  invisible anyway. Targets stay v4-only. Registry now records v3Pools and
+  aeroPools per chain (167 pools on Base, 117 on Robinhood), one market per
+  pair per venue with a "-v3"/"-aero" slug suffix. Verified by
+  `scripts/simulate-v3.ts` round trips (deposit + withdraw in one simulated
+  block) on ETH/USDC v3, ETH/USDC Aerodrome, cbBTC/USDC Aerodrome, ETH/USDG
+  v3 and NVDA/USDG v3. Gotcha: Robinhood's SwapRouter02 is 0xcaf681…, not the
+  0xf333… StateView that sits next to it in the deployments table.

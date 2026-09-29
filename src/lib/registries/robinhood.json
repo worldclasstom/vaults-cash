@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T04:51:43.189Z",
+  "generatedAt": "2026-09-29T16:02:46.484Z",
   "chainId": 4663,
   "verified": true,
   "uniswap": {
@@ -10,6 +10,13 @@
       "quoter": "0x8dc178efb8111bb0973dd9d722ebeff267c98f94",
       "stateView": "0xf3334192d15450cdd385c8b70e03f9a6bd9e673b"
     },
+    "v3": {
+      "factory": "0x1f7d7550b1b028f7571e69a784071f0205fd2efa",
+      "positionManager": "0x73991a25c818bf1f1128deaab1492d45638de0d3",
+      "quoter": "0x33e885ed0ec9bf04ecfb19341582aadcb4c8a9e7",
+      "swapRouter": "0xf3334192d15450cdd385c8b70e03f9a6bd9e673b",
+      "weth": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    },
     "permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3"
   },
   "tokens": {
@@ -18,7 +25,7 @@
       "name": "Global Dollar",
       "symbol": "USDG",
       "decimals": 6,
-      "totalSupply": "701985474957632",
+      "totalSupply": "709355855545603",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/51281/large/GDN_USDG_Token_200x200.png?1730484111"
     },
@@ -27,7 +34,7 @@
       "name": "WETH",
       "symbol": "WETH",
       "decimals": 18,
-      "totalSupply": "36937630679457131730993",
+      "totalSupply": "35765994977884700482101",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/102174283/large/weth-robinhood.jpeg?1782924507"
     },
@@ -36,7 +43,7 @@
       "name": "Tesla • Robinhood Token",
       "symbol": "TSLA",
       "decimals": 18,
-      "totalSupply": "12315190380000000000000",
+      "totalSupply": "14775731980000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x322f0929c4625ed5bad873c95208d54e1c003b2d.png"
     },
@@ -45,7 +52,7 @@
       "name": "Apple • Robinhood Token",
       "symbol": "AAPL",
       "decimals": 18,
-      "totalSupply": "16029524855610000000000",
+      "totalSupply": "16595479170130000000000",
       "uiMultiplier": "1000566080061092436",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xaf3d76f1834a1d425780943c99ea8a608f8a93f9.png"
     },
@@ -54,7 +61,7 @@
       "name": "AMD • Robinhood Token",
       "symbol": "AMD",
       "decimals": 18,
-      "totalSupply": "3347455900000000000000",
+      "totalSupply": "2986006060000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x86923f96303d656e4aa86d9d42d1e57ad2023fdc.png"
     },
@@ -63,7 +70,7 @@
       "name": "Amazon • Robinhood Token",
       "symbol": "AMZN",
       "decimals": 18,
-      "totalSupply": "14857123600000000000000",
+      "totalSupply": "15982829520000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x12f190a9f9d7d37a250758b26824b97ce941bf54.png"
     },
@@ -72,7 +79,7 @@
       "name": "Alibaba • Robinhood Token",
       "symbol": "BABA",
       "decimals": 18,
-      "totalSupply": "4678897880000000000000",
+      "totalSupply": "4956179850000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xad25ac6c84d497db898fa1e8387bf6af3532a1c4.png"
     },
@@ -81,7 +88,7 @@
       "name": "Bloom Energy • Robinhood Token",
       "symbol": "BE",
       "decimals": 18,
-      "totalSupply": "2952233240000000000000",
+      "totalSupply": "3098900980000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x822cc93ffd030293e9842c30bbd678f530701867.png"
     },
@@ -90,7 +97,7 @@
       "name": "Coinbase • Robinhood Token",
       "symbol": "COIN",
       "decimals": 18,
-      "totalSupply": "11223761980000000000000",
+      "totalSupply": "11785159850000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x6330d8c3178a418788df01a47479c0ce7ccf450b.png"
     },
@@ -99,7 +106,7 @@
       "name": "Circle Internet Group • Robinhood Token",
       "symbol": "CRCL",
       "decimals": 18,
-      "totalSupply": "43078777700000000000000",
+      "totalSupply": "60855994670000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xdf0992e440dd0be65bd8439b609d6d4366bf1cb5.png"
     },
@@ -108,7 +115,7 @@
       "name": "CoreWeave • Robinhood Token",
       "symbol": "CRWV",
       "decimals": 18,
-      "totalSupply": "6560727330000000000000",
+      "totalSupply": "6395993800000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x5f10a1c971b69e47e059e1dc91901b59b3fb49c3.png"
     },
@@ -117,7 +124,7 @@
       "name": "Alphabet Class A • Robinhood Token",
       "symbol": "GOOGL",
       "decimals": 18,
-      "totalSupply": "18295846878580000000000",
+      "totalSupply": "19346824808320000000000",
       "uiMultiplier": "1000193924414112587",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3.png"
     },
@@ -126,7 +133,7 @@
       "name": "Intel • Robinhood Token",
       "symbol": "INTC",
       "decimals": 18,
-      "totalSupply": "15774022400000000000000",
+      "totalSupply": "19671530430000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xc72b96e0e48ecd4dc75e1e45396e26300bc39681.png"
     },
@@ -135,7 +142,7 @@
       "name": "Meta Platforms • Robinhood Token",
       "symbol": "META",
       "decimals": 18,
-      "totalSupply": "8972952806050000000000",
+      "totalSupply": "11367887954770000000000",
       "uiMultiplier": "1000541459879451635",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xc0d6457c16cc70d6790dd43521c899c87ce02f35.png"
     },
@@ -144,7 +151,7 @@
       "name": "Microsoft • Robinhood Token",
       "symbol": "MSFT",
       "decimals": 18,
-      "totalSupply": "5688804843390000000000",
+      "totalSupply": "5534964572140000000000",
       "uiMultiplier": "1000412952576205964",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xe93237c50d904957cf27e7b1133b510c669c2e74.png"
     },
@@ -153,7 +160,7 @@
       "name": "Micron Technology • Robinhood Token",
       "symbol": "MU",
       "decimals": 18,
-      "totalSupply": "4132926231220000000000",
+      "totalSupply": "4176363711040000000000",
       "uiMultiplier": "1000074823219171086",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xff080c8ce2e5feadaca0da81314ae59d232d4afd.png"
     },
@@ -162,7 +169,7 @@
       "name": "NVIDIA • Robinhood Token",
       "symbol": "NVDA",
       "decimals": 18,
-      "totalSupply": "90530799870790000000000",
+      "totalSupply": "82336461827230000000000",
       "uiMultiplier": "1000775159164630595",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec.png"
     },
@@ -171,7 +178,7 @@
       "name": "Oracle • Robinhood Token",
       "symbol": "ORCL",
       "decimals": 18,
-      "totalSupply": "6308196992900000000000",
+      "totalSupply": "7297184625340000000000",
       "uiMultiplier": "1002210914971013375",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xb0992820e760d836549ba69bc7598b4af75dee03.png"
     },
@@ -180,7 +187,7 @@
       "name": "Palantir Technologies • Robinhood Token",
       "symbol": "PLTR",
       "decimals": 18,
-      "totalSupply": "14921703470000000000000",
+      "totalSupply": "14221947880000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a.png"
     },
@@ -189,7 +196,7 @@
       "name": "Sandisk Corporation • Robinhood Token",
       "symbol": "SNDK",
       "decimals": 18,
-      "totalSupply": "910082490000000000000",
+      "totalSupply": "937004830000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xb90a19ff0af67f7779aff50a882a9cff42446400.png"
     },
@@ -198,7 +205,7 @@
       "name": "Space Exploration Technologies Corp. Class A Common Stock • Robinhood Token",
       "symbol": "SPCX",
       "decimals": 18,
-      "totalSupply": "79220001360000000000000",
+      "totalSupply": "78335882930000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea.png"
     },
@@ -207,7 +214,7 @@
       "name": "USA Rare Earth • Robinhood Token",
       "symbol": "USAR",
       "decimals": 18,
-      "totalSupply": "37403703010000000000000",
+      "totalSupply": "39819154080000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xd917b029c761d264c6a312bbbcda868658ef86a6.png"
     },
@@ -216,7 +223,7 @@
       "name": "Invesco QQQ • Robinhood Token",
       "symbol": "QQQ",
       "decimals": 18,
-      "totalSupply": "7207010759990000000000",
+      "totalSupply": "7127049036470000000000",
       "uiMultiplier": "1000700791241405425",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xd5f3879160bc7c32ebb4dc785f8a4f505888de68.png"
     },
@@ -225,7 +232,7 @@
       "name": "iShares 0-3 Month Treasury Bond • Robinhood Token",
       "symbol": "SGOV",
       "decimals": 18,
-      "totalSupply": "31750816845120000000000",
+      "totalSupply": "29616913121120000000000",
       "uiMultiplier": "1005101770003214918",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x92fd66527192e3e61d4ddd13322aa222de86f9b5.png"
     },
@@ -234,7 +241,7 @@
       "name": "iShares Silver Trust • Robinhood Token",
       "symbol": "SLV",
       "decimals": 18,
-      "totalSupply": "25325134530000000000000",
+      "totalSupply": "29693769210000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f.png"
     },
@@ -243,7 +250,7 @@
       "name": "SPDR S&P 500 ETF Trust • Robinhood Token",
       "symbol": "SPY",
       "decimals": 18,
-      "totalSupply": "29988236833430000000000",
+      "totalSupply": "30515702581940000000000",
       "uiMultiplier": "1001717991187472003",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0x117cc2133c37b721f49de2a7a74833232b3b4c0c.png"
     },
@@ -252,7 +259,7 @@
       "name": "United States Oil Fund • Robinhood Token",
       "symbol": "USO",
       "decimals": 18,
-      "totalSupply": "16700109960000000000000",
+      "totalSupply": "19023551080000000000000",
       "uiMultiplier": "1000000000000000000",
       "logo": "https://cdn.robinhood.com/ncw_assets/logos/0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344.png"
     }
@@ -263,8 +270,8 @@
       "pair": "ETH/USDG",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -197406,
-      "liquidity": "70845594626547515"
+      "tick": -197409,
+      "liquidity": "75430558358775517"
     },
     {
       "poolId": "0x387bf619da4d3fb62bb276482693dba1b9b3520f573cabdfe033384a24125982",
@@ -272,22 +279,22 @@
       "fee": 500,
       "tickSpacing": 10,
       "tick": -197404,
-      "liquidity": "2456425445278794"
+      "liquidity": "39434268400717254"
     },
     {
       "poolId": "0xd313d79d9d6a714e7bdf02fc42a2c27ede7e51928ffd605126fe9e1192630cf8",
       "pair": "ETH/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -197389,
-      "liquidity": "38600881834658742"
+      "tick": -197394,
+      "liquidity": "46109256160981812"
     },
     {
       "poolId": "0xef5672974ad552f1ce24f2873f3e4237e82d44780ef623b6a239db42b08a7d5c",
       "pair": "ETH/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -197430,
+      "tick": -197312,
       "liquidity": "839181829648865"
     },
     {
@@ -295,7 +302,7 @@
       "pair": "WETH/USDG",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 887271,
+      "tick": -200735,
       "liquidity": "0"
     },
     {
@@ -303,16 +310,16 @@
       "pair": "WETH/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197405,
-      "liquidity": "49599553624916733"
+      "tick": -197406,
+      "liquidity": "56574195491254004"
     },
     {
       "poolId": "0x77c25b9386d47de62e0155c393696e9f43f7e6d036c6ca52f66735ccbb8808a7",
       "pair": "WETH/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -197387,
-      "liquidity": "1489641710191281"
+      "tick": -197405,
+      "liquidity": "1682569048719173"
     },
     {
       "poolId": "0x4e61f742ae3516c0223997579cc13753b653a3ed299dcf40f3baf5a4daa6e353",
@@ -343,8 +350,8 @@
       "pair": "TSLA/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -216944,
-      "liquidity": "480267525564005543"
+      "tick": -217619,
+      "liquidity": "451484107792663428"
     },
     {
       "poolId": "0xf55e03a600310950b9d5cacdef20ce52cc7d542a0950534fbe46006c65d2d650",
@@ -375,16 +382,16 @@
       "pair": "AAPL/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 218135,
-      "liquidity": "601930760853092941"
+      "tick": 218266,
+      "liquidity": "649923728299722684"
     },
     {
       "poolId": "0xda4116b5894ee7479e64eae9276e1a2944ef0e5ce863a299d296a15618deee01",
       "pair": "AAPL/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 218037,
-      "liquidity": "655547623384710"
+      "tick": 218178,
+      "liquidity": "353777609792889"
     },
     {
       "poolId": "0x47f046dc586a95159a6b9a52fb7e8130b26ad9df920e670637e641f8411d7339",
@@ -399,8 +406,8 @@
       "pair": "AMD/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 212117,
-      "liquidity": "159373083520961169"
+      "tick": 212074,
+      "liquidity": "205539810189672595"
     },
     {
       "poolId": "0xf50fb6880e6e2d57e9f01a072fbb2c6a196188303582bb63b625c6c7f4b526ad",
@@ -423,15 +430,15 @@
       "pair": "AMZN/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -221144,
-      "liquidity": "4956821630817166"
+      "tick": -221278,
+      "liquidity": "6989376874107526"
     },
     {
       "poolId": "0xcdb9b84202eb9ff8338b02327a10e40525f1e2a050d4d59933b6806662697fbf",
       "pair": "AMZN/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -220919,
+      "tick": -221146,
       "liquidity": "3460120783792"
     },
     {
@@ -455,7 +462,7 @@
       "pair": "COIN/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 27005,
+      "tick": 26378,
       "liquidity": "822333266722"
     },
     {
@@ -463,7 +470,7 @@
       "pair": "COIN/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 887271,
+      "tick": -887272,
       "liquidity": "0"
     },
     {
@@ -471,7 +478,7 @@
       "pair": "COIN/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 226199,
+      "tick": -887272,
       "liquidity": "0"
     },
     {
@@ -479,15 +486,15 @@
       "pair": "COIN/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 223443,
-      "liquidity": "291445479735306502"
+      "tick": 223728,
+      "liquidity": "323138043139737634"
     },
     {
       "poolId": "0x1fc3e834049a557d970408e908516a0f4aa964fa24f3f2262e215d786080b773",
       "pair": "CRCL/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 33572,
+      "tick": 33866,
       "liquidity": "1096440811995"
     },
     {
@@ -503,7 +510,7 @@
       "pair": "CRCL/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 231677,
+      "tick": -887272,
       "liquidity": "0"
     },
     {
@@ -511,7 +518,7 @@
       "pair": "CRCL/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 231934,
+      "tick": -887272,
       "liquidity": "0"
     },
     {
@@ -543,7 +550,7 @@
       "pair": "GOOGL/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 20262,
+      "tick": 20661,
       "liquidity": "476693023470"
     },
     {
@@ -551,8 +558,8 @@
       "pair": "GOOGL/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 20616,
-      "liquidity": "252620162151026281942"
+      "tick": 20717,
+      "liquidity": "181664116179250813819"
     },
     {
       "poolId": "0xe79893434bd23d7c63d24424315008509c469696d1f460301122806dad531748",
@@ -567,23 +574,23 @@
       "pair": "GOOGL/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -217999,
-      "liquidity": "557494443904897138"
+      "tick": -218049,
+      "liquidity": "528549993971214272"
     },
     {
       "poolId": "0xef22239f96c6ac95dcd57b90c6b14c0cc8c3c16844def34daef68dc9dd945344",
       "pair": "GOOGL/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -217975,
-      "liquidity": "24416987657549"
+      "tick": -218011,
+      "liquidity": "2707432629773"
     },
     {
       "poolId": "0x78bb0cebf41302dc136946a5124eed9dabc84acd86b6cc19afb0cb7577628271",
       "pair": "INTC/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 31682,
+      "tick": 44279,
       "liquidity": "629564181230"
     },
     {
@@ -607,8 +614,8 @@
       "pair": "INTC/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 228333,
-      "liquidity": "263768442498467175"
+      "tick": 228666,
+      "liquidity": "365729149432899929"
     },
     {
       "poolId": "0xc0e6a00d12864408543de101f053458012935c952a5f7dcb5749f867b1e7e046",
@@ -639,8 +646,8 @@
       "pair": "META/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 210289,
-      "liquidity": "5090183766250325008"
+      "tick": 210530,
+      "liquidity": "3225530744823203151"
     },
     {
       "poolId": "0x2a862e4b43c6a9a494a94f79eb920caf87be597bacba06567bfd67139f41ad16",
@@ -655,8 +662,8 @@
       "pair": "MSFT/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 16764,
-      "liquidity": "235083422605342110515"
+      "tick": 16674,
+      "liquidity": "260498258980761718160"
     },
     {
       "poolId": "0x42a076f7c02257747f27bbe473ccc969ccd2b6a761c09eb8d262316b6c231b17",
@@ -671,15 +678,15 @@
       "pair": "MSFT/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 214174,
-      "liquidity": "287615330655323674"
+      "tick": 213982,
+      "liquidity": "268388660282770248"
     },
     {
       "poolId": "0xd181a99bb09d0badcb04ce583f732feea5f8a11b3ab5691d8d1e17e4f469a441",
       "pair": "MSFT/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 214267,
+      "tick": 214000,
       "liquidity": "2238957411304"
     },
     {
@@ -687,8 +694,8 @@
       "pair": "MU/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 9140,
-      "liquidity": "105082932568306696694"
+      "tick": 9276,
+      "liquidity": "97238471193189531838"
     },
     {
       "poolId": "0xc9dff44f8d08713e07daf8efab6f533cc182f7e2f2f29429a983ab6604b270b1",
@@ -711,15 +718,15 @@
       "pair": "MU/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 206551,
-      "liquidity": "67174429945282629"
+      "tick": 206562,
+      "liquidity": "81801500235642741"
     },
     {
       "poolId": "0xb914b61379ad8d5f58647d75f61c9e22bb9ed8d2defaa52f8b25d9c2a073ea4d",
       "pair": "NVDA/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 24739,
+      "tick": 24522,
       "liquidity": "41511431769470417"
     },
     {
@@ -727,8 +734,8 @@
       "pair": "NVDA/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 24747,
-      "liquidity": "411794220504676125872"
+      "tick": 24511,
+      "liquidity": "2817537017770324703481"
     },
     {
       "poolId": "0x74443c913e7a682bdc6e56800b6da5ccc099f9ef73f63337d065b0c4b50b7684",
@@ -743,23 +750,23 @@
       "pair": "NVDA/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 24739,
-      "liquidity": "28380721970085433938"
+      "tick": 24621,
+      "liquidity": "1116878220865264846"
     },
     {
       "poolId": "0x6444a8e0b267406a15db74ca00c4a24bdfa81ed3180f5b6d0851f8ed6f4f29c5",
       "pair": "NVDA/USDG",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 222149,
-      "liquidity": "2271953838828055"
+      "tick": 221919,
+      "liquidity": "184937513694998608"
     },
     {
       "poolId": "0x2d6ec380a3dc18dc4a2067ba6884835b49455cd79c8afa1f7625b6b2f85670a6",
       "pair": "NVDA/USDG",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 222144,
+      "tick": 221922,
       "liquidity": "12780327839514"
     },
     {
@@ -767,8 +774,8 @@
       "pair": "NVDA/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 222143,
-      "liquidity": "507004805717965005"
+      "tick": 221912,
+      "liquidity": "499104782202499731"
     },
     {
       "poolId": "0x5e86db9a096faa8c8b12d7b41ef49b245035e242cc8ee83f86467891de85b8ac",
@@ -783,7 +790,7 @@
       "pair": "ORCL/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 60624,
+      "tick": 29094,
       "liquidity": "480341386756"
     },
     {
@@ -791,15 +798,15 @@
       "pair": "ORCL/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 226541,
-      "liquidity": "10802525804663305"
+      "tick": 226865,
+      "liquidity": "65202798080854762"
     },
     {
       "poolId": "0x2eaa3bc103861a5b6e97584366dd9d8282bbfa1607b105a6c9f8dd6b1307c8fa",
       "pair": "PLTR/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 27054,
+      "tick": 27075,
       "liquidity": "5474863693539"
     },
     {
@@ -815,15 +822,15 @@
       "pair": "PLTR/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 223811,
-      "liquidity": "832280687924657505"
+      "tick": 224010,
+      "liquidity": "613149227774862666"
     },
     {
       "poolId": "0x0f6951750c817d6ba3555d267bb9b0cdbfcae805b87164a8103def7bf05eb848",
       "pair": "SNDK/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 3202,
+      "tick": 4409,
       "liquidity": "1378028598367"
     },
     {
@@ -839,8 +846,8 @@
       "pair": "SNDK/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 201355,
-      "liquidity": "38830398811420314"
+      "tick": 201815,
+      "liquidity": "41209980921269679"
     },
     {
       "poolId": "0xd2f570761d0db7e2878ca414341d2fc570d1fead5b79ff94731936b4a446fbdf",
@@ -855,8 +862,8 @@
       "pair": "SPCX/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 28847,
-      "liquidity": "670084540718876566013"
+      "tick": 28947,
+      "liquidity": "649653325334767132432"
     },
     {
       "poolId": "0x8415d6bebcbda7622ff2f67650834352a4511ee4015d9b442b5b3cc66aee9c7c",
@@ -871,16 +878,16 @@
       "pair": "SPCX/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -226300,
-      "liquidity": "35915752313468135"
+      "tick": -226329,
+      "liquidity": "36216475948466364"
     },
     {
       "poolId": "0xcb6ffbcc84359535c2cc0a5688c0a76520ea6e0a4820fddd3ac8d7880e576370",
       "pair": "SPCX/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -226234,
-      "liquidity": "779809949420575178"
+      "tick": -226331,
+      "liquidity": "628703243024117239"
     },
     {
       "poolId": "0x92437558c044cd5ca6da1c67b383369bb34b46bc4c6ce3e3d682297d720ad48f",
@@ -895,8 +902,8 @@
       "pair": "QQQ/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 12794,
-      "liquidity": "517384290504486175652"
+      "tick": 12980,
+      "liquidity": "161036994130011954040"
     },
     {
       "poolId": "0xe5139dc9d4c2e3c3bbe69ee399b7137bac0f96f2cbcfc868ca44344e84b5026e",
@@ -911,7 +918,7 @@
       "pair": "QQQ/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 210226,
+      "tick": 210290,
       "liquidity": "365295266107527"
     },
     {
@@ -919,7 +926,7 @@
       "pair": "QQQ/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 210299,
+      "tick": 210250,
       "liquidity": "11845596943468"
     },
     {
@@ -935,7 +942,7 @@
       "pair": "SLV/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 37400,
+      "tick": 38264,
       "liquidity": "1408864128407"
     },
     {
@@ -951,16 +958,16 @@
       "pair": "SLV/USDG",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -235578,
-      "liquidity": "19662454555449"
+      "tick": -236160,
+      "liquidity": "15253079443191"
     },
     {
       "poolId": "0x7d32bc830f40a330af8723b8bb50d4d6b0152297d659e9898e6a47b785686459",
       "pair": "SPY/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 12461,
-      "liquidity": "33564842637870171031"
+      "tick": 12603,
+      "liquidity": "296616477894746634"
     },
     {
       "poolId": "0x373af02ddc07b764382372fe98f92410d3d70e6eb21f253199a8f458303a8bf2",
@@ -975,8 +982,8 @@
       "pair": "SPY/USDG",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -209867,
-      "liquidity": "8589398345973873237"
+      "tick": -209900,
+      "liquidity": "5389572602529140296"
     },
     {
       "poolId": "0x7eeda68cd84620339e6ad4bf054af9b19878ac13139991c7aaec018c40a8bb6a",
@@ -987,181 +994,1354 @@
       "liquidity": "0"
     }
   ],
+  "v3Pools": [
+    {
+      "address": "0x52e65b17fb6e5ba00ed806f37afcd2daa50271ca",
+      "pair": "WETH/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -197408,
+      "liquidity": "4531920297292231282",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x69bfaf19c9f377bb306a89aed9f6b07e2c1a8d9a",
+      "pair": "WETH/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -197409,
+      "liquidity": "1073330316968514536",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xa9188730fe85be88ad499d7d52b099e800fb0334",
+      "pair": "WETH/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -197402,
+      "liquidity": "296714729784632987",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x5f009e071f07e92b6c624e83f52f17bbda34680d",
+      "pair": "WETH/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -197328,
+      "liquidity": "55852213710888130",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xa953ca88ff430e9487c60ca34d757414f4efda07",
+      "pair": "TSLA/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 20227,
+      "liquidity": "1378097459480415342781",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d"
+    },
+    {
+      "address": "0x7868622ff2c3b1b6c8acb15fe0bdaebf043dda48",
+      "pair": "TSLA/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -138141,
+      "liquidity": "0",
+      "token0": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xc4f0172d6ac8dd294dd1137d047d5e1893760236",
+      "pair": "TSLA/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -217622,
+      "liquidity": "15989815806203654",
+      "token0": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xf4acdaeeb7022862a763c9b1b885e11191c889e3",
+      "pair": "TSLA/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -217625,
+      "liquidity": "349691668408106102",
+      "token0": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xb349fb08c2712f3a70bad40a4d006b68d67e888b",
+      "pair": "TSLA/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -217587,
+      "liquidity": "2703998368959033",
+      "token0": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xe4d4ba605b042054bd8815d515d98ddf46232622",
+      "pair": "AAPL/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 16932,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
+    },
+    {
+      "address": "0x8bb3514e2204e1cdf3ac149efee7ff04d91b719f",
+      "pair": "AAPL/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 20883,
+      "liquidity": "3990019197422364853424",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
+    },
+    {
+      "address": "0xaae0d815ee56e4092a5e5c2911e676fea50b2d6d",
+      "pair": "AAPL/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 218286,
+      "liquidity": "570962458666470521",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
+    },
+    {
+      "address": "0x783c9bbb765047cfdd2b84b92b2ca9f11d34b7ed",
+      "pair": "AAPL/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 218271,
+      "liquidity": "151897495397245026",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
+    },
+    {
+      "address": "0x3714aa8105de1f384481b425788af413748c1837",
+      "pair": "AAPL/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 218202,
+      "liquidity": "1239327106125364",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
+    },
+    {
+      "address": "0x5ca1b5e6cb510b3bf53e7cd8f7d9b5a71b4a4dc0",
+      "pair": "AMD/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 14761,
+      "liquidity": "1132282877817878944",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC"
+    },
+    {
+      "address": "0x4ee16fe614f3a04f1510edf1932a41cbd5c4af9c",
+      "pair": "AMD/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -1,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC"
+    },
+    {
+      "address": "0x48d284a2a4d3dc1b3da08231fe44317e7e7aa51f",
+      "pair": "AMD/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 212114,
+      "liquidity": "103788516302761708",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC"
+    },
+    {
+      "address": "0xd6af1dcb75cdae4f2efc403a58ef023a51edc686",
+      "pair": "AMD/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 212065,
+      "liquidity": "6157948300539212",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC"
+    },
+    {
+      "address": "0x8b2a73a8234cfc12b8b53ae048d0ddf76bfac37c",
+      "pair": "AMZN/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x12f190a9F9d7D37a250758b26824B97CE941bF54"
+    },
+    {
+      "address": "0x2232a2d6382bffdf18d4cd434b45d11a6b1c24ce",
+      "pair": "AMZN/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 22664,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x12f190a9F9d7D37a250758b26824B97CE941bF54"
+    },
+    {
+      "address": "0x7b242dfa849419242e3733308d5c91fe2a7dae7e",
+      "pair": "AMZN/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -138098,
+      "liquidity": "0",
+      "token0": "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xa99dea8d168392abb4aed0419629309dac7dbfbb",
+      "pair": "AMZN/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -221140,
+      "liquidity": "0",
+      "token0": "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x8ac92da74ab5f3b1d024dc1943ad7e15dc4179ef",
+      "pair": "AMZN/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -221259,
+      "liquidity": "1743568585694767535",
+      "token0": "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x25967b7ca2d06aa46e47e188231ca78c87ef1fd7",
+      "pair": "AMZN/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x368ddd38861d31435d764fc54df7d16481e3590b",
+      "pair": "BABA/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 229450,
+      "liquidity": "185574682021",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4"
+    },
+    {
+      "address": "0xa57ab582b310dd6f9e934ea1eeea152741545e6a",
+      "pair": "BABA/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 229505,
+      "liquidity": "94144460031244810",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4"
+    },
+    {
+      "address": "0x9eda4bcb3ebfede532f3cae3864fc0cefff782aa",
+      "pair": "BABA/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 229453,
+      "liquidity": "1002064253630230",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4"
+    },
+    {
+      "address": "0xe3eca0fa4a9bd2c90852c94fe4a756da11300489",
+      "pair": "BE/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 22064,
+      "liquidity": "4342523915161868857",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x822CC93fFD030293E9842c30BBD678F530701867"
+    },
+    {
+      "address": "0x1bad145c8f06444e0df81c28257cd20231bd1f16",
+      "pair": "BE/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 219451,
+      "liquidity": "30236488300417640",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x822CC93fFD030293E9842c30BBD678F530701867"
+    },
+    {
+      "address": "0xb28ae7eaa50a7eb468d6aa516c85b1bb56b3b085",
+      "pair": "BE/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x822CC93fFD030293E9842c30BBD678F530701867"
+    },
+    {
+      "address": "0xad8c7ab119a9ca04480cb117a9d87c7e2d637d22",
+      "pair": "COIN/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 26300,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b"
+    },
+    {
+      "address": "0x6707aeac7d0e519b083219d27bb427364363183a",
+      "pair": "COIN/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 26414,
+      "liquidity": "11057263540183593611210",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b"
+    },
+    {
+      "address": "0xe12ef9f26cfc947aa48bae4625103dd914183599",
+      "pair": "COIN/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 26240,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b"
+    },
+    {
+      "address": "0x1aa941420f6347cf004e2d21e40f0632d8862cf8",
+      "pair": "COIN/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 223833,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b"
+    },
+    {
+      "address": "0x3a6ec0aa6c702323414d449b5f60f4b742a82ded",
+      "pair": "COIN/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 224820,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b"
+    },
+    {
+      "address": "0x5c51a0035051fa2db80aec8781be3bd6207d27e0",
+      "pair": "COIN/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 225300,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b"
+    },
+    {
+      "address": "0xb649fe35ff2855adef4c9a140f86e3248fafc910",
+      "pair": "COIN/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 223866,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x6330D8C3178a418788dF01a47479c0ce7CCF450b"
+    },
+    {
+      "address": "0x8774c8cd1802b861aa655e127502ee87c0ff6150",
+      "pair": "CRCL/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 32483,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5"
+    },
+    {
+      "address": "0x38163f0d0f2a002382013d8aa98f29ce5fc63774",
+      "pair": "CRCL/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 32827,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5"
+    },
+    {
+      "address": "0x754ddd4bf8e8635b4301a7f4af2ea7a82ab6cea7",
+      "pair": "CRCL/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 34563,
+      "liquidity": "548144013430241340898",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5"
+    },
+    {
+      "address": "0xa01e08626792d78c65c495b581a50d2156dc860c",
+      "pair": "CRCL/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 231319,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5"
+    },
+    {
+      "address": "0x654e4143e82a5824445ade0824351c2a9acd95a8",
+      "pair": "CRCL/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 231932,
+      "liquidity": "997248181410493204",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5"
+    },
+    {
+      "address": "0x9324a34abd68e46cd0f62a561a7bb10a2b1fa477",
+      "pair": "CRCL/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 232395,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5"
+    },
+    {
+      "address": "0x6a43fb714beb867a6aed91160ce736bd204747a8",
+      "pair": "CRWV/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 34720,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x5f10A1C971B69e47e059e1dC91901B59b3fB49C3"
+    },
+    {
+      "address": "0x556e74940e01c4b449a97e9d0c5f3360af210bcd",
+      "pair": "CRWV/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -231600,
+      "liquidity": "0",
+      "token0": "0x5f10A1C971B69e47e059e1dC91901B59b3fB49C3",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x8fb9301586f27e2cff85312f7c1d0f16c6167cde",
+      "pair": "GOOGL/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 20667,
+      "liquidity": "1910787851950423440",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3"
+    },
+    {
+      "address": "0x778f2a0cf24e8d12fe3730c87fe1448d47e66add",
+      "pair": "GOOGL/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 18409,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3"
+    },
+    {
+      "address": "0x04c361dad399e9249f9c3fe6d54915689b54a42e",
+      "pair": "GOOGL/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 20647,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3"
+    },
+    {
+      "address": "0x8c2b4303fa0b99d07a5d3e9411497a277e65b673",
+      "pair": "GOOGL/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 20728,
+      "liquidity": "426947210311275751617",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3"
+    },
+    {
+      "address": "0xa3617bb4d7dc9dd20f79165486097a54b3593164",
+      "pair": "GOOGL/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 96,
+      "liquidity": "0",
+      "token0": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x34d0dc122cf9a8eb296fc5e0d3a233625d7d19b7",
+      "pair": "GOOGL/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -218071,
+      "liquidity": "1139884168587430305",
+      "token0": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x553e9a453425cd9b90919f317061fbc3794cc57a",
+      "pair": "GOOGL/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -218057,
+      "liquidity": "6556461623426263",
+      "token0": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xb2bb17fa1905bcc1558b5aaec894faab666b323a",
+      "pair": "GOOGL/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -217628,
+      "liquidity": "0",
+      "token0": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x1b375a9c30ac43391aefae1bcf3a988d92458725",
+      "pair": "INTC/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 31330,
+      "liquidity": "221966389601119594408",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681"
+    },
+    {
+      "address": "0x2e5a92f5013a64661a49312111be2e8abd33f56a",
+      "pair": "INTC/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 228727,
+      "liquidity": "282282440984159056",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681"
+    },
+    {
+      "address": "0xa4bdb396a69617eb7f70e2cc1ef526f7340b1b0d",
+      "pair": "META/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 13152,
+      "liquidity": "9271149996453254292138",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35"
+    },
+    {
+      "address": "0xda3d011420ec0f1b832ed2a31abf872e69132c3d",
+      "pair": "META/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 13177,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35"
+    },
+    {
+      "address": "0xad6df50832884f3498cd354086cefb0e39070f1b",
+      "pair": "META/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -1,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35"
+    },
+    {
+      "address": "0x107a7cb40d8665360ba10e59471af06150a50922",
+      "pair": "META/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 210532,
+      "liquidity": "181040182658541264",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35"
+    },
+    {
+      "address": "0x6fd62e9843ad2ac2c4fbf2b62647953ea29b3537",
+      "pair": "META/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 210540,
+      "liquidity": "313179162396204",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35"
+    },
+    {
+      "address": "0x98e196c9711280f8a4cdbd70f7e6bf4c3a649ce4",
+      "pair": "MSFT/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 13414,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    },
+    {
+      "address": "0x3d69ea64810300877b938e9ad9916c25912c08f5",
+      "pair": "MSFT/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -1,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    },
+    {
+      "address": "0x38fa8bf13a6b2ac49be77babb22c1837d1e505f9",
+      "pair": "MSFT/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    },
+    {
+      "address": "0xeb60bcd1d920ad6e102690ccfc6fb488899e1510",
+      "pair": "MSFT/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 213987,
+      "liquidity": "736292303804726453",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    },
+    {
+      "address": "0x2ea9292113514ed84fd16aa4ad1e416537e39c8c",
+      "pair": "MSFT/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 213976,
+      "liquidity": "87128385518721",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xe93237C50D904957Cf27E7B1133b510C669c2e74"
+    },
+    {
+      "address": "0xfd4911302ba5c25d153a6912b394a72d0a9601f2",
+      "pair": "MU/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 9191,
+      "liquidity": "55560653726738142339",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD"
+    },
+    {
+      "address": "0x301f48ec369bb3bfa0bc04d44a79037aa0ee2340",
+      "pair": "MU/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 9259,
+      "liquidity": "2741340818961070815958",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD"
+    },
+    {
+      "address": "0x6fd0f36320a1e50e42f130ce4a5c530b992a0a14",
+      "pair": "MU/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 207433,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD"
+    },
+    {
+      "address": "0xd057b1bc54917855bbee58ead58647f47cab35e5",
+      "pair": "MU/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 206593,
+      "liquidity": "251308252308458567",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD"
+    },
+    {
+      "address": "0x057a53e4b1b9a2febae171a798e97c27300400c6",
+      "pair": "NVDA/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -149170,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "address": "0x62ab521f71431f78ac374cdbadc6cda3c8916b6c",
+      "pair": "NVDA/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 24513,
+      "liquidity": "16235976823229089273082",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "address": "0xc0be1cb0f674d9737c72b2a63fc542361185b807",
+      "pair": "NVDA/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 24516,
+      "liquidity": "4982633714610705321733",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "address": "0x8b6a6416a5d1040efcfa6234da6aa1265dfe123e",
+      "pair": "NVDA/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 24591,
+      "liquidity": "101140725342418820751",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "address": "0xb75d2d02b0ec3de50d32e40a4f1a8dae8acc4333",
+      "pair": "NVDA/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 222985,
+      "liquidity": "14297015922504961",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "address": "0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
+      "pair": "NVDA/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 221920,
+      "liquidity": "11571100712668817837",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "address": "0xb944cec30bd4175855215d767adc81f39e5f7e2b",
+      "pair": "NVDA/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 221920,
+      "liquidity": "37679061221470030",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "address": "0xc277560df3689a401ba7dedd7626168b234ceb5e",
+      "pair": "NVDA/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 221972,
+      "liquidity": "18001700290564",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "address": "0x61be5bfbaf17ae28bf68006103b2e78fe6112638",
+      "pair": "PLTR/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 26660,
+      "liquidity": "825689495696888110666",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
+    },
+    {
+      "address": "0x851680416a4f4e1c463d45171d61acddbc8554c0",
+      "pair": "PLTR/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 224070,
+      "liquidity": "325594951999871422",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A"
+    },
+    {
+      "address": "0x0654e1e709987c57812a726a0a4ce61db4ca149e",
+      "pair": "SNDK/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 4396,
+      "liquidity": "594360041790272",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+    },
+    {
+      "address": "0x995c1ad5eb998b1bdd89f515c4bb64760c411b62",
+      "pair": "SNDK/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 4487,
+      "liquidity": "143744841219637818925",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+    },
+    {
+      "address": "0xc9f2e2229ef638a7629185c9b222ad2eeec39b74",
+      "pair": "SNDK/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 202863,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+    },
+    {
+      "address": "0xa1e1c9519cd5ae47e9a935645e1a7b935b944559",
+      "pair": "SNDK/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 201818,
+      "liquidity": "12434438623440421",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xB90A19fF0Af67f7779afF50A882A9CfF42446400"
+    },
+    {
+      "address": "0x7b35d2d016d11e56b82fcb4ba3790dc1c9f8e2f3",
+      "pair": "SPCX/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 25577,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+    },
+    {
+      "address": "0xc3c9f0171490ef0f4536fe493f3b0ebb5ee0cb5e",
+      "pair": "SPCX/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 28922,
+      "liquidity": "14774999598659219405155",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+    },
+    {
+      "address": "0x9e88bd178bf54eb0e4431e8ad20ef2ac3f809af9",
+      "pair": "SPCX/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+    },
+    {
+      "address": "0x910566bdba2081ea4ed711e3ef61ccc0a458ec84",
+      "pair": "SPCX/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 25906,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+    },
+    {
+      "address": "0x87c58b43537005189cfc7b512d818dc9125e94fc",
+      "pair": "SPCX/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -226332,
+      "liquidity": "38680902050250",
+      "token0": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xc61284332117c3fb23a2a56cceffd07f7af60029",
+      "pair": "SPCX/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -226331,
+      "liquidity": "2533776885747338352",
+      "token0": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xeb07d9587efd1778dfb9c385ec43ef6d5f9fe401",
+      "pair": "SPCX/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -226324,
+      "liquidity": "520924403044189253",
+      "token0": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xfbb32c09488e3fc33fe6fd84fe6ae442b4d13a31",
+      "pair": "SPCX/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -226322,
+      "liquidity": "72493034454788143",
+      "token0": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x2b307a1bf7a16d20c577cda78c3447c72ff3694f",
+      "pair": "USAR/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 247881,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd917B029C761D264c6A312BBbcDA868658eF86a6"
+    },
+    {
+      "address": "0x04391780f519b7d3ba59c9590459d76e23d225c4",
+      "pair": "USAR/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 249898,
+      "liquidity": "58251382262750986",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd917B029C761D264c6A312BBbcDA868658eF86a6"
+    },
+    {
+      "address": "0x21cf29b6406d966a81ca48fb3e99c8def01f3ad5",
+      "pair": "USAR/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 247865,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd917B029C761D264c6A312BBbcDA868658eF86a6"
+    },
+    {
+      "address": "0x8ec7ef7b775b04ab1000a122ce0ae1dcff509a5c",
+      "pair": "QQQ/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 12241,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68"
+    },
+    {
+      "address": "0xa40d00a55d43ba2d188039dcf88bd68f4f133e78",
+      "pair": "QQQ/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 12895,
+      "liquidity": "5804643425548918396290",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68"
+    },
+    {
+      "address": "0x13444127f263a5ac1c545efcec022b467df91658",
+      "pair": "QQQ/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 12969,
+      "liquidity": "99126330262574735597",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68"
+    },
+    {
+      "address": "0x4539019b527211998642fec342c85dcb44c7e5e4",
+      "pair": "QQQ/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -1,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68"
+    },
+    {
+      "address": "0xd60a5d14db690b7afad71f76b108071d7175597d",
+      "pair": "QQQ/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 210289,
+      "liquidity": "1321718968927835881",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68"
+    },
+    {
+      "address": "0xebd78dcfc8a6b3a696f1e191ad1ff321f9579f79",
+      "pair": "QQQ/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 210272,
+      "liquidity": "6750802466519645",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68"
+    },
+    {
+      "address": "0x7f310e3d05e575bd449e4484ef5da15863ea43b1",
+      "pair": "SGOV/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 32738,
+      "liquidity": "2934033022224902104801",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5"
+    },
+    {
+      "address": "0xffb376bfc48668f16719b42ed8aeef5b98dbc4f1",
+      "pair": "SGOV/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 230158,
+      "liquidity": "0",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5"
+    },
+    {
+      "address": "0x6ba50150b17ffd0972915aaf04ffd5e8f4fa49b4",
+      "pair": "SGOV/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 230157,
+      "liquidity": "13871967827365434444",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5"
+    },
+    {
+      "address": "0xfab520051f96f4d2a32c22b6a3dd7fffdf231bfe",
+      "pair": "SGOV/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 230169,
+      "liquidity": "58119285954674108061",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5"
+    },
+    {
+      "address": "0xa996ce34d4adfe00347d6821514a634dc7bf6326",
+      "pair": "SLV/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 37110,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f"
+    },
+    {
+      "address": "0xca2734c70e3c348edcda36a6478c9275a0ff0c90",
+      "pair": "SLV/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 38853,
+      "liquidity": "249149535508276006697",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f"
+    },
+    {
+      "address": "0x37ed4621d1eb3abc9e551a888e6aaf0a41f7be8e",
+      "pair": "SLV/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -236269,
+      "liquidity": "986294246703086",
+      "token0": "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x8cb787e6c315d464775289bad00fdd67d53ecb3d",
+      "pair": "SLV/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -236242,
+      "liquidity": "254698060068795671",
+      "token0": "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x0fa7bc480885dcf58ad2ef63ec7289cf2481d51c",
+      "pair": "SLV/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -236241,
+      "liquidity": "48361459991008266",
+      "token0": "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x038fc7811482cb34d1204da89a285325cd094a02",
+      "pair": "SPY/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 11541,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+    },
+    {
+      "address": "0xddcbba3666f578e3f09516f21ff85bfee859ab5e",
+      "pair": "SPY/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 12523,
+      "liquidity": "14221804995311693397048",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+    },
+    {
+      "address": "0xe30ac12dc35fac73d2266fb68fe49ba47745b2c5",
+      "pair": "SPY/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 12309,
+      "liquidity": "0",
+      "token0": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "token1": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+    },
+    {
+      "address": "0x62fde201c424d6d07730b77450dd73928ebac5f5",
+      "pair": "SPY/USDG",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -209950,
+      "liquidity": "0",
+      "token0": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xa7bb1ac63bbab0c44316e6c8c455213441689167",
+      "pair": "SPY/USDG",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -209928,
+      "liquidity": "748944543440722977",
+      "token0": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0xa43b424bc609495aed4bcd88d654934b510b0ad9",
+      "pair": "SPY/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -209904,
+      "liquidity": "33595974442721357",
+      "token0": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    {
+      "address": "0x02175608f1b5e6b5ed221ccfdc7be197d111d915",
+      "pair": "USO/USDG",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 226535,
+      "liquidity": "3163640796042436801",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
+    },
+    {
+      "address": "0x6ed11c7dfd8e2ca5620eed29a7b9b53ae90dd0d2",
+      "pair": "USO/USDG",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 226489,
+      "liquidity": "9783074496859493",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
+    }
+  ],
+  "aeroPools": [],
   "geckoTopPools": [
     {
       "geckoAddress": "0x52e65b17fb6e5ba00ed806f37afcd2daa50271ca",
       "name": "USDG / WETH 0.01%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 19060729.4135,
-      "volume24hUsd": 389627401.281857
+      "reserveUsd": 21922620.8312,
+      "volume24hUsd": 385121148.370937
     },
     {
-      "geckoAddress": "0x24107d152f14a76d292123265ae3f3c71f863fc2f4ef7ba49d64e78d28ea379e",
-      "name": "WETH / USDG 0.01%",
-      "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 381585.136,
-      "volume24hUsd": 7552576.00292804
+      "geckoAddress": "0x7a35168956f129c032ec035cc47383a605a71df0",
+      "name": "WETH / USDG 0.006%",
+      "dex": "alandale-cl",
+      "reserveUsd": 228062.5751,
+      "volume24hUsd": 11176461.4360879
     },
     {
-      "geckoAddress": "0x5875d407a42965b0e768c8925cea290e06fa50603ef34fc99eb92a1050e6ae36",
-      "name": "META / USDG 0.3%",
-      "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 4705164.1231,
-      "volume24hUsd": 9825394.83088071
-    },
-    {
-      "geckoAddress": "0x16679e2ac1a798865ecf1c1639e67693ddb1c220",
-      "name": "WETH / USDG 0.05%",
-      "dex": "up-v3",
-      "reserveUsd": 587459.3096,
-      "volume24hUsd": 11525481.3567339
+      "geckoAddress": "0xfe313dbaa0f659bc3a36cc47b43949cbd960ce66",
+      "name": "swordcat / WETH 0.01%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 9342.2644,
+      "volume24hUsd": 16797722.6696697
     },
     {
       "geckoAddress": "0xf4d0171f995d576b972aa982080eaf4da456cf9e",
       "name": "WETH / USDG 0.005%",
       "dex": "giga-v3",
-      "reserveUsd": 193056.7024,
-      "volume24hUsd": 3297577.83832425
+      "reserveUsd": 193523.5194,
+      "volume24hUsd": 3483461.77968878
     },
     {
-      "geckoAddress": "0x7a35168956f129c032ec035cc47383a605a71df0",
-      "name": "WETH / USDG 0.004%",
-      "dex": "alandale-cl",
-      "reserveUsd": 209949.6598,
-      "volume24hUsd": 8927404.38110892
+      "geckoAddress": "0xa32a077a3e9d1ce561ec2a4b136db701a3166195455da4d8d364d6189443afe1",
+      "name": "ROBINPEPE / WETH",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 64825.7922,
+      "volume24hUsd": 3438513.31933851
     },
     {
-      "geckoAddress": "0x69bfaf19c9f377bb306a89aed9f6b07e2c1a8d9a",
-      "name": "USDG / WETH 0.05%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 4733474.7025,
-      "volume24hUsd": 18373444.8363308
+      "geckoAddress": "0x16679e2ac1a798865ecf1c1639e67693ddb1c220",
+      "name": "WETH / USDG 0.05%",
+      "dex": "up-v3",
+      "reserveUsd": 339011.2837,
+      "volume24hUsd": 9933467.9047807
     },
     {
-      "geckoAddress": "0x8068ab043efd411b87506c41be1add38faaf18c0af0016c663ca92feff0b8159",
-      "name": "WETH / USDG",
-      "dex": "orvex-v4",
-      "reserveUsd": 56776.6599,
-      "volume24hUsd": 1881003.88571507
+      "geckoAddress": "0x99f1143ef8323cc044f6dd8b521d5fe871abd4e2fb141510d35e955111c05d91",
+      "name": "RBD / WETH 0.25%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 45678.6415,
+      "volume24hUsd": 101141.179302996
     },
     {
-      "geckoAddress": "0xf2a0be59ab76b96f957bd5e5b967f2b75e8db269",
-      "name": "PONS / USDG 0.3%",
-      "dex": "ramses-v3-robinhood",
-      "reserveUsd": 1493592.7523,
-      "volume24hUsd": 22488886.6524767
+      "geckoAddress": "0x24107d152f14a76d292123265ae3f3c71f863fc2f4ef7ba49d64e78d28ea379e",
+      "name": "WETH / USDG 0.01%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 445979.6129,
+      "volume24hUsd": 4686120.73945086
     },
     {
       "geckoAddress": "0xfae65eaa11943f45e83d5b45dc7a7c801c51bfb0",
       "name": "WETH / USDG 0.01%",
       "dex": "ramses-v3-robinhood",
-      "reserveUsd": 542253.2286,
-      "volume24hUsd": 9665751.61713051
+      "reserveUsd": 668903.7087,
+      "volume24hUsd": 18270104.401306
     },
     {
-      "geckoAddress": "0xe2b46c905e12ab8e2f864e4821a4325884c1b126",
-      "name": "GME / USDG 0.05%",
+      "geckoAddress": "0x69bfaf19c9f377bb306a89aed9f6b07e2c1a8d9a",
+      "name": "USDG / WETH 0.05%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 375213.0677,
-      "volume24hUsd": 5372567.77094531
+      "reserveUsd": 5378141.0851,
+      "volume24hUsd": 18537795.3499512
     },
     {
-      "geckoAddress": "0x5eac4195930d5ff8b7a34a347f2bde951c42eb730d6e26075bea3dd7c66feb40",
-      "name": "ROBIN / USDG",
-      "dex": "pons-v2-dex",
-      "reserveUsd": 189234.4785,
-      "volume24hUsd": 1133403.36404403
+      "geckoAddress": "0x8068ab043efd411b87506c41be1add38faaf18c0af0016c663ca92feff0b8159",
+      "name": "WETH / USDG",
+      "dex": "orvex-v4",
+      "reserveUsd": 57854.5421,
+      "volume24hUsd": 1579942.30019485
     },
     {
-      "geckoAddress": "0x40a433930370f6cdf0a78debc2c6dd599c23bd428c0d67dd8b5373e4f101557f",
-      "name": "musebook / META",
-      "dex": "bankr-robinhood",
-      "reserveUsd": 5333465.6395,
-      "volume24hUsd": 3941490.82436055
-    },
-    {
-      "geckoAddress": "0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
-      "name": "NVDA / USDG 0.05%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 5699090.8962,
-      "volume24hUsd": 14119252.230591
-    },
-    {
-      "geckoAddress": "0xa6e013da812a4f2e151e2c08aa05d53a67ad84487e35d60a0b5b7456066fad78",
-      "name": "LILY / META",
-      "dex": "bankr-robinhood",
-      "reserveUsd": 68613.8112,
-      "volume24hUsd": 923687.733644234
-    },
-    {
-      "geckoAddress": "0x90691314f1bca335cf43fa9444a314ec15b2a0d82d644a9ace7e3acde70e1cd5",
-      "name": "CDS / USDG",
-      "dex": "pons-v2-dex",
-      "reserveUsd": 4151.2205,
-      "volume24hUsd": 846059.706119946
-    },
-    {
-      "geckoAddress": "0x93cc54eb4e1928e841cb8b2e488bd82e8d97d56e0aab16cf078ef71c576dcded",
-      "name": "musebook / USDG 0.75%",
+      "geckoAddress": "0x91e9823a895a2d05a2c853fbd1619da089b36054f0a342039a0e8046608bbece",
+      "name": "ROO / WETH",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 537119.8725,
-      "volume24hUsd": 5230662.09941567
+      "reserveUsd": 32042.2956,
+      "volume24hUsd": 1251603.95796151
     },
     {
-      "geckoAddress": "0xc58bb68060bcb7b3ea0f6d4a4afef1e57f628722e808db12afb6d1733552872f",
-      "name": "META / USDG 0.031%",
+      "geckoAddress": "0x9a25f2461055af82b771ed88d16a2e9245dcea344a7211aa8c147d72f9d658ec",
+      "name": "HOODIE / WETH",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 271536.6143,
-      "volume24hUsd": 5662647.38769583
-    },
-    {
-      "geckoAddress": "0x5d8910badaa313e4f945a6993d95b40a7e1562dd29750c6437271eb6140c30a1",
-      "name": "HITBUY / WETH 0.3%",
-      "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 57568.7735,
-      "volume24hUsd": 18690588.7939769
+      "reserveUsd": 52360.8415,
+      "volume24hUsd": 1317043.82377453
     },
     {
       "geckoAddress": "0xbac3aa3b91584a53a579b3c999a56756e954e59247e497bad1d25a4334bde551",
       "name": "WETH / USDG",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 30325124.3851,
-      "volume24hUsd": 77852176.8061759
+      "reserveUsd": 30712121.7075,
+      "volume24hUsd": 96645438.5330774
     },
     {
-      "geckoAddress": "0x541bedd98337d22c46ff8196494f14e7d9922ddedf07b74df44c7020487e5fdf",
-      "name": "Agrippa / musebook",
-      "dex": "bankr-robinhood",
-      "reserveUsd": 1212565.1567,
-      "volume24hUsd": 3850586.04104401
-    },
-    {
-      "geckoAddress": "0xf5f99b04d32f7fa3ae37f6a6753eb434981e997da17b10b665fbe1b9bc0cddde",
-      "name": "BLISS / WETH",
-      "dex": "pons-v2-dex",
-      "reserveUsd": 11766.9685,
-      "volume24hUsd": 2734790.14246387
-    },
-    {
-      "geckoAddress": "0xc61284332117c3fb23a2a56cceffd07f7af60029",
-      "name": "SPCX / USDG 0.05%",
+      "geckoAddress": "0xa402616f4d05cca33947fabc6ff51ba795f6d2f4",
+      "name": "ROUTE / WETH 0.01%",
       "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 2582338.5512,
-      "volume24hUsd": 10284441.6609763
+      "reserveUsd": 1.3377,
+      "volume24hUsd": 14397950.1341012
+    },
+    {
+      "geckoAddress": "0xe7a662ad4ae168421ff6a7301277c2e653782a17",
+      "name": "WALLET / WETH 0.01%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 2.978010832e-11,
+      "volume24hUsd": 11059036.0635186
+    },
+    {
+      "geckoAddress": "0x896f15b2c8fd167a4243fb2c5bbf9358c4de5d8adc7e85fab7887fc50adb3e25",
+      "name": "FILAB / WETH 0.3%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 219868.6423,
+      "volume24hUsd": 23179590.0419875
+    },
+    {
+      "geckoAddress": "0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
+      "name": "NVDA / USDG 0.05%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 5741986.0704,
+      "volume24hUsd": 19893055.1121363
+    },
+    {
+      "geckoAddress": "0x843f350cc330887b3b43988093d1f458ecfd729f",
+      "name": "BPOOL / WETH 0.01%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 12284.912,
+      "volume24hUsd": 13746769.7137854
+    },
+    {
+      "geckoAddress": "0xa6b2579671f40524b08ba53871f19599edeeb3e8",
+      "name": "FLING / WETH 0.01%",
+      "dex": "uniswap-v3-robinhood",
+      "reserveUsd": 10.6928,
+      "volume24hUsd": 7515913.83287644
+    },
+    {
+      "geckoAddress": "0x56000f3980200d0f39a9f2eefd5233b2196b4445",
+      "name": "PONS / USDG 0.05%",
+      "dex": "giga-v3",
+      "reserveUsd": 35213.1608,
+      "volume24hUsd": 1569279.10378964
+    },
+    {
+      "geckoAddress": "0xc19d1d77bfdaeb66c285a17286d325062c1cd0c7ce88c1fe60ef70797ee8f215",
+      "name": "HOODCATS / WETH 0.25%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 53977.6705,
+      "volume24hUsd": 648970.755188604
+    },
+    {
+      "geckoAddress": "0x2adc17c9e5c50f44fef7e209b8710e1ecd5624831beb52a528ffc9e51722bf02",
+      "name": "SHCAT / WETH 0.3%",
+      "dex": "uniswap-v4-robinhood",
+      "reserveUsd": 87713.1293,
+      "volume24hUsd": 18638198.4484327
     },
     {
       "geckoAddress": "0x54f7883914619af9105355bf83ed678bcf9f63560218ac61c9963b9503d0ba32",
       "name": "WETH / USDG 0.046%",
       "dex": "uniswap-v4-robinhood",
-      "reserveUsd": 1555042.4191,
-      "volume24hUsd": 2562656.93269015
+      "reserveUsd": 1263177.8511,
+      "volume24hUsd": 2343888.72522142
     },
     {
-      "geckoAddress": "0xe972dfc9032d148f4b1618fb914fbbd2fc41d6dc",
-      "name": "musebook / WETH 1%",
-      "dex": "uniswap-v3-robinhood",
-      "reserveUsd": 440821.712,
-      "volume24hUsd": 5097913.35274844
+      "geckoAddress": "0x9752660471c6c1b036bf8732bdd50cf1392962c4a4877ddb07e8571ca9f962df",
+      "name": "APPSHARE / WETH",
+      "dex": "pons-v2-dex",
+      "reserveUsd": 20915.4464,
+      "volume24hUsd": 1405880.33256043
     }
   ]
 }

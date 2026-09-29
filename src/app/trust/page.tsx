@@ -73,7 +73,7 @@ export default function TrustPage() {
 
         <Section title="If vaults.cash disappeared tomorrow" sticker={<Chip>Nothing happens to your money</Chip>}>
           <p className="text-sm leading-relaxed text-muted">
-            Every position is a standard Uniswap v4 position that Uniswap&apos;s own app can manage. Each position on your
+            Every position is a standard Uniswap v3, Uniswap v4 or Aerodrome position that the exchange&apos;s own app can manage. Each position on your
             Portfolio page has an &ldquo;Open in Uniswap&rdquo; link; that page works without us. Your wallet lives with
             Privy, not with vaults.cash, and you can export its key from the Account page at any time.
           </p>

@@ -15,6 +15,7 @@ config.resolver.extraNodeModules = {
   ...(config.resolver.extraNodeModules ?? {}),
   viem: own("viem"),
   "@uniswap/v4-sdk": own("@uniswap/v4-sdk"),
+  "@uniswap/v3-sdk": own("@uniswap/v3-sdk"),
   "@uniswap/sdk-core": own("@uniswap/sdk-core"),
   jsbi: own("jsbi"),
 };

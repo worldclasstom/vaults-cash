@@ -1,15 +1,18 @@
-import { CHAINS, type ChainId } from "./chain";
+import { CHAINS, type ChainId, type Venue } from "./chain";
 import baseRegistry from "./registries/base.json";
 import robinhoodRegistry from "./registries/robinhood.json";
 
 export type PoolRef = {
+  /** v4: the PoolManager pool id. v3 / Aerodrome: the pool contract address (also its GeckoTerminal id). */
   poolId: `0x${string}`;
-  /** v4 currencies, sorted; address(0) = native ETH */
+  /** sorted; address(0) = native ETH (v4 only; v3 venues hold WETH) */
   currency0: `0x${string}`;
   currency1: `0x${string}`;
   fee: number;
   tickSpacing: number;
 };
+
+export type { Venue } from "./chain";
 
 export type TokenKind = "stable" | "crypto" | "stock";
 /** what a token's price tracks — two legs that track the same thing make a
@@ -51,6 +54,8 @@ export type Market = {
    *  quote already is the stablecoin */
   quoteUsdSlug?: string;
   pool: PoolRef;
+  /** which AMM the pool lives on; everything but Uniswap v4 is a v3-style pool */
+  venue: Venue;
   /** address-sort order varies per pool: true when base is currency0 */
   baseIsCurrency0: boolean;
   /** category for filters: stock if either leg is a stock token, stable if
@@ -79,7 +84,10 @@ type Registry = {
     { address: string; name: string; decimals: number; uiMultiplier?: string | null; logo?: string | null }
   >;
   v4Pools: Array<{ poolId: string; pair: string; fee: number; tickSpacing: number; tick: number; liquidity: string }>;
+  v3Pools?: Array<V3RegistryPool>;
+  aeroPools?: Array<V3RegistryPool>;
 };
+type V3RegistryPool = { address: string; pair: string; fee: number; tickSpacing: number; tick: number; liquidity: string; token0: string; token1: string };
 
 /** Presentation + classification for tokens we know. Anything else in the
  *  registry with a live pool is still listed with its on-chain name, kind
@@ -96,6 +104,10 @@ const KNOWN: Record<string, Known> = {
   rETH: { name: "Rocket Pool ETH", kind: "crypto", color: "#f7a600", correlates: "eth" },
   weETH: { name: "EtherFi Staked ETH", kind: "crypto", color: "#6c4ff7", correlates: "eth" },
   AERO: { name: "Aerodrome", kind: "crypto", color: "#5b6ef5" },
+  CRV: { name: "Curve", kind: "crypto", color: "#e8e33a" },
+  ETHFI: { name: "EtherFi", kind: "crypto", color: "#6c4ff7" },
+  ZRO: { name: "LayerZero", kind: "crypto", color: "#f0f0f0" },
+  TEL: { name: "Telcoin", kind: "crypto", color: "#14c8ff" },
   LINK: { name: "Chainlink", kind: "crypto", color: "#2a5ada" },
   AAVE: { name: "Aave", kind: "crypto", color: "#b6509e" },
   VIRTUAL: { name: "Virtuals", kind: "crypto", color: "#22c55e" },
@@ -141,7 +153,7 @@ const order = (sym: string) => {
 function quoteRank(t: TokenInfo, stable: `0x${string}`): number {
   if (t.address.toLowerCase() === stable.toLowerCase()) return 0;
   if (t.kind === "stable") return 1;
-  if (t.address === NATIVE_ETH) return 2;
+  if (t.address === NATIVE_ETH || t.symbol === "ETH") return 2; // native ETH, or WETH standing in for it on v3 venues
   if (t.symbol === "cbBTC") return 3;
   return 9;
 }
@@ -225,7 +237,8 @@ function buildMarkets(chainId: ChainId, registry: Registry): Market[] {
     byPair.set(key, e);
   }
 
-  const makeMarket = (base: TokenInfo, quote: TokenInfo, pools: Pool[], quoteUsd: number): Market | null => {
+  const makeMarket = (base: TokenInfo, quote: TokenInfo, pools: Pool[], quoteUsd: number, venue: Venue = "uniswap-v4"): Market | null => {
+    const suffix = venue === "uniswap-v4" ? "" : venue === "uniswap-v3" ? "-v3" : "-aero";
     const [currency0, currency1] =
       base.address.toLowerCase() < quote.address.toLowerCase() ? [base.address, quote.address] : [quote.address, base.address];
     const baseIsCurrency0 = currency0.toLowerCase() === base.address.toLowerCase();
@@ -241,12 +254,13 @@ function buildMarkets(chainId: ChainId, registry: Registry): Market[] {
     const kind: TokenKind =
       base.kind === "stock" || quote.kind === "stock" ? "stock" : base.kind === "stable" && quote.kind === "stable" ? "stable" : "crypto";
     return {
-      slug: `${cfg.slug}/${base.symbol.toLowerCase()}-${quote.symbol.toLowerCase()}`,
+      slug: `${cfg.slug}/${base.symbol.toLowerCase()}-${quote.symbol.toLowerCase()}${suffix}`,
       chainId,
       base,
       quote,
       quoteIsStable,
-      quoteUsdSlug: quoteIsStable ? undefined : `${cfg.slug}/${quote.symbol.toLowerCase()}-${cfg.quote.symbol.toLowerCase()}`,
+      // the quote leg's dollar pool at the SAME venue: the deposit zap swaps through it and needs the same token flavour (WETH vs ETH)
+      quoteUsdSlug: quoteIsStable ? undefined : `${cfg.slug}/${quote.symbol.toLowerCase()}-${cfg.quote.symbol.toLowerCase()}${suffix}`,
       pool: {
         poolId: best.poolId as `0x${string}`,
         currency0,
@@ -254,6 +268,7 @@ function buildMarkets(chainId: ChainId, registry: Registry): Market[] {
         fee: best.fee,
         tickSpacing: best.tickSpacing,
       },
+      venue,
       baseIsCurrency0,
       kind,
       lowIl: base.correlates !== null && base.correlates === quote.correlates,
@@ -294,9 +309,59 @@ function buildMarkets(chainId: ChainId, registry: Registry): Market[] {
 
   const bySym = (m: Market, n: Market) =>
     order(m.base.symbol) - order(n.base.symbol) ||
-    m.base.symbol.localeCompare(n.base.symbol) ||
-    order(m.quote.symbol) - order(n.quote.symbol);
-  return [...stableMarkets.sort(bySym), ...pairMarkets.sort(bySym)];
+    order(m.quote.symbol) - order(n.quote.symbol) ||
+    m.base.symbol.localeCompare(n.base.symbol);
+
+  // v3-style venues: WETH stands in for ETH (same asset, shown as ETH), pools
+  // are keyed by contract address, one pool per pair per venue
+  const wethAsEth: TokenInfo | undefined = registry.tokens.WETH
+    ? { ...toInfo("WETH"), symbol: "ETH", name: "Ethereum", kind: "crypto", correlates: "eth", color: KNOWN.ETH.color, logo: ETH_LOGO }
+    : undefined;
+  const v3Markets: Market[] = [];
+  const venues: Array<[Venue, V3RegistryPool[] | undefined]> = [
+    ["uniswap-v3", registry.v3Pools],
+    ["aerodrome", registry.aeroPools],
+  ];
+  for (const [venue, list] of venues) {
+    if (!list?.length) continue;
+    const vTokens = new Map(tokens);
+    vTokens.delete("ETH");
+    if (wethAsEth) vTokens.set("WETH", wethAsEth);
+    const byPairV = new Map<string, { a: TokenInfo; b: TokenInfo; pools: Pool[] }>();
+    for (const p of list) {
+      const [x, y] = p.pair.split("/");
+      const a = vTokens.get(x);
+      const b = vTokens.get(y);
+      if (!a || !b) continue;
+      const key = [x, y].sort().join("/");
+      const e = byPairV.get(key) ?? { a, b, pools: [] };
+      e.pools.push({ poolId: p.address, pair: p.pair, fee: p.fee, tickSpacing: p.tickSpacing, tick: p.tick, liquidity: p.liquidity });
+      byPairV.set(key, e);
+    }
+    const usdV = new Map<string, number>([[stable.toLowerCase(), 1]]);
+    const stableV: Market[] = [];
+    const othersV: Array<{ base: TokenInfo; quote: TokenInfo; pools: Pool[] }> = [];
+    for (const { a, b, pools } of byPairV.values()) {
+      const [quote, base] = quoteRank(a, stable) <= quoteRank(b, stable) ? [a, b] : [b, a];
+      if (quote.address.toLowerCase() === stable.toLowerCase()) {
+        const m = makeMarket(base, quote, pools, 1, venue);
+        if (!m) continue;
+        stableV.push(m);
+        const tick = pools.find((p) => p.poolId === m.pool.poolId)!.tick;
+        usdV.set(base.address.toLowerCase(), tickToQuotePrice(tick, m.baseIsCurrency0, base.decimals, quote.decimals));
+      } else othersV.push({ base, quote, pools });
+    }
+    const pairsV: Market[] = [];
+    for (const { base, quote, pools } of othersV) {
+      const quoteUsd = usdV.get(quote.address.toLowerCase());
+      if (!quoteUsd) continue;
+      const m = makeMarket(base, quote, pools, quoteUsd, venue);
+      if (m) pairsV.push(m);
+    }
+    v3Markets.push(...stableV.sort(bySym), ...pairsV.sort(bySym));
+  }
+
+  return [...stableMarkets.sort(bySym), ...pairMarkets.sort(bySym), ...v3Markets];
 }
 
 export const MARKETS: Market[] = [

@@ -181,6 +181,10 @@ export async function buildZapPlan(params: {
   referrer?: `0x${string}` | null;
 }): Promise<ZapPlan> {
   const { market, owner, usdcAmount, preset, customWidth, slippageBps, poolState, addTo, referrer } = params;
+  if (market.venue !== "uniswap-v4") {
+    const { buildZapPlanV3 } = await import("./v3plan");
+    return buildZapPlanV3(params);
+  }
   const quoteToken = CHAINS[market.chainId].quote;
   const stable = quoteToken.address;
   const minDep = minDepositUsd(market.chainId);

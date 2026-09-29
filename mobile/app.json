@@ -11,15 +11,13 @@
     "ios": {
       "bundleIdentifier": "cash.vaults.app",
       "supportsTablet": false,
-      "usesAppleSignIn": true,
-      "icon": "./assets/expo.icon"
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "cash.vaults.app",
       "adaptiveIcon": {
         "backgroundColor": "#0b0d0b",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
@@ -31,7 +29,7 @@
         {
           "backgroundColor": "#0b0d0b",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 200
         }
       ],
       "expo-secure-store",
@@ -39,7 +37,15 @@
       "expo-apple-authentication",
       [
         "expo-build-properties",
-        { "ios": { "deploymentTarget": "17.5" }, "android": { "compileSdkVersion": 35 } }
+        {
+          "ios": {
+            "deploymentTarget": "17.5",
+            "enableSceneSupport": true
+          },
+          "android": {
+            "compileSdkVersion": 35
+          }
+        }
       ]
     ],
     "experiments": {

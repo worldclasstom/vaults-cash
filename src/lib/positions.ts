@@ -52,6 +52,10 @@ export const wrapSub = (a: bigint, b: bigint) => (a - b) & U256;
 
 /** Uncollected trading fees for a position, in raw token units. */
 export async function getUncollectedFees(position: OwnedPosition) {
+  if (position.market.venue !== "uniswap-v4") {
+    const { getUncollectedFeesV3 } = await import("./v3core");
+    return getUncollectedFeesV3(position);
+  }
   const { market, tokenId, tickLower, tickUpper } = position;
   const client = publicClientFor(market.chainId);
   const stateView = chainConfig(market.chainId).uniswap.v4.stateView;
@@ -130,9 +134,11 @@ export async function fetchPositionsOnChain(
 /** All of the user's positions across every supported chain. One chain's
  *  explorer being down hides that chain's positions, not everyone's. */
 export async function fetchPositions(owner: `0x${string}`): Promise<OwnedPosition[]> {
-  const results = await Promise.allSettled(
-    CHAIN_IDS.map((chainId) => fetchPositionsOnChain(owner, chainId)),
-  );
+  const { fetchPositionsV3 } = await import("./v3core");
+  const results = await Promise.allSettled([
+    ...CHAIN_IDS.map((chainId) => fetchPositionsOnChain(owner, chainId)),
+    ...CHAIN_IDS.flatMap((chainId) => [fetchPositionsV3(owner, chainId, "uniswap-v3"), fetchPositionsV3(owner, chainId, "aerodrome")]),
+  ]);
   const ok = results.filter((r) => r.status === "fulfilled");
   if (ok.length === 0 && results.length > 0) {
     throw (results[0] as PromiseRejectedResult).reason;

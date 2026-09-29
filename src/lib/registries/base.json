@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T04:17:18.514Z",
+  "generatedAt": "2026-09-29T16:02:56.560Z",
   "chainId": 8453,
   "verified": true,
   "uniswap": {
@@ -10,6 +10,13 @@
       "quoter": "0x0d5e0f971ed27fbff6c2837bf31316121532048d",
       "stateView": "0xa3c0c9b65bad0b08107aa264b0f3db444b867a71"
     },
+    "v3": {
+      "factory": "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
+      "positionManager": "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1",
+      "quoter": "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a",
+      "swapRouter": "0x2626664c2603336E57B271c5C0b26F421741e481",
+      "weth": "0x4200000000000000000000000000000000000006"
+    },
     "permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3"
   },
   "tokens": {
@@ -18,7 +25,7 @@
       "name": "USD Coin",
       "symbol": "USDC",
       "decimals": 6,
-      "totalSupply": "4263335326924522",
+      "totalSupply": "4377336142269242",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/6319/large/USDC.png?1769615602"
     },
@@ -27,7 +34,7 @@
       "name": "Wrapped Ether",
       "symbol": "WETH",
       "decimals": 18,
-      "totalSupply": "263154975314011917362746",
+      "totalSupply": "264174052763224350873994",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/39810/large/weth.png?1724139790"
     },
@@ -36,7 +43,7 @@
       "name": "Coinbase Wrapped BTC",
       "symbol": "cbBTC",
       "decimals": 8,
-      "totalSupply": "4629730121377",
+      "totalSupply": "4674614457070",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/40143/large/cbbtc.webp?1726136727"
     },
@@ -45,16 +52,52 @@
       "name": "Coinbase Wrapped XRP",
       "symbol": "cbXRP",
       "decimals": 6,
-      "totalSupply": "131562099030741",
+      "totalSupply": "133626250138988",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/66267/large/Coinbase_Wrapped_XPR_%28cbXRP%29.png?1749023398"
+    },
+    "CRV": {
+      "address": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415",
+      "name": "Curve DAO Token",
+      "symbol": "CRV",
+      "decimals": 18,
+      "totalSupply": "1490912146865231319009195",
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/12124/large/Curve.png?1696511967"
+    },
+    "ETHFI": {
+      "address": "0x6C240DDA6b5c336DF09A4D011139beAAa1eA2Aa2",
+      "name": "ether.fi governance token",
+      "symbol": "ETHFI",
+      "decimals": 18,
+      "totalSupply": "978975693385840000000000",
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/35958/large/etherfi.jpeg?1710254562"
+    },
+    "ZRO": {
+      "address": "0x6985884C4392D348587B19cb9eAAf157F13271cd",
+      "name": "LayerZero",
+      "symbol": "ZRO",
+      "decimals": 18,
+      "totalSupply": "6081703632749000000000000",
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/28206/large/ftxG9_TJ_400x400.jpeg?1696527208"
+    },
+    "TEL": {
+      "address": "0x09bE1692ca16e06f536F0038fF11D1dA8524aDB1",
+      "name": "Telcoin",
+      "symbol": "TEL",
+      "decimals": 2,
+      "totalSupply": "87548799565",
+      "uiMultiplier": null,
+      "logo": "https://coin-images.coingecko.com/coins/images/1899/large/telcoin-gray.png?1790362476"
     },
     "cbETH": {
       "address": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
       "name": "Coinbase Wrapped Staked ETH",
       "symbol": "cbETH",
       "decimals": 18,
-      "totalSupply": "77240644693751909949781",
+      "totalSupply": "76842460053090410011245",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/27008/large/cbeth.png?1709186989"
     },
@@ -63,7 +106,7 @@
       "name": "Wrapped liquid staked Ether 2.0",
       "symbol": "wstETH",
       "decimals": 18,
-      "totalSupply": "29329852403356503163586",
+      "totalSupply": "30694893313636641009247",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/53103/large/superbridge-bridged-wsteth-base.png?1735227990"
     },
@@ -72,7 +115,7 @@
       "name": "Rocket Pool ETH",
       "symbol": "rETH",
       "decimals": 18,
-      "totalSupply": "1935541258647803027661",
+      "totalSupply": "1925284956358356102058",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/20764/large/reth.png?1696520159"
     },
@@ -81,7 +124,7 @@
       "name": "Wrapped eETH",
       "symbol": "weETH",
       "decimals": 18,
-      "totalSupply": "19088203454085098705148",
+      "totalSupply": "19000321539211961961207",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/33033/large/weETH.png?1701438396"
     },
@@ -99,7 +142,7 @@
       "name": "Tether USD",
       "symbol": "USDT",
       "decimals": 6,
-      "totalSupply": "26915048103682",
+      "totalSupply": "26798779722372",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/39963/large/usdt.png?1724952731"
     },
@@ -108,7 +151,7 @@
       "name": "EURC",
       "symbol": "EURC",
       "decimals": 6,
-      "totalSupply": "52340169595469",
+      "totalSupply": "51617349669222",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/26045/large/EURC.png?1769615705"
     },
@@ -126,7 +169,7 @@
       "name": "ChainLink Token",
       "symbol": "LINK",
       "decimals": 18,
-      "totalSupply": "201323305164554384255888",
+      "totalSupply": "191743126306340229043881",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/877/large/Chainlink_Logo_500.png?1760023405"
     },
@@ -135,7 +178,7 @@
       "name": "Aave Token",
       "symbol": "AAVE",
       "decimals": 18,
-      "totalSupply": "30050990655016121242182",
+      "totalSupply": "29550029975941196744660",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/12645/large/aave-token-round.png?1720472354"
     },
@@ -144,7 +187,7 @@
       "name": "Virtual Protocol",
       "symbol": "VIRTUAL",
       "decimals": 18,
-      "totalSupply": "497013085032629590884775503",
+      "totalSupply": "497021898227024858355256724",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/34057/large/LOGOMARK.png?1708356054"
     },
@@ -153,7 +196,7 @@
       "name": "Degen",
       "symbol": "DEGEN",
       "decimals": 18,
-      "totalSupply": "36114005629848640466839574939",
+      "totalSupply": "36083622668802065124373821514",
       "uiMultiplier": null,
       "logo": "https://coin-images.coingecko.com/coins/images/34515/large/android-chrome-512x512.png?1706198225"
     }
@@ -164,7 +207,7 @@
       "pair": "ETH/USDC",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -197412,
+      "tick": -197410,
       "liquidity": "57790948091786"
     },
     {
@@ -172,23 +215,23 @@
       "pair": "ETH/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197411,
-      "liquidity": "46624983769581899"
+      "tick": -197404,
+      "liquidity": "23204365131592387"
     },
     {
       "poolId": "0xe070797535b13431808f8fc81fdbe7b41362960ed0b55bc2b6117c49c51b7eb9",
       "pair": "ETH/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -197387,
-      "liquidity": "330363358460815646"
+      "tick": -197396,
+      "liquidity": "332837920618152065"
     },
     {
       "poolId": "0xa7d23af8df40bfaa36d3635aa84475d53f635b1fdf42a99d3cd40bad59190100",
       "pair": "ETH/USDC",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -197435,
+      "tick": -197321,
       "liquidity": "58503299134955"
     },
     {
@@ -220,16 +263,16 @@
       "pair": "WETH/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197411,
-      "liquidity": "71711514135813"
+      "tick": -197414,
+      "liquidity": "92276942699500"
     },
     {
       "poolId": "0x1d8c55f347727c0fb4f5e1b65cdb93639e0c7102580a7d345e1144cd5a718f54",
       "pair": "WETH/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -197385,
-      "liquidity": "25127404905614235"
+      "tick": -197395,
+      "liquidity": "25107518678720221"
     },
     {
       "poolId": "0x4949ca7a256e6eb04214e80f98c890bba07658bc314e42a676bdafa2704662b7",
@@ -252,16 +295,16 @@
       "pair": "cbBTC/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -264731,
-      "liquidity": "26720867559744883"
+      "tick": -264632,
+      "liquidity": "21898672933764967"
     },
     {
       "poolId": "0xe6195a1f1c8f5d0bcf0a880db26738a1df4f6863017700a8f6377a72d45366f2",
       "pair": "cbBTC/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -264760,
-      "liquidity": "956873152389735"
+      "tick": -264603,
+      "liquidity": "1012616815041168"
     },
     {
       "poolId": "0xba52f0ea13b86e23e0d4b2cba92784bdfd85623b8594d165e257980fb45b8be3",
@@ -284,24 +327,24 @@
       "pair": "cbBTC/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -67320,
-      "liquidity": "1097136728267"
+      "tick": -67228,
+      "liquidity": "1235041255536"
     },
     {
       "poolId": "0x179492f1f9c7b2e2518a01eda215baab8adf0b02dd3a90fe68059c0cac5686f5",
       "pair": "cbBTC/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -67350,
-      "liquidity": "19438151565"
+      "tick": -67229,
+      "liquidity": "20530846204"
     },
     {
       "poolId": "0x20897a5fe1b823e02fcea5fd7eeb8af75830d8352d2904b076e98692eff2e0a2",
       "pair": "cbBTC/USDC",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -67393,
-      "liquidity": "10369710551"
+      "tick": -67291,
+      "liquidity": "10719971732"
     },
     {
       "poolId": "0x78e1350738bc5e265cfa1187fa3dfc7533d9da7c0eec7d4ee3699e8250117641",
@@ -316,7 +359,7 @@
       "pair": "cbXRP/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -201457,
+      "tick": -201644,
       "liquidity": "898078088112"
     },
     {
@@ -332,8 +375,8 @@
       "pair": "cbXRP/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -4013,
-      "liquidity": "30885035266"
+      "tick": -4162,
+      "liquidity": "30936094543"
     },
     {
       "poolId": "0xad0e1a65986c1200486b1ee0e73cfecbfd2e8bafc772ee7726e84ea6600224e2",
@@ -341,6 +384,158 @@
       "fee": 10000,
       "tickSpacing": 200,
       "tick": -8430,
+      "liquidity": "0"
+    },
+    {
+      "poolId": "0x4d9e63509e83a2973b729302f355e652a413c402aa5738599d6219e7e6ecc3e1",
+      "pair": "CRV/ETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 88313,
+      "liquidity": "71997340442880305"
+    },
+    {
+      "poolId": "0x8f197a82072e68356c555c78fbe98388c17cb2f7121477912beb5b86251e9907",
+      "pair": "CRV/ETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 89854,
+      "liquidity": "0"
+    },
+    {
+      "poolId": "0x4ac14d6dcc218502bc73f6afd21372889f7117d1c10857b6a4c0a8837a184dfa",
+      "pair": "CRV/ETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 88035,
+      "liquidity": "113026112336187568"
+    },
+    {
+      "poolId": "0x7188cfc95722e160dc39cf32fbc3b44f0e0bc95319a152f659b7d6bfca8f4620",
+      "pair": "CRV/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 285520,
+      "liquidity": "900424864362222385"
+    },
+    {
+      "poolId": "0xb3675e9077e5b0250ec089d7c8c3d712627ea90318855e8166fc0a290274290f",
+      "pair": "CRV/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 293435,
+      "liquidity": "0"
+    },
+    {
+      "poolId": "0x3de2a8642859649d22d4a6f6a87b1441c51fdf8bf2bcd8864628a6a0f7119843",
+      "pair": "ETHFI/ETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 81366,
+      "liquidity": "6762120442393669037877"
+    },
+    {
+      "poolId": "0x22c2f702ba98ae65d401e6543451968afaae0a7864c5477a101da87a28c3f407",
+      "pair": "ETHFI/ETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 81368,
+      "liquidity": "1845905222517511740"
+    },
+    {
+      "poolId": "0x95f0e46920a0dc5efe388ea89a71ef0994f5c082766a4d2508344f3617cefe17",
+      "pair": "ETHFI/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -284821,
+      "liquidity": "0"
+    },
+    {
+      "poolId": "0xa80cb478b2ded8ba4fcd6a6e86be3123c8375729bbeb5d4d9c7653de0170fb15",
+      "pair": "ETHFI/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -286383,
+      "liquidity": "0"
+    },
+    {
+      "poolId": "0xdaf9ad21cddd831dfe727dcc3794c58ef745c7d11382aad36b8398f7132ab6da",
+      "pair": "ZRO/ETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 65343,
+      "liquidity": "0"
+    },
+    {
+      "poolId": "0x44394115775811f00149eeb4bf785eef47f94462f815b3c971abbe1cd424d2e7",
+      "pair": "ZRO/ETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 73832,
+      "liquidity": "20684752755832794965"
+    },
+    {
+      "poolId": "0x783ef2da6de46d971e3cb749d0e5940380ef089d418e76448e9a0fb25bd0d120",
+      "pair": "ZRO/ETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 73839,
+      "liquidity": "7159356934207490516"
+    },
+    {
+      "poolId": "0x29cab941a14c20ccfc32259dcea1ff7fa42eee75d039965f4f9369c343720650",
+      "pair": "ZRO/ETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 73819,
+      "liquidity": "57711158360032971178"
+    },
+    {
+      "poolId": "0x9669d6d864c1c4cf5ed74d2f6f7fb39f8e30f6f786c4ee4847bb133f17d40bb0",
+      "pair": "ZRO/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -272191,
+      "liquidity": "71539857051"
+    },
+    {
+      "poolId": "0x8173975e7f90a132ce5078829874bf03b954b9fdc8642aa15f0477ccd145c6b1",
+      "pair": "ZRO/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -271249,
+      "liquidity": "933719393224880"
+    },
+    {
+      "poolId": "0xaf4982efba30c7f6b183120b970bf414c05c4c7a045e7f9fab11eefc366ca300",
+      "pair": "ZRO/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -271218,
+      "liquidity": "20431221628229728"
+    },
+    {
+      "poolId": "0xf906d9c59f7fe2887629a8ffe61cc69c7e2329d3100f677d6ba251fbc015eae5",
+      "pair": "TEL/ETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -233444,
+      "liquidity": "0"
+    },
+    {
+      "poolId": "0xb6d004fca4f9a34197862176485c45ceab7117c86f07422d1fe3d9cfd6e9d1da",
+      "pair": "TEL/ETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -228717,
+      "liquidity": "29850723447"
+    },
+    {
+      "poolId": "0xa0d672040279169695ff8f3ac28b5b85894cfc7ccfbc71476fb606ca37aca389",
+      "pair": "TEL/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 39019,
       "liquidity": "0"
     },
     {
@@ -356,15 +551,15 @@
       "pair": "cbETH/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -1308,
-      "liquidity": "1346231584143938279991"
+      "tick": -1312,
+      "liquidity": "140231432235552207472"
     },
     {
       "poolId": "0x65ff30001f00dea1b0c5ee1096c41921a0a3349f122156f187cabf6cbee20990",
       "pair": "cbETH/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -1276,
+      "tick": -1348,
       "liquidity": "110569813396277546"
     },
     {
@@ -380,7 +575,7 @@
       "pair": "cbETH/USDC",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -196073,
+      "tick": -196035,
       "liquidity": "850249002994"
     },
     {
@@ -396,7 +591,7 @@
       "pair": "cbETH/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -196124,
+      "tick": -196121,
       "liquidity": "1052477620"
     },
     {
@@ -420,7 +615,7 @@
       "pair": "wstETH/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -2167,
+      "tick": -2202,
       "liquidity": "2256417826057657"
     },
     {
@@ -428,7 +623,7 @@
       "pair": "wstETH/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -2158,
+      "tick": -2212,
       "liquidity": "515008151586557048"
     },
     {
@@ -468,8 +663,8 @@
       "pair": "rETH/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -1549,
-      "liquidity": "11417413762289868480"
+      "tick": -1554,
+      "liquidity": "11674702078449987184"
     },
     {
       "poolId": "0xfe93c8ace95aa660ce0013b40017f5c0453bfb78c3340b29c96bc230fe3fe476",
@@ -477,7 +672,7 @@
       "fee": 500,
       "tickSpacing": 10,
       "tick": -1556,
-      "liquidity": "0"
+      "liquidity": "275245258086019993"
     },
     {
       "poolId": "0x36d221ffb18b650eafb51bd3c535a6d50150ccf3a4bc8a7887b3fa28d57ca8d6",
@@ -500,7 +695,7 @@
       "pair": "weETH/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -991,
+      "tick": -985,
       "liquidity": "39850186033214196"
     },
     {
@@ -532,15 +727,15 @@
       "pair": "DAI/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 78948,
-      "liquidity": "1204503252412998690"
+      "tick": 79105,
+      "liquidity": "60565025237203488"
     },
     {
       "poolId": "0xccebeacc62081b2b641ed287df24dea177a92bff828b195509335909bc620b9e",
       "pair": "DAI/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 78947,
+      "tick": 78966,
       "liquidity": "3947600213819890384"
     },
     {
@@ -548,8 +743,8 @@
       "pair": "DAI/USDC",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -276326,
-      "liquidity": "7311828262581169"
+      "tick": -276330,
+      "liquidity": "1167826278346632"
     },
     {
       "poolId": "0xe000cf0bb619e837a8efcfa287bb09f71f996c75ca76c3d19307fcfc9cd0716a",
@@ -557,7 +752,7 @@
       "fee": 500,
       "tickSpacing": 10,
       "tick": -276327,
-      "liquidity": "186101517997377657"
+      "liquidity": "186003174894455128"
     },
     {
       "poolId": "0xe41357e760c43407ad6cdbaf22f43038a0af410393b18662b8115aa790431a27",
@@ -572,7 +767,7 @@
       "pair": "USDT/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -197381,
+      "tick": -197333,
       "liquidity": "930027191638"
     },
     {
@@ -580,7 +775,7 @@
       "pair": "USDT/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -197382,
+      "tick": -197414,
       "liquidity": "6789157791155"
     },
     {
@@ -588,8 +783,8 @@
       "pair": "USDT/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -197383,
-      "liquidity": "320263590037537"
+      "tick": -197382,
+      "liquidity": "267910028394662"
     },
     {
       "poolId": "0x416d320f3e2fbfc9cb8c171e2a42f3506c60ce8737a814a8398265a6bc78367f",
@@ -604,24 +799,24 @@
       "pair": "USDT/USDC",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 8,
-      "liquidity": "686451506864"
+      "tick": 6,
+      "liquidity": "909928026212"
     },
     {
       "poolId": "0xf2ea2ff082a026f1a939674d78057b52f6d7d5927dea069ae3093dfc7b15c30b",
       "pair": "USDT/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 8,
-      "liquidity": "498875497011"
+      "tick": 11,
+      "liquidity": "620517866475"
     },
     {
       "poolId": "0xedbc441668d06aa8bc072732c4f65f9381cde6777a63bbc956adb9266bfac43f",
       "pair": "USDT/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 0,
-      "liquidity": "18162367420"
+      "tick": 3,
+      "liquidity": "23186534437"
     },
     {
       "poolId": "0x83d5d3113e6a02ebf85a97d65aa948f80eec7666e3f85c76a6e5eeff8a9c5ee0",
@@ -644,7 +839,7 @@
       "pair": "EURC/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -198647,
+      "tick": -198663,
       "liquidity": "3105196966683"
     },
     {
@@ -652,7 +847,7 @@
       "pair": "EURC/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -198682,
+      "tick": -198642,
       "liquidity": "147121446041943"
     },
     {
@@ -676,8 +871,8 @@
       "pair": "EURC/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 1289,
-      "liquidity": "91200186085"
+      "tick": 1253,
+      "liquidity": "42307518396"
     },
     {
       "poolId": "0x7fab483af13937fcddc0ad4978f453a25dc73546e8d1708888887ee9f13137ac",
@@ -700,7 +895,7 @@
       "pair": "AERO/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 82920,
+      "tick": 81394,
       "liquidity": "8001567663324424"
     },
     {
@@ -716,15 +911,15 @@
       "pair": "AERO/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 82809,
-      "liquidity": "2040723513829319641939"
+      "tick": 81170,
+      "liquidity": "438405074505425271145"
     },
     {
       "poolId": "0x97ea61ec1113fede823a1c221eb69b20a51d1a3015d7dde1157e60fe0949e415",
       "pair": "AERO/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 82823,
+      "tick": 81102,
       "liquidity": "23308651985043410"
     },
     {
@@ -732,7 +927,7 @@
       "pair": "AERO/USDC",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 280933,
+      "tick": 277541,
       "liquidity": "3106688207"
     },
     {
@@ -740,7 +935,7 @@
       "pair": "AERO/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 280320,
+      "tick": 278545,
       "liquidity": "5409862552950"
     },
     {
@@ -748,23 +943,23 @@
       "pair": "AERO/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 280207,
-      "liquidity": "5663512989238231"
+      "tick": 278576,
+      "liquidity": "5651459449526544"
     },
     {
       "poolId": "0x56a0cd87d81cc71184a4b2dd42964591bf351d0cfdded03f9bc75b7b559344ce",
       "pair": "AERO/USDC",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 280271,
-      "liquidity": "1407926263624066"
+      "tick": 278515,
+      "liquidity": "1443465103466578"
     },
     {
       "poolId": "0xabcf4416765f4951271a6d1bed5d09b7cfec78330a6f9ba2ab2957b9af278eff",
       "pair": "LINK/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 53581,
+      "tick": 53580,
       "liquidity": "21057327753273069"
     },
     {
@@ -772,8 +967,8 @@
       "pair": "LINK/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 53780,
-      "liquidity": "384353990507302894"
+      "tick": 51914,
+      "liquidity": "863602936363035356"
     },
     {
       "poolId": "0xc13f0db56d89a6f9b37187d727066482c32712e79d0f7a8f1d660e70158e44b3",
@@ -828,8 +1023,8 @@
       "pair": "AAVE/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 29645,
-      "liquidity": "24098562818277127779"
+      "tick": 27619,
+      "liquidity": "14629701458970642720"
     },
     {
       "poolId": "0xa9fa43fc326e9815bb4231e4853be7379f62d7ecf2c184f4255c4f16458fefd0",
@@ -852,7 +1047,7 @@
       "pair": "AAVE/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -227033,
+      "tick": -225008,
       "liquidity": "40036757323600"
     },
     {
@@ -860,7 +1055,7 @@
       "pair": "AAVE/USDC",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -226946,
+      "tick": -225801,
       "liquidity": "9758736806635"
     },
     {
@@ -868,7 +1063,7 @@
       "pair": "VIRTUAL/ETH",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": 82559,
+      "tick": 81004,
       "liquidity": "24483986341686943"
     },
     {
@@ -876,7 +1071,7 @@
       "pair": "VIRTUAL/ETH",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": 82387,
+      "tick": 81182,
       "liquidity": "40915078671699498751"
     },
     {
@@ -884,15 +1079,15 @@
       "pair": "VIRTUAL/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 82400,
-      "liquidity": "1372859463426712201900"
+      "tick": 81179,
+      "liquidity": "1527726094411515126697"
     },
     {
       "poolId": "0xe3f7d2c5c2753685de43b5a2e178a647ae3dd31b778121d1d33f6bb2ba7e3615",
       "pair": "VIRTUAL/ETH",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": 82399,
+      "tick": 81097,
       "liquidity": "171694810026008677054"
     },
     {
@@ -916,8 +1111,8 @@
       "pair": "VIRTUAL/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -279801,
-      "liquidity": "963611301390947692"
+      "tick": -278588,
+      "liquidity": "971975168965967685"
     },
     {
       "poolId": "0xde4286c7066d1d4a8400c5a27233a0281fee212196ba304bf4e86b4fd29d1394",
@@ -940,8 +1135,8 @@
       "pair": "DEGEN/ETH",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": 147198,
-      "liquidity": "3237113858141242832218"
+      "tick": 147349,
+      "liquidity": "3165925003516225919430"
     },
     {
       "poolId": "0x734582225b3331b178a85788ed1cbb54873985fb4d94d8df4fd14c7cbeec99b1",
@@ -956,7 +1151,7 @@
       "pair": "DEGEN/USDC",
       "fee": 100,
       "tickSpacing": 1,
-      "tick": -345047,
+      "tick": -344841,
       "liquidity": "1081010551074"
     },
     {
@@ -964,7 +1159,7 @@
       "pair": "DEGEN/USDC",
       "fee": 500,
       "tickSpacing": 10,
-      "tick": -344479,
+      "tick": -344580,
       "liquidity": "38223494312324"
     },
     {
@@ -972,7 +1167,7 @@
       "pair": "DEGEN/USDC",
       "fee": 3000,
       "tickSpacing": 60,
-      "tick": -344457,
+      "tick": -344641,
       "liquidity": "259327095824715"
     },
     {
@@ -980,185 +1175,1849 @@
       "pair": "DEGEN/USDC",
       "fee": 10000,
       "tickSpacing": 200,
-      "tick": -344541,
+      "tick": -344600,
       "liquidity": "29163570169570218"
+    }
+  ],
+  "v3Pools": [
+    {
+      "address": "0xb4cb800910b228ed3d0834cf79d697127bbb00e5",
+      "pair": "WETH/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -197412,
+      "liquidity": "136807945027615135",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+      "pair": "WETH/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -197408,
+      "liquidity": "1395117798305369817",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
+      "pair": "WETH/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -197400,
+      "liquidity": "42872874644366984040",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x0b1c2dcbbfa744ebd3fc17ff1a96a1e1eb4b2d69",
+      "pair": "WETH/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -197329,
+      "liquidity": "55241692429197600",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x4c1e404a013bf1917faf2dbf5e5cef3e9bafb5aa",
+      "pair": "cbBTC/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -264652,
+      "liquidity": "57273758055",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x7aea2e8a3843516afa07293a10ac8e49906dabd1",
+      "pair": "cbBTC/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -264636,
+      "liquidity": "207100190775969015",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x8c7080564b5a792a33ef2fd473fba6364d5495e5",
+      "pair": "cbBTC/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -264611,
+      "liquidity": "101960676116941881",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x233571eae953d9d59eefc0769f71dc19287ddccb",
+      "pair": "cbBTC/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -264628,
+      "liquidity": "2439809101963164",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0xe9e25e35aa99a2a60155010802b81a25c45ba185",
+      "pair": "cbBTC/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -67295,
+      "liquidity": "1868412",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef",
+      "pair": "cbBTC/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -67230,
+      "liquidity": "2186177026803",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0xec558e484cc9f2210714e345298fdc53b253c27d",
+      "pair": "cbBTC/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -67235,
+      "liquidity": "517639914374",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x3e7586d52a9d07f8611b8ecf6ccc8a689c34a659",
+      "pair": "cbBTC/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -67289,
+      "liquidity": "333415203",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0xe474b345531c21f22f298d2db20e5928efcbe440",
+      "pair": "cbXRP/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -203150,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcb585250f852C6c6bf90434AB21A00f02833a4af"
+    },
+    {
+      "address": "0x6cefe2a691b1734042c10958b8e0ec19d81b2850",
+      "pair": "cbXRP/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -201583,
+      "liquidity": "4255903918962616",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcb585250f852C6c6bf90434AB21A00f02833a4af"
+    },
+    {
+      "address": "0x64c0c853fffe5c4fba75a10d7b3513efb7d9904b",
+      "pair": "cbXRP/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcb585250f852C6c6bf90434AB21A00f02833a4af"
+    },
+    {
+      "address": "0x3733cbb1402c788900a0a152e61c9aa31888fb95",
+      "pair": "cbXRP/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -4223,
+      "liquidity": "97839680365",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcb585250f852C6c6bf90434AB21A00f02833a4af"
+    },
+    {
+      "address": "0x1bd7ff4999325eebca07863857457e70e2b3d1ba",
+      "pair": "CRV/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 88038,
+      "liquidity": "25579027132152278344",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415"
+    },
+    {
+      "address": "0x330e535c40eb49cc186496f061052fcf814d68cb",
+      "pair": "CRV/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 88026,
+      "liquidity": "443760742543890679784",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415"
+    },
+    {
+      "address": "0xc1792d1169dc2283a8f49ec94c7b8f0dbb57ee00",
+      "pair": "CRV/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 292532,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415"
+    },
+    {
+      "address": "0xb0f2f7e815f2a9c495ff27608df1677e1fb2f582",
+      "pair": "CRV/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 285455,
+      "liquidity": "627189134761689",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415"
+    },
+    {
+      "address": "0x7dab0f32e71802cf607839ec4d3978a20b3ba649",
+      "pair": "CRV/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 384643,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415"
+    },
+    {
+      "address": "0xb4bfb4a8d7d7513903ff4363fd6af071e23505f1",
+      "pair": "ETHFI/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x6C240DDA6b5c336DF09A4D011139beAAa1eA2Aa2"
+    },
+    {
+      "address": "0x9aed3a8f97e5e5e7189d50690126b2e490a68fda",
+      "pair": "ETHFI/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -278340,
+      "liquidity": "0",
+      "token0": "0x6C240DDA6b5c336DF09A4D011139beAAa1eA2Aa2",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xfa0d2bf6184215d32e4c3e507bf1202f49ac8a8a",
+      "pair": "ZRO/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 65330,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x6985884C4392D348587B19cb9eAAf157F13271cd"
+    },
+    {
+      "address": "0x899cd88db60c1484ceebbf9b0a91a9a6415d485b",
+      "pair": "ZRO/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 69890,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x6985884C4392D348587B19cb9eAAf157F13271cd"
+    },
+    {
+      "address": "0xa2d4a8e00daad32acace1a0dd0905f6aaf57e84e",
+      "pair": "ZRO/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 73831,
+      "liquidity": "412836908818987037962",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x6985884C4392D348587B19cb9eAAf157F13271cd"
+    },
+    {
+      "address": "0x41fd11e5997fbc144418fd2f1b5d9d9b45a94e32",
+      "pair": "ZRO/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 73834,
+      "liquidity": "239652612401101505232",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x6985884C4392D348587B19cb9eAAf157F13271cd"
+    },
+    {
+      "address": "0xbbecd9cedcf3e9dcf50a462decdc03057fae2aeb",
+      "pair": "ZRO/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -262460,
+      "liquidity": "0",
+      "token0": "0x6985884C4392D348587B19cb9eAAf157F13271cd",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x74a381c6073aaef9e044bf0ab1bef3e2965b2812",
+      "pair": "ZRO/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -271187,
+      "liquidity": "11138855450414",
+      "token0": "0x6985884C4392D348587B19cb9eAAf157F13271cd",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x4587df381022922f6622f9096c22e754bcf27b4f",
+      "pair": "ZRO/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -271229,
+      "liquidity": "18190798792821426",
+      "token0": "0x6985884C4392D348587B19cb9eAAf157F13271cd",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x7e278e5fbbb5c1985716e8d5fe635a523b4712d0",
+      "pair": "TEL/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x09bE1692ca16e06f536F0038fF11D1dA8524aDB1",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0xd484752bd4a4be869d274afed815fb686080a754",
+      "pair": "TEL/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 45000,
+      "liquidity": "0",
+      "token0": "0x09bE1692ca16e06f536F0038fF11D1dA8524aDB1",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xa9dafa443a02fbc907cb0093276b3e6f4ef02a46",
+      "pair": "cbETH/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 1316,
+      "liquidity": "1345029459728765499659",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x10648ba41b8565907cfa1496765fa4d95390aa0d",
+      "pair": "cbETH/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 1313,
+      "liquidity": "5830034603488785988654",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x7b9636266734270de5be02544c04e27046903ff8",
+      "pair": "cbETH/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 1320,
+      "liquidity": "2009051818126710664",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x6fb974dcea795d10ade524bcc3fc9e3e9d29ea87",
+      "pair": "cbETH/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 1402,
+      "liquidity": "22342871407808828",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0xf0913af89c3cf89256196fe5ea3e5370dc90c026",
+      "pair": "cbETH/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -194630,
+      "liquidity": "0",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xfdebedc97d56edd31abdcb887570546b257964f2",
+      "pair": "cbETH/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -199650,
+      "liquidity": "0",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xa8e4c55d6daf4d768aeba2378c1ad94c112ef48a",
+      "pair": "cbETH/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -196076,
+      "liquidity": "95737373898884",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xe65ef07833be37659919bbe7ec366a2ec889c884",
+      "pair": "cbETH/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x20e068d76f9e90b90604500b84c7e19dcb923e7e",
+      "pair": "wstETH/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -2192,
+      "liquidity": "76468203512145480809967",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+    },
+    {
+      "address": "0x6f4482cbf7b43599078fcb012732e20480015644",
+      "pair": "wstETH/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -2190,
+      "liquidity": "1323178809410658798868",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+    },
+    {
+      "address": "0x106c077a4d5b422e6e01c1442f7b3321c3281af4",
+      "pair": "wstETH/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -2212,
+      "liquidity": "2441364304849841",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+    },
+    {
+      "address": "0xa8f8a457f22d53f90998354879664d14cee2f009",
+      "pair": "wstETH/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -2074,
+      "liquidity": "19501111890318913",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+    },
+    {
+      "address": "0x45837e65e4c44ca260ab40e6dc30ff1b466a00ca",
+      "pair": "wstETH/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 195217,
+      "liquidity": "52975117443952",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+    },
+    {
+      "address": "0x7344cd93d0538f661920dfe607c94dc6f2df1ec0",
+      "pair": "rETH/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -1288,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c"
+    },
+    {
+      "address": "0x9e13996a9f5a9870c105d7e3c311848273740e98",
+      "pair": "rETH/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -1557,
+      "liquidity": "6308837490143491798132",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c"
+    },
+    {
+      "address": "0xae05dfba2e97c48511d0e065bc9edf676a33ca7b",
+      "pair": "rETH/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -1524,
+      "liquidity": "41852770144200",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c"
+    },
+    {
+      "address": "0x1d060b01f6a88efbc61d76263282be60a2fae785",
+      "pair": "rETH/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -385,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c"
+    },
+    {
+      "address": "0xb1419a7f9e8c6e434b1d05377e0dbc4154e3de78",
+      "pair": "weETH/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 995,
+      "liquidity": "287919636535863954157",
+      "token0": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x33dfd66802cc936a58a0b25b5e4f792c1ca2312e",
+      "pair": "weETH/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x06b80b12048a37f3762a0015a80ac0bb37c4e539",
+      "pair": "weETH/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 948,
+      "liquidity": "1611609587107633",
+      "token0": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0xfa038a1d7f6b68e29b02136939eac4c81b612d60",
+      "pair": "weETH/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 890,
+      "liquidity": "2044585484980492",
+      "token0": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x35c1281fa244f03d4b7e2c69a019ee5d099fb4ca",
+      "pair": "weETH/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x2cbe9598e25662ece3217bf3172d8f092ffbfcb9",
+      "pair": "weETH/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -198512,
+      "liquidity": "0",
+      "token0": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x4ac4b49da3d462e7b7c6f8cec10fea0f7b4ad36d",
+      "pair": "weETH/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x751864805accc54ce46e09fb7f6c46c907ac8590",
+      "pair": "DAI/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 78962,
+      "liquidity": "92415876674162603",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+    },
+    {
+      "address": "0x93e8542e6ca0efffb9d57a270b76712b968a38f5",
+      "pair": "DAI/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 78916,
+      "liquidity": "224906065190286172183",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+    },
+    {
+      "address": "0xdcf81663e68f076ef9763442de134fd0699de4ef",
+      "pair": "DAI/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 78936,
+      "liquidity": "20568942388362452119",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+    },
+    {
+      "address": "0x48ad1e2e7c447f6814e69aefe3f0203a0cc128af",
+      "pair": "DAI/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 79069,
+      "liquidity": "221025070217496892",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb"
+    },
+    {
+      "address": "0xc18f50d6a832f12f6dcaaeee8d0c87a65b96787e",
+      "pair": "DAI/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -276329,
+      "liquidity": "4643646041269677722",
+      "token0": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x19a8b1542b807cd6a76fcbb5ff5f53c6169f36d7",
+      "pair": "DAI/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -276326,
+      "liquidity": "336477451049404318",
+      "token0": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xe63174bc0ee37b76d28956b680af6ba4c508f48a",
+      "pair": "DAI/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -276322,
+      "liquidity": "196281880899295",
+      "token0": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x6ef112968283869e99dc8a6bccc7346302c3bdba",
+      "pair": "DAI/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xd0d182fed9d119e1e41f5199266974f2546eb3f5",
+      "pair": "USDT/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -196258,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0xd92e0767473d1e3ff11ac036f2b1db90ad0ae55f",
+      "pair": "USDT/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -197398,
+      "liquidity": "1595427060702942",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0xce1d8c90a5f0ef28fe0f457e5ad615215899319a",
+      "pair": "USDT/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -197392,
+      "liquidity": "24385570947929554",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0x05e5995e09a4494fdc1ede4c1eb02221898bdd48",
+      "pair": "USDT/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -196201,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0xd56da2b74ba826f19015e6b7dd9dae1903e85da1",
+      "pair": "USDT/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 6,
+      "liquidity": "463922311268953",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0xb7f084c7f7f1c680d08780e2b2ef4f2133db0df8",
+      "pair": "USDT/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 9,
+      "liquidity": "18077006082032",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0x82ccd0de0293ccbd2184901a69fdc2dd8073320e",
+      "pair": "USDT/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 0,
+      "liquidity": "116507852621",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0x5d165468c8a6cf3d50702850ed29becb9ac9ca4d",
+      "pair": "USDT/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 53,
+      "liquidity": "37371",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0x7d2942cf767ad2f201ce417ada8a79586a407a07",
+      "pair": "EURC/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -199375,
+      "liquidity": "93115172",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+    },
+    {
+      "address": "0x38c2f66cbae43502518da7c97a9972a1842825b1",
+      "pair": "EURC/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+    },
+    {
+      "address": "0x260441e9574c0633c70c5cff3a47d75dc9bc3e22",
+      "pair": "EURC/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -198628,
+      "liquidity": "1710468946374",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+    },
+    {
+      "address": "0x3e4235511f4b1ba90ace2e361f490b35bee140f4",
+      "pair": "EURC/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -200322,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+    },
+    {
+      "address": "0x6a1c74e023fe2619516f89408e9d8c541e4e3eef",
+      "pair": "EURC/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 1653,
+      "liquidity": "18414002945",
+      "token0": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x7279c08a36333e12c3fc81747963264c100d66fb",
+      "pair": "EURC/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 1248,
+      "liquidity": "2623436866290",
+      "token0": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x03d8219070e54a55a9ce60889ead2ffd18eb6aa9",
+      "pair": "EURC/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 1239,
+      "liquidity": "223786902722",
+      "token0": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xd99fad95b3d1235b403ee26c5b16531d9aa8e576",
+      "pair": "EURC/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 1355,
+      "liquidity": "14145183",
+      "token0": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x18ec0afa38e54850f51f03a673352ddd0fffd8ba",
+      "pair": "AERO/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 80782,
+      "liquidity": "2832641325172407",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0x9e88239ac8c225e4fe63c72a4c7fc9d1c9ef7e24",
+      "pair": "AERO/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0x3d5d143381916280ff91407febeb52f2b60f33cf",
+      "pair": "AERO/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 81179,
+      "liquidity": "79799080466666443017057",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0x0d5959a52e7004b601f0be70618d01ac3cdce976",
+      "pair": "AERO/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 81103,
+      "liquidity": "1168115922576635942086",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0xdee40d2c0855557d174cdd8b0862fd24a65423ee",
+      "pair": "AERO/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 278078,
+      "liquidity": "89415097815",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
+      "pair": "AERO/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 278584,
+      "liquidity": "519798095823508258",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0x2426dc0a657bd481ab48f86c1616431905901238",
+      "pair": "AERO/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 278574,
+      "liquidity": "8126437553420668",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0x611374654470457af78aa4056f34e64b9acbec8b",
+      "pair": "AERO/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 278512,
+      "liquidity": "21910173942155400",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0x224a5d3f2155f2f85af70b6d72aea61a15273ff4",
+      "pair": "LINK/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 51992,
+      "liquidity": "2011554535472032286738",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196"
+    },
+    {
+      "address": "0x380cbdcabc633a8d99eb02aa31fb15cfa3e2cfc5",
+      "pair": "LINK/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 51935,
+      "liquidity": "17310823185173820880",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196"
+    },
+    {
+      "address": "0xbeacc8ab83c4c32b4a11354a3412a2a12bd6c4b4",
+      "pair": "LINK/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196"
+    },
+    {
+      "address": "0x6c79527d387dd5c0579080374e65d3b4f711719b",
+      "pair": "LINK/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 249382,
+      "liquidity": "1589280447944292",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196"
+    },
+    {
+      "address": "0x08c049f958e7d1f1b7ae44466b80d7773ca09c8e",
+      "pair": "LINK/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 249404,
+      "liquidity": "133382197665698998",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196"
+    },
+    {
+      "address": "0xda11f0ce51729422ee6d6cc561b7c8a3eb80d407",
+      "pair": "LINK/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 250071,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196"
+    },
+    {
+      "address": "0x3da2f29349e47f91b87af8bd3941bfc48a82177d",
+      "pair": "AAVE/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 23855,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x63706e401c06ac8513145b7687A14804d17f814b"
+    },
+    {
+      "address": "0xfece51f2c744e7fe1333481d24701b66b2df46b3",
+      "pair": "AAVE/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 24112,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x63706e401c06ac8513145b7687A14804d17f814b"
+    },
+    {
+      "address": "0x2e86514cfd61fb19c5cf2b879d536d273d6e693d",
+      "pair": "AAVE/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 27635,
+      "liquidity": "1177770789586608488542",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x63706e401c06ac8513145b7687A14804d17f814b"
+    },
+    {
+      "address": "0x0d8ed0fefe5826793d24b46241c007c896561c36",
+      "pair": "AAVE/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x63706e401c06ac8513145b7687A14804d17f814b"
+    },
+    {
+      "address": "0x91bcf207fd676943967c49f35685992654783dee",
+      "pair": "AAVE/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x63706e401c06ac8513145b7687A14804d17f814b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xc562998555779318b85284b7af71bebb2ada3461",
+      "pair": "AAVE/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -225037,
+      "liquidity": "14824180359297103",
+      "token0": "0x63706e401c06ac8513145b7687A14804d17f814b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xf8643d52bab7bedbd26ca59700692de65a6eee3a",
+      "pair": "AAVE/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -225221,
+      "liquidity": "116651313836",
+      "token0": "0x63706e401c06ac8513145b7687A14804d17f814b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x0e3413b54afc11557a7fd3589d541be1dcb1d2b0",
+      "pair": "VIRTUAL/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -81480,
+      "liquidity": "1929605165670427",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x9c087eb773291e50cf6c6a90ef0f4500e349b903",
+      "pair": "VIRTUAL/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -81176,
+      "liquidity": "64800215300007203540481",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x1d4dab3f27c7f656b6323c1d6ef713b48a8f72f1",
+      "pair": "VIRTUAL/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -81178,
+      "liquidity": "3149273688292134558970",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x8e0a7d4018fb2674346d5742055174f899fe1826",
+      "pair": "VIRTUAL/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -81116,
+      "liquidity": "4587248430359490067964",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0xfd394ad7cf5895b332767074345a175f29347311",
+      "pair": "VIRTUAL/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -269604,
+      "liquidity": "0",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x23211b35d62a5c9a76cf1aa1cc391bb331d50659",
+      "pair": "VIRTUAL/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -278581,
+      "liquidity": "1056574304620161",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x529d2863a1521d0b57db028168fde2e97120017c",
+      "pair": "VIRTUAL/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -278591,
+      "liquidity": "5921249226134040977",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xa9991eeaca10af662633913106fe4c18ec06e1f8",
+      "pair": "VIRTUAL/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -278528,
+      "liquidity": "4345465407070096",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xac1bd19ba4d6e8e4a40eb6088f9cdc7ca34f36b6",
+      "pair": "DEGEN/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": 147403,
+      "liquidity": "1401712446036488625",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed"
+    },
+    {
+      "address": "0xb0037fffffb6e514f88458bc698102865bca910a",
+      "pair": "DEGEN/WETH",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": 147329,
+      "liquidity": "28479393743641070988",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed"
+    },
+    {
+      "address": "0xc9034c3e7f58003e6ae0c8438e7c8f4598d5acaa",
+      "pair": "DEGEN/WETH",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": 147345,
+      "liquidity": "254542787540369135941994",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed"
+    },
+    {
+      "address": "0x0ca6485b7e9cf814a3fd09d81672b07323535b64",
+      "pair": "DEGEN/WETH",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": 147338,
+      "liquidity": "385538238930529386746198",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed"
+    },
+    {
+      "address": "0x8f8799cef65e4dda2853619ada8f5290493f3ae5",
+      "pair": "DEGEN/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xa528671c1c7c50d685674a2b06d9b9d5d0bf798d",
+      "pair": "DEGEN/USDC",
+      "fee": 500,
+      "tickSpacing": 10,
+      "tick": -344674,
+      "liquidity": "26886497218222",
+      "token0": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x0cc3150056ff3fa2e70be77d25fe9ec33d12a437",
+      "pair": "DEGEN/USDC",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "tick": -344656,
+      "liquidity": "4385059324671617",
+      "token0": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x29715d8d279cab143a12ff515b40a2b35d7bad37",
+      "pair": "DEGEN/USDC",
+      "fee": 10000,
+      "tickSpacing": 200,
+      "tick": -344569,
+      "liquidity": "1281152509941231",
+      "token0": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    }
+  ],
+  "aeroPools": [
+    {
+      "address": "0xdbc6998296caa1652a810dc8d3baf4a8294330f1",
+      "pair": "WETH/USDC",
+      "fee": 80,
+      "tickSpacing": 1,
+      "tick": -197411,
+      "liquidity": "3199944816900319",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xaad23a67f2ac693abbe543489aeb3f24f561d517",
+      "pair": "WETH/USDC",
+      "fee": 500,
+      "tickSpacing": 50,
+      "tick": -197405,
+      "liquidity": "1681724443022345",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59",
+      "pair": "WETH/USDC",
+      "fee": 579,
+      "tickSpacing": 100,
+      "tick": -197409,
+      "liquidity": "2258235134995541768",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x148bc43946a902258916e580b0e6d92aaa74746f",
+      "pair": "WETH/USDC",
+      "fee": 3000,
+      "tickSpacing": 200,
+      "tick": -197392,
+      "liquidity": "84146678310057",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x0652202c4b2d09cb93aedefadc14b36869483a98",
+      "pair": "WETH/USDC",
+      "fee": 500,
+      "tickSpacing": 2000,
+      "tick": -197406,
+      "liquidity": "720757241686447",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x22aee3699b6a0fed71490c103bd4e5f3309891d5",
+      "pair": "cbBTC/WETH",
+      "fee": 85,
+      "tickSpacing": 1,
+      "tick": -264641,
+      "liquidity": "742484668791472",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x70acdf2ad0bf2402c957154f944c19ef4e1cbae1",
+      "pair": "cbBTC/WETH",
+      "fee": 2525,
+      "tickSpacing": 100,
+      "tick": -264617,
+      "liquidity": "118610187802044116",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x4f5905e36ac07ee1f01ffb939aa7f212a58d5cdf",
+      "pair": "cbBTC/USDC",
+      "fee": 181,
+      "tickSpacing": 1,
+      "tick": -67230,
+      "liquidity": "3497186018",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x798a3ae1563c47a310541cc6277ee879cd1be667",
+      "pair": "cbBTC/USDC",
+      "fee": 500,
+      "tickSpacing": 50,
+      "tick": -65730,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x4e962bb3889bf030368f56810a9c96b83cb3e778",
+      "pair": "cbBTC/USDC",
+      "fee": 508,
+      "tickSpacing": 100,
+      "tick": -67230,
+      "liquidity": "4652098397638",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0x3e66e55e97ce60096f74b7c475e8249f2d31a9fb",
+      "pair": "cbBTC/USDC",
+      "fee": 350,
+      "tickSpacing": 2000,
+      "tick": -67231,
+      "liquidity": "1255221072679",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+    },
+    {
+      "address": "0xa382a0693152d2b62d667d70a8eaa2e574380519",
+      "pair": "cbXRP/WETH",
+      "fee": 500,
+      "tickSpacing": 100,
+      "tick": -203430,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcb585250f852C6c6bf90434AB21A00f02833a4af"
+    },
+    {
+      "address": "0xa6da283cf7d06b2279626e787c329d6acf7e2994",
+      "pair": "cbXRP/WETH",
+      "fee": 2500,
+      "tickSpacing": 2000,
+      "tick": -201565,
+      "liquidity": "2558561643912722",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xcb585250f852C6c6bf90434AB21A00f02833a4af"
+    },
+    {
+      "address": "0x587a2bbe7e7537762a1a923687f90706cf0c0877",
+      "pair": "cbXRP/USDC",
+      "fee": 3000,
+      "tickSpacing": 200,
+      "tick": -4172,
+      "liquidity": "32853",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcb585250f852C6c6bf90434AB21A00f02833a4af"
+    },
+    {
+      "address": "0xf7c8db2e04092df74120305d53017b40920d5c2e",
+      "pair": "cbXRP/USDC",
+      "fee": 10000,
+      "tickSpacing": 2000,
+      "tick": -10000,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xcb585250f852C6c6bf90434AB21A00f02833a4af"
+    },
+    {
+      "address": "0xfefe4e80f2d747a484154f7ae18b20d478e49d40",
+      "pair": "ETHFI/WETH",
+      "fee": 2700,
+      "tickSpacing": 200,
+      "tick": 81356,
+      "liquidity": "1491551928391313596627",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x6C240DDA6b5c336DF09A4D011139beAAa1eA2Aa2"
+    },
+    {
+      "address": "0xa4463789e8f3c6a599b3dfb608dde55513bcf289",
+      "pair": "ZRO/WETH",
+      "fee": 1500,
+      "tickSpacing": 100,
+      "tick": 73844,
+      "liquidity": "349976731146284108997",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x6985884C4392D348587B19cb9eAAf157F13271cd"
+    },
+    {
+      "address": "0xf8563289297fc5fe420f8dc399c2cd0748a16697",
+      "pair": "ZRO/WETH",
+      "fee": 10000,
+      "tickSpacing": 2000,
+      "tick": 887271,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x6985884C4392D348587B19cb9eAAf157F13271cd"
+    },
+    {
+      "address": "0x47ca96ea59c13f72745928887f84c9f52c3d7348",
+      "pair": "cbETH/WETH",
+      "fee": 60,
+      "tickSpacing": 1,
+      "tick": 1315,
+      "liquidity": "8630749034322110107671215",
+      "token0": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x861a2922be165a5bd41b1e482b49216b465e1b5f",
+      "pair": "wstETH/WETH",
+      "fee": 90,
+      "tickSpacing": 1,
+      "tick": -2192,
+      "liquidity": "19855927734684123663710026",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+    },
+    {
+      "address": "0xc5e47133b68c6c50298312829cb4d4f56ed43325",
+      "pair": "wstETH/WETH",
+      "fee": 500,
+      "tickSpacing": 100,
+      "tick": -1,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+    },
+    {
+      "address": "0x18abab4e9470782bc8c7e5d020b54c5cc474e8a7",
+      "pair": "wstETH/USDC",
+      "fee": 500,
+      "tickSpacing": 100,
+      "tick": 195399,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452"
+    },
+    {
+      "address": "0x67c9abd95eb6fa27e95f1b9a702c8a86370223ad",
+      "pair": "rETH/WETH",
+      "fee": 500,
+      "tickSpacing": 1,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c"
+    },
+    {
+      "address": "0xcb1f3e1a6bb8a0e2d97bdc9d48db093b2c0095f9",
+      "pair": "rETH/USDC",
+      "fee": 500,
+      "tickSpacing": 100,
+      "tick": 195836,
+      "liquidity": "347381073832",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xB6fe221Fe9EeF5aBa221c348bA20A1Bf5e73624c"
+    },
+    {
+      "address": "0xbd3cd0d9d429b41f0a2e1c026552bd598294d5e0",
+      "pair": "weETH/WETH",
+      "fee": 85,
+      "tickSpacing": 1,
+      "tick": 993,
+      "liquidity": "10326736508394427110069126",
+      "token0": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x4e364ea305fc2b3e264e57813b17be772b3f6a32",
+      "pair": "USDT/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -201066,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0x9785ef59e2b499fb741674ecf6faf912df7b3c1b",
+      "pair": "USDT/WETH",
+      "fee": 409,
+      "tickSpacing": 100,
+      "tick": -197402,
+      "liquidity": "606726723402204111",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0xa41bc0affba7fd420d186b84899d7ab2ac57fcd1",
+      "pair": "USDT/USDC",
+      "fee": 9,
+      "tickSpacing": 1,
+      "tick": 6,
+      "liquidity": "7087904232323078",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+    },
+    {
+      "address": "0xc723202b87d4ca664cb115e924931c6afd18aff7",
+      "pair": "EURC/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -202252,
+      "liquidity": "0",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+    },
+    {
+      "address": "0x5d4e504eb4c526995e0cc7a6e327fda75d8b52b5",
+      "pair": "EURC/WETH",
+      "fee": 150,
+      "tickSpacing": 100,
+      "tick": -198659,
+      "liquidity": "2315543166672750",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+    },
+    {
+      "address": "0xc5e51044eb7318950b1afb044fccfb25782c48c1",
+      "pair": "EURC/USDC",
+      "fee": 76,
+      "tickSpacing": 1,
+      "tick": 1251,
+      "liquidity": "792313901210",
+      "token0": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0xe846373c1a92b167b4e9cd5d8e4d6b1db9e90ec7",
+      "pair": "EURC/USDC",
+      "fee": 73,
+      "tickSpacing": 50,
+      "tick": 1251,
+      "liquidity": "102578681479264",
+      "token0": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x8f20734720d1bbf200489f79269e218439b7366a",
+      "pair": "EURC/USDC",
+      "fee": 10000,
+      "tickSpacing": 2000,
+      "tick": 1437,
+      "liquidity": "46232",
+      "token0": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x82321f3beb69f503380d6b233857d5c43562e2d0",
+      "pair": "AERO/WETH",
+      "fee": 3064,
+      "tickSpacing": 200,
+      "tick": 81176,
+      "liquidity": "283143971822324407864757",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0x9ed0f0f21b83d1595147dc6b32b5607647bdcd56",
+      "pair": "AERO/USDC",
+      "fee": 500,
+      "tickSpacing": 50,
+      "tick": -887272,
+      "liquidity": "0",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0xa4fdd479eda160671636e2ecf8f993cbf86258a8",
+      "pair": "AERO/USDC",
+      "fee": 500,
+      "tickSpacing": 100,
+      "tick": 278586,
+      "liquidity": "1682564307944318961",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0xccd9cc53b63662088c738b8bc06e9078fb8d9ad4",
+      "pair": "AERO/USDC",
+      "fee": 3000,
+      "tickSpacing": 200,
+      "tick": 278581,
+      "liquidity": "1903506063539715819",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0xbe00ff35af70e8415d0eb605a286d8a45466a4c1",
+      "pair": "AERO/USDC",
+      "fee": 10000,
+      "tickSpacing": 2000,
+      "tick": 278512,
+      "liquidity": "47375521541714811028",
+      "token0": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631"
+    },
+    {
+      "address": "0x72be417afb0abea66913141c605d313bb389b59c",
+      "pair": "LINK/WETH",
+      "fee": 2500,
+      "tickSpacing": 100,
+      "tick": 51986,
+      "liquidity": "24087403241460543468763",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196"
+    },
+    {
+      "address": "0x4a79b0168296c0ef7b8f314973b82ad406a29f1b",
+      "pair": "AAVE/WETH",
+      "fee": 3000,
+      "tickSpacing": 200,
+      "tick": 27630,
+      "liquidity": "6404088804818749276221",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x63706e401c06ac8513145b7687A14804d17f814b"
+    },
+    {
+      "address": "0xd3bfee2e038aaa0e6d77f8823941905e66f822fe",
+      "pair": "AAVE/USDC",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -225262,
+      "liquidity": "50300976188062293",
+      "token0": "0x63706e401c06ac8513145b7687A14804d17f814b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x9dce7ccc7526edfa3d248aeddcec10df01f9c838",
+      "pair": "AAVE/USDC",
+      "fee": 500,
+      "tickSpacing": 100,
+      "tick": -225263,
+      "liquidity": "0",
+      "token0": "0x63706e401c06ac8513145b7687A14804d17f814b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x497ac4a096c7e467ba394a28020c926a330f19b2",
+      "pair": "AAVE/USDC",
+      "fee": 3000,
+      "tickSpacing": 200,
+      "tick": -229042,
+      "liquidity": "0",
+      "token0": "0x63706e401c06ac8513145b7687A14804d17f814b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x14cea6cd0157e0fba35a21c2eaed2a2aea774627",
+      "pair": "VIRTUAL/WETH",
+      "fee": 100,
+      "tickSpacing": 1,
+      "tick": -80623,
+      "liquidity": "0",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0x3f0296bf652e19bca772ec3df08b32732f93014a",
+      "pair": "VIRTUAL/WETH",
+      "fee": 100,
+      "tickSpacing": 100,
+      "tick": -81178,
+      "liquidity": "40750199964375769648029",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0xc200f21efe67c7f41b81a854c26f9cda80593065",
+      "pair": "VIRTUAL/WETH",
+      "fee": 600,
+      "tickSpacing": 200,
+      "tick": -81180,
+      "liquidity": "72839544458024642907504",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x4200000000000000000000000000000000000006"
+    },
+    {
+      "address": "0xae08f8e7f810bab3e12875adc9715ecd626cf23c",
+      "pair": "VIRTUAL/USDC",
+      "fee": 3000,
+      "tickSpacing": 200,
+      "tick": -278498,
+      "liquidity": "18962485234677",
+      "token0": "0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b",
+      "token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    {
+      "address": "0x68a5aea4de3d938a755d85d1868fe79a9c7b6ae1",
+      "pair": "DEGEN/WETH",
+      "fee": 100,
+      "tickSpacing": 100,
+      "tick": 147258,
+      "liquidity": "569131738917226225",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed"
+    },
+    {
+      "address": "0xafb62448929664bfccb0aae22f232520e765ba88",
+      "pair": "DEGEN/WETH",
+      "fee": 2400,
+      "tickSpacing": 200,
+      "tick": 147348,
+      "liquidity": "43395880567424352073567",
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed"
     }
   ],
   "geckoTopPools": [
     {
+      "geckoAddress": "0x2df380544b88adb3ad0a94100dcc45fd705aae2d",
+      "name": "xdp / USDC 0.01%",
+      "dex": "uniswap-v3-base",
+      "reserveUsd": 1834575.1126,
+      "volume24hUsd": 187499517.930295
+    },
+    {
+      "geckoAddress": "0x1ef035205f94c7734827961c438474d089a334a0",
+      "name": "xdp / USDC 2%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 576785.3983,
+      "volume24hUsd": 13338998.7573623
+    },
+    {
       "geckoAddress": "0x72ab388e2e2f6facef59e3c3fa2c4e29011c2d38",
       "name": "WETH / USDC 0.01%",
       "dex": "pancakeswap-v3-base",
-      "reserveUsd": 4833525.7101,
-      "volume24hUsd": 70934144.2153872
+      "reserveUsd": 4918802.2547,
+      "volume24hUsd": 74467017.7948196
     },
     {
       "geckoAddress": "0xb4cb800910b228ed3d0834cf79d697127bbb00e5",
       "name": "WETH / USDC 0.01%",
       "dex": "uniswap-v3-base",
-      "reserveUsd": 364295.8577,
-      "volume24hUsd": 5321942.7135217
-    },
-    {
-      "geckoAddress": "0xdb366ce311055bc3e275de10dbc320b4ade74c3ebc0179dd3fbb8efbcdb1b096",
-      "name": "SPIKE / wtCOIN",
-      "dex": "uniswap-v4-base",
-      "reserveUsd": 77368.1179,
-      "volume24hUsd": 4350826.91840765
-    },
-    {
-      "geckoAddress": "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59",
-      "name": "WETH / USDC 0.05%",
-      "dex": "aerodrome-slipstream",
-      "reserveUsd": 7400764.9299,
-      "volume24hUsd": 115168719.571817
+      "reserveUsd": 547362.1944,
+      "volume24hUsd": 7495004.25514669
     },
     {
       "geckoAddress": "0xd0b53d9277642d899df5c87a3966a349a798f224",
       "name": "USDC / WETH 0.05%",
       "dex": "uniswap-v3-base",
-      "reserveUsd": 9446027.6085,
-      "volume24hUsd": 24664401.2580106
-    },
-    {
-      "geckoAddress": "0xbedfdb1c91ccfd3269d5aec696c95e96457205ab9cab1ebe6be608e295a3a0a5",
-      "name": "SPIKE / ETH",
-      "dex": "o1-launchpad",
-      "reserveUsd": 192293.611,
-      "volume24hUsd": 8277869.47100486
+      "reserveUsd": 9700095.0633,
+      "volume24hUsd": 22881801.4027434
     },
     {
       "geckoAddress": "0x7c7420dd105e2779316423ba3e973f434315efa9",
       "name": "cbBTC / WETH 0.009%",
       "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 1627906.7218,
-      "volume24hUsd": 40505764.4306179
+      "reserveUsd": 1946110.1424,
+      "volume24hUsd": 58540264.2705708
     },
     {
       "geckoAddress": "0xb94b22332abf5f89877a14cc88f2abc48c34b3df",
       "name": "cbBTC / USDC 0.01%",
       "dex": "pancakeswap-v3-base",
-      "reserveUsd": 1780354.6527,
-      "volume24hUsd": 11580293.7751486
-    },
-    {
-      "geckoAddress": "0x4e392fbfe4d0557c82d2f97f02ec39daa31516dd",
-      "name": "WETH / USDC 0.008%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 155176.7849,
-      "volume24hUsd": 2893836.96251998
-    },
-    {
-      "geckoAddress": "0xc211e1f853a898bd1302385ccde55f33a8c4b3f3",
-      "name": "cbBTC / WETH 0.01%",
-      "dex": "pancakeswap-v3-base",
-      "reserveUsd": 5946817.1706,
-      "volume24hUsd": 39161702.383034
-    },
-    {
-      "geckoAddress": "0x3693022bd390e147d8dd89a05403c80ff21dd64b",
-      "name": "ZEST / USDC 0.018%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 185231.0476,
-      "volume24hUsd": 1356891.18450009
-    },
-    {
-      "geckoAddress": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
-      "name": "WETH / USDC 0.3%",
-      "dex": "uniswap-v3-base",
-      "reserveUsd": 151931076.5797,
-      "volume24hUsd": 105637331.429956
-    },
-    {
-      "geckoAddress": "0x4618dfcbc52d9fbcd45ec4a65fc61b5da57ad205",
-      "name": "wtCOIN / USDC 0.3%",
-      "dex": "aerodrome-slipstream-2",
-      "reserveUsd": 223850.4307,
-      "volume24hUsd": 3655119.36335323
-    },
-    {
-      "geckoAddress": "0x3f0296bf652e19bca772ec3df08b32732f93014a",
-      "name": "VIRTUAL / WETH 0.05%",
-      "dex": "aerodrome-slipstream",
-      "reserveUsd": 368989.9995,
-      "volume24hUsd": 3167706.71161765
-    },
-    {
-      "geckoAddress": "0x20cb8f872ae894f7c9e32e621c186e5afce82fd0",
-      "name": "AERO / WETH 0.05%",
-      "dex": "pancakeswap-v3-base",
-      "reserveUsd": 176129.1682,
-      "volume24hUsd": 1458781.76456916
-    },
-    {
-      "geckoAddress": "0x8a8e4170c09074b109352190d47e54d7c1f61e4e",
-      "name": "PROS / USDC 0.01%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 888889.3094,
-      "volume24hUsd": 2534572.70200132
-    },
-    {
-      "geckoAddress": "0x160d7e9d948b16c163332a277b393c288408eb12",
-      "name": "cbBTC / USDC 0.05%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 5009184.1283,
-      "volume24hUsd": 29038385.2070582
-    },
-    {
-      "geckoAddress": "0x7cb770d0513c30e0cb45e4899e4a2cbeed6f9830",
-      "name": "VIRTUAL / USDC 0.05%",
-      "dex": "pancakeswap-v3-base",
-      "reserveUsd": 260899.9716,
-      "volume24hUsd": 1356682.37251091
-    },
-    {
-      "geckoAddress": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
-      "name": "AERO / USDC 0.05%",
-      "dex": "uniswap-v3-base",
-      "reserveUsd": 287634.939,
-      "volume24hUsd": 1190446.36366766
-    },
-    {
-      "geckoAddress": "0x9c087eb773291e50cf6c6a90ef0f4500e349b903",
-      "name": "VIRTUAL / WETH 0.05%",
-      "dex": "uniswap-v3-base",
-      "reserveUsd": 476041.7403,
-      "volume24hUsd": 2173273.14833202
-    },
-    {
-      "geckoAddress": "0x3fe04a59ebd38cf06080a6f60a98d124eb59392a",
-      "name": "WETH / USDC 0.05%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 8037697.8525,
-      "volume24hUsd": 52253973.4478769
-    },
-    {
-      "geckoAddress": "0x717e174d5dae280802d1a2c15c1c0976561a3f61",
-      "name": "ZRO / WETH 0.043%",
-      "dex": "aerodrome-slipstream-3",
-      "reserveUsd": 165597.1384,
-      "volume24hUsd": 1557515.48677087
+      "reserveUsd": 1744191.4349,
+      "volume24hUsd": 10384074.2992208
     },
     {
       "geckoAddress": "0xa41bc0affba7fd420d186b84899d7ab2ac57fcd1",
       "name": "USDT / USDC 0.01%",
       "dex": "aerodrome-slipstream",
-      "reserveUsd": 1069939.445,
-      "volume24hUsd": 10680274.5243908
+      "reserveUsd": 1084729.4797,
+      "volume24hUsd": 15401512.3878648
     },
     {
-      "geckoAddress": "0x6b0f53cbd9272d8117e9535fe25371dedf39a1be",
-      "name": "VELVET / USDC 0.01%",
+      "geckoAddress": "0x3f0296bf652e19bca772ec3df08b32732f93014a",
+      "name": "VIRTUAL / WETH 0.05%",
       "dex": "aerodrome-slipstream",
-      "reserveUsd": 1034632.9266,
-      "volume24hUsd": 534186.788269302
+      "reserveUsd": 371894.4367,
+      "volume24hUsd": 4394408.60532368
     },
     {
-      "geckoAddress": "0xf0bac62dd4fd04dc26c9bc9ded68f16c515ab71c09bb87e8e546b7ce83c0ccb9",
-      "name": "CATALYST / USDC",
+      "geckoAddress": "0xc211e1f853a898bd1302385ccde55f33a8c4b3f3",
+      "name": "cbBTC / WETH 0.01%",
+      "dex": "pancakeswap-v3-base",
+      "reserveUsd": 5947939.0108,
+      "volume24hUsd": 43267393.3640558
+    },
+    {
+      "geckoAddress": "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59",
+      "name": "WETH / USDC 0.05%",
+      "dex": "aerodrome-slipstream",
+      "reserveUsd": 7534506.903,
+      "volume24hUsd": 118276567.020787
+    },
+    {
+      "geckoAddress": "0x20cb8f872ae894f7c9e32e621c186e5afce82fd0",
+      "name": "AERO / WETH 0.05%",
+      "dex": "pancakeswap-v3-base",
+      "reserveUsd": 186258.5821,
+      "volume24hUsd": 1309849.26390338
+    },
+    {
+      "geckoAddress": "0x9c087eb773291e50cf6c6a90ef0f4500e349b903",
+      "name": "VIRTUAL / WETH 0.05%",
+      "dex": "uniswap-v3-base",
+      "reserveUsd": 562952.831,
+      "volume24hUsd": 3929245.27319063
+    },
+    {
+      "geckoAddress": "0x4e392fbfe4d0557c82d2f97f02ec39daa31516dd",
+      "name": "WETH / USDC 0.008%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 124007.4856,
+      "volume24hUsd": 1486804.83633461
+    },
+    {
+      "geckoAddress": "0x7cb770d0513c30e0cb45e4899e4a2cbeed6f9830",
+      "name": "VIRTUAL / USDC 0.05%",
+      "dex": "pancakeswap-v3-base",
+      "reserveUsd": 277858.5828,
+      "volume24hUsd": 1513496.5535695
+    },
+    {
+      "geckoAddress": "0x160d7e9d948b16c163332a277b393c288408eb12",
+      "name": "cbBTC / USDC 0.05%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 5043946.9528,
+      "volume24hUsd": 34618341.6197368
+    },
+    {
+      "geckoAddress": "0x3fe04a59ebd38cf06080a6f60a98d124eb59392a",
+      "name": "WETH / USDC 0.05%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 8982980.8405,
+      "volume24hUsd": 75094548.2690176
+    },
+    {
+      "geckoAddress": "0x9520e1a3bfd86da6c1e9e5ee4b9c2f11c413358f",
+      "name": "VIRTUAL / WETH 0.011%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 192836.7755,
+      "volume24hUsd": 2852272.13021699
+    },
+    {
+      "geckoAddress": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
+      "name": "WETH / USDC 0.3%",
+      "dex": "uniswap-v3-base",
+      "reserveUsd": 156992239.7078,
+      "volume24hUsd": 130597218.912298
+    },
+    {
+      "geckoAddress": "0xf13203ddbf2c9816a79b656a1a952521702715d92fea465b84ae2ed6e94a7f22",
+      "name": "USDT / USDC",
       "dex": "uniswap-v4-base",
-      "reserveUsd": 1148126.1602,
-      "volume24hUsd": 8099947.95036357
+      "reserveUsd": 1961052.1267,
+      "volume24hUsd": 4351276.17227522
+    },
+    {
+      "geckoAddress": "0x8a8e4170c09074b109352190d47e54d7c1f61e4e",
+      "name": "PROS / USDC 0.01%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 967194.6179,
+      "volume24hUsd": 1399974.71335622
+    },
+    {
+      "geckoAddress": "0xa4fdd479eda160671636e2ecf8f993cbf86258a8",
+      "name": "AERO / USDC 0.05%",
+      "dex": "aerodrome-slipstream",
+      "reserveUsd": 786529.3577,
+      "volume24hUsd": 1654249.17558905
+    },
+    {
+      "geckoAddress": "0xe5b5f522e98b5a2baae212d4da66b865b781db97",
+      "name": "AERO / USDC 0.05%",
+      "dex": "uniswap-v3-base",
+      "reserveUsd": 276712.8178,
+      "volume24hUsd": 685250.951695201
+    },
+    {
+      "geckoAddress": "0xc200f21efe67c7f41b81a854c26f9cda80593065",
+      "name": "VIRTUAL / WETH 0.7%",
+      "dex": "aerodrome-slipstream",
+      "reserveUsd": 446711.5318,
+      "volume24hUsd": 3861344.14374151
+    },
+    {
+      "geckoAddress": "0x1131db5977242a03ebead1acd18f80a9a29e5922",
+      "name": "SOL / USDC 0.021%",
+      "dex": "aerodrome-slipstream-3",
+      "reserveUsd": 702874.6109,
+      "volume24hUsd": 7955256.62357884
     }
   ]
 }

@@ -328,7 +328,7 @@ function HowItWorks({ market }: { market: Market }) {
     <section className="space-y-4 rounded-3xl bg-surface shadow-card p-5 text-sm">
       <h2 className="font-display text-xl font-extrabold">How this pool works</h2>
       <Step n={1} title={`You hold ${b} and ${q}`}>
-        Your deposit is split into both, matched to your price range, and placed in the official Uniswap pool. It stays in your own wallet as a position you can withdraw any time.
+        Your deposit is split into both, matched to your price range, and placed in the official pool on the exchange shown above. It stays in your own wallet as a position you can withdraw any time.
       </Step>
       <Step n={2} title={`Traders pay you ${market.pool.fee / 10_000}% per trade`}>
         Every swap through this pool while the price is inside your range pays a fee, shared among everyone providing liquidity in that range. Narrower ranges earn a bigger share.

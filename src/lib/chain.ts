@@ -54,8 +54,12 @@ export type ChainConfig = {
       quoter: `0x${string}`;
       stateView: `0x${string}`;
     };
+    /** Uniswap v3: one contract per pool, WETH not native ETH */
+    v3?: V3Contracts;
     permit2: `0x${string}`;
   };
+  /** Aerodrome Slipstream (Base): a Uniswap v3 fork keyed by tick spacing */
+  aerodrome?: V3Contracts;
   /** Blockscout — used to enumerate a user's v4 position NFTs */
   explorer: { url: string; apiUrl: string };
   /** GeckoTerminal network slug for pool stats */
@@ -86,6 +90,14 @@ export function gasMode(chainId: ChainId): "sponsored" | "token" | "eth" {
 
 const PERMIT2 = "0x000000000022D473030F116dDEE9F6B43aC78BA3" as const;
 
+export type V3Contracts = {
+  factory: `0x${string}`;
+  positionManager: `0x${string}`;
+  quoter: `0x${string}`;
+  swapRouter: `0x${string}`;
+  weth: `0x${string}`;
+};
+
 export const CHAINS: Record<ChainId, ChainConfig> = {
   8453: {
     chain: baseChain,
@@ -101,7 +113,21 @@ export const CHAINS: Record<ChainId, ChainConfig> = {
         quoter: "0x0d5e0f971ed27fbff6c2837bf31316121532048d",
         stateView: "0xa3c0c9b65bad0b08107aa264b0f3db444b867a71",
       },
+      v3: {
+        factory: "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
+        positionManager: "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1",
+        quoter: "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a",
+        swapRouter: "0x2626664c2603336E57B271c5C0b26F421741e481",
+        weth: "0x4200000000000000000000000000000000000006",
+      },
       permit2: PERMIT2,
+    },
+    aerodrome: {
+      factory: "0x5e7BB104d84c7CB9B682AaC2F3d509f5F406809A",
+      positionManager: "0x827922686190790b37229fd06084350E74485b72",
+      quoter: "0x254cF9E1E6e233aa1AC962CB9B05b2cfeAaE15b0",
+      swapRouter: "0xBE6D8f0d05cC4be24d5167a3eF062215bE6D18a5",
+      weth: "0x4200000000000000000000000000000000000006",
     },
     explorer: { url: "https://base.blockscout.com", apiUrl: "https://base.blockscout.com/api/v2" },
     gecko: "base",
@@ -121,6 +147,13 @@ export const CHAINS: Record<ChainId, ChainConfig> = {
         universalRouter: "0x8876789976decbfcbbbe364623c63652db8c0904",
         quoter: "0x8dc178efb8111bb0973dd9d722ebeff267c98f94",
         stateView: "0xf3334192d15450cdd385c8b70e03f9a6bd9e673b",
+      },
+      v3: {
+        factory: "0x1f7d7550b1b028f7571e69a784071f0205fd2efa",
+        positionManager: "0x73991a25c818bf1f1128deaab1492d45638de0d3",
+        quoter: "0x33e885ed0ec9bf04ecfb19341582aadcb4c8a9e7",
+        swapRouter: "0xcaf681a66d020601342297493863e78c959e5cb2",
+        weth: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
       },
       permit2: PERMIT2,
     },
@@ -159,14 +192,27 @@ export function explorerUrl(chainId: number, kind: "tx" | "address", value: stri
 }
 
 /** The position NFT on the chain's Blockscout explorer. */
-export function explorerNftUrl(chainId: number, tokenId: bigint) {
+export type Venue = "uniswap-v4" | "uniswap-v3" | "aerodrome";
+export const VENUE_LABEL: Record<Venue, string> = { "uniswap-v4": "Uniswap v4", "uniswap-v3": "Uniswap v3", aerodrome: "Aerodrome" };
+
+/** The position NFT contract a venue mints on a chain. */
+export function positionManagerOf(chainId: number, venue: Venue): `0x${string}` {
   const c = chainConfig(chainId);
-  return `${c.explorer.url}/token/${c.uniswap.v4.positionManager}/instance/${tokenId}`;
+  if (venue === "uniswap-v4") return c.uniswap.v4.positionManager;
+  const v = venue === "uniswap-v3" ? c.uniswap.v3 : c.aerodrome;
+  if (!v) throw new Error(`${VENUE_LABEL[venue]} is not on ${c.label}`);
+  return v.positionManager;
+}
+
+export function explorerNftUrl(chainId: number, tokenId: bigint, venue: Venue = "uniswap-v4") {
+  const c = chainConfig(chainId);
+  return `${c.explorer.url}/token/${positionManagerOf(chainId, venue)}/instance/${tokenId}`;
 }
 
 /** The same position inside Uniswap's own app — the strongest "you don't
  *  need us" proof there is. Our chain slugs match Uniswap's URL slugs
  *  (checked 2026-09-24: /positions/v4/base/… and /positions/v4/robinhood/…). */
-export function uniswapPositionUrl(chainId: number, tokenId: bigint) {
-  return `https://app.uniswap.org/positions/v4/${chainConfig(chainId).slug}/${tokenId}`;
+export function uniswapPositionUrl(chainId: number, tokenId: bigint, venue: Venue = "uniswap-v4") {
+  if (venue === "aerodrome") return `https://aerodrome.finance/deposit`;
+  return `https://app.uniswap.org/positions/${venue === "uniswap-v3" ? "v3" : "v4"}/${chainConfig(chainId).slug}/${tokenId}`;
 }

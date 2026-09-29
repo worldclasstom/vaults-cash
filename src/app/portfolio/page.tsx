@@ -329,11 +329,11 @@ function PositionCard({ p }: { p: PositionView }) {
       </p>
       <p className="pt-1 text-xs text-muted">
         Position NFT #{p.tokenId.toString()} in your wallet ·{" "}
-        <a href={uniswapPositionUrl(m.chainId, p.tokenId)} target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-foreground hover:underline">
-          Open in Uniswap ↗
+        <a href={uniswapPositionUrl(m.chainId, p.tokenId, m.venue)} target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-foreground hover:underline">
+          Open in {m.venue === "aerodrome" ? "Aerodrome" : "Uniswap"} ↗
         </a>{" "}
         ·{" "}
-        <a href={explorerNftUrl(m.chainId, p.tokenId)} target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-foreground hover:underline">
+        <a href={explorerNftUrl(m.chainId, p.tokenId, m.venue)} target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-foreground hover:underline">
           Explorer ↗
         </a>
       </p>

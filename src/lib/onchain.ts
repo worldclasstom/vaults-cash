@@ -62,6 +62,10 @@ export const stateViewAbi = parseAbi([
 export type PoolState = { sqrtPriceX96: bigint; tick: number; liquidity: bigint };
 
 export async function getPoolState(market: Market): Promise<PoolState> {
+  if (market.venue !== "uniswap-v4") {
+    const { getPoolStateV3 } = await import("./v3core");
+    return getPoolStateV3(market);
+  }
   const client = publicClientFor(market.chainId);
   const stateView = CHAINS[market.chainId].uniswap.v4.stateView;
   const [slot0, liquidity] = await Promise.all([

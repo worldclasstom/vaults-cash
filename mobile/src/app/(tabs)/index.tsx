@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { fmtPrice, fmtUsd } from "@web/lib/format";
+import { VENUE_LABEL } from "@web/lib/chain";
 import { useMarketQuotes, useStats } from "@/lib/data";
 import { Card, Chip, Loading, Muted, Screen } from "@/components/ui";
 import { colors, radius, space } from "@/theme";
@@ -50,6 +51,7 @@ export default function PoolsScreen() {
                     <Chip tone={r.market.chainId === 8453 ? "base" : "robinhood"} rotate={i % 2 ? 2 : -2}>
                       {r.market.chainId === 8453 ? "Base" : "Robinhood"}
                     </Chip>
+                    {r.market.venue !== "uniswap-v4" && <Chip rotate={i % 2 ? -2 : 2}>{VENUE_LABEL[r.market.venue]}</Chip>}
                   </View>
                   <Muted>{st ? `${fmtUsd(st.tvlUsd, { compact: true })} liquidity · ${fmtUsd(st.vol24hUsd, { compact: true })} traded 24h` : `$${fmtPrice(r.priceUsd)}`}</Muted>
                 </View>

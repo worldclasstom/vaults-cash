@@ -187,5 +187,5 @@ before blaming a wallet or a paymaster: a reverting step shows up here first.
 | `/api/cron/swaps` | every 5 min | swap index (lib/swapIndex.ts) |
 | `/api/cron/targets` | every 5 min | Targets keeper: marks hit/expired; closes contract-registered ladders via `LadderCloser.close` from the keeper EOA; legacy ladders via agent access |
 
-All three are safe to hit by hand (idempotent, work-bounded). `scripts/simulate-ladder.ts` dry-runs a ladder like `simulate-deposit.ts` does a deposit.
+All three are safe to hit by hand (idempotent, work-bounded). `scripts/simulate-ladder.ts` dry-runs a ladder like `simulate-deposit.ts` does a deposit; `scripts/simulate-v3.ts <slug-v3|-aero> <richOwner> 25` dry-runs a v3/Aerodrome deposit AND the withdraw of the minted position in one simulated block (Base needs ALCHEMY_API_KEY; the CDP RPC denies eth_simulateV1; don't use the pool itself as the owner or its swap self-pays and reverts IIA).
 

@@ -17,6 +17,7 @@ import { Actions, V4Planner } from "@uniswap/v4-sdk";
 import { chainConfig } from "./chain";
 import type { Market } from "./markets";
 import { publicClientFor } from "./onchain";
+import { buildSwapCallV3, quoteExactInV3 } from "./v3core";
 
 export type Call = { to: `0x${string}`; value: bigint; data: `0x${string}` };
 
@@ -97,8 +98,14 @@ export function buildSwapCall(params: {
   amountIn: bigint;
   minAmountOut: bigint;
   deadline: bigint;
+  /** v3-style venues pay the output to an explicit recipient: the wallet */
+  recipient?: `0x${string}`;
 }): Call {
   const { market, direction, amountIn, minAmountOut, deadline } = params;
+  if (market.venue !== "uniswap-v4") {
+    if (!params.recipient) throw new Error("v3 swap needs a recipient");
+    return buildSwapCallV3({ market, direction, amountIn, minAmountOut, deadline, recipient: params.recipient });
+  }
   const toBase = direction === "quoteToBase";
   const input = toBase ? market.quote.address : market.base.address;
   const output = toBase ? market.base.address : market.quote.address;
@@ -169,6 +176,7 @@ export function buildSwapCall(params: {
 }
 
 async function quoteExactIn(market: Market, amountIn: bigint, direction: SwapDirection) {
+  if (market.venue !== "uniswap-v4") return quoteExactInV3(market, amountIn, direction);
   const input = direction === "quoteToBase" ? market.quote.address : market.base.address;
   const zeroForOne = input.toLowerCase() === market.pool.currency0.toLowerCase();
   const { result } = await publicClientFor(market.chainId).simulateContract({

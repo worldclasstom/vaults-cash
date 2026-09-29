@@ -1,12 +1,12 @@
 export function fmtUsd(n: number, opts: { compact?: boolean } = {}): string {
   if (!Number.isFinite(n)) return "—";
   if (opts.compact && Math.abs(n) >= 10_000) {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      notation: "compact",
-      maximumFractionDigits: 1,
-    }).format(n);
+    // hand-rolled: Hermes (the iPhone app) has no compact notation
+    const abs = Math.abs(n);
+    const [div, suffix] = abs >= 1e9 ? [1e9, "B"] : abs >= 1e6 ? [1e6, "M"] : [1e3, "K"];
+    const v = abs / div;
+    const digits = v >= 100 ? 0 : 1;
+    return `${n < 0 ? "-" : ""}$${v.toFixed(digits).replace(/\.0$/, "")}${suffix}`;
   }
   return new Intl.NumberFormat("en-US", {
     style: "currency",

@@ -16,6 +16,7 @@
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-query-persist-client": "^5.104.0",
     "@uniswap/sdk-core": "^7.18.0",
+    "@uniswap/v3-sdk": "^3.31.5",
     "@uniswap/v4-sdk": "^2.3.0",
     "@zerodev/ecdsa-validator": "^5.4.9",
     "@zerodev/sdk": "^5.5.10",

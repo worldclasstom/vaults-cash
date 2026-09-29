@@ -6,6 +6,7 @@ import { poolIdle } from "@/lib/limits";
 import { useState } from "react";
 import { chainConfig } from "@/lib/chain";
 import type { Market, TokenInfo } from "@/lib/markets";
+import { VENUE_LABEL } from "@/lib/chain";
 
 /** Token logo from the registry (GeckoTerminal images), falling back to a
  *  brand-colored monogram — which is also what the Robinhood stock tokens
@@ -108,6 +109,7 @@ export function MarketChips({
     <span className="flex flex-wrap items-center gap-1">
       <Chip title="Share of every trade that LPs earn">{market.pool.fee / 10_000}% fee</Chip>
       {chain && <ChainChip chainId={market.chainId} />}
+      <Chip title="The exchange this pool lives on">{VENUE_LABEL[market.venue]}</Chip>
       {steady && (
         <Chip tone="accent" title="Both sides track the same thing, so price swings barely change what you hold">
           Steady
