@@ -109,7 +109,7 @@ export function LoginTray() {
     <View style={s.tray}>
       {Platform.OS === "ios" && (
         // Drawn by us so all three buttons share one face; keeps Apple's rules: their logo, their exact wording, white or black.
-        <Button tone="white" left={<SymbolView name="apple.logo" size={20} tintColor="#000" style={{ width: 20, height: 22 }} />} onPress={() => run(() => oauth.login({ provider: "apple" }))} disabled={busy}>
+        <Button tone="white" left={<SymbolView name="apple.logo" size={24} tintColor="#000" style={{ width: 22, height: 26, marginTop: -3 }} />} onPress={() => run(() => oauth.login({ provider: "apple" }))} disabled={busy}>
           Sign in with Apple
         </Button>
       )}
