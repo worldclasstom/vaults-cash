@@ -1,7 +1,7 @@
 /** The sign-in tray under the intro: Apple, Google, then email or phone in a code flow. */
 import { useState } from "react";
 import { useLoginWithEmail, useLoginWithOAuth, useLoginWithSMS } from "@privy-io/expo";
-import * as AppleAuthentication from "expo-apple-authentication";
+import { SymbolView } from "expo-symbols";
 import { Linking, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Button, Muted } from "@/components/ui";
@@ -108,13 +108,10 @@ export function LoginTray() {
   return (
     <View style={s.tray}>
       {Platform.OS === "ios" && (
-        <AppleAuthentication.AppleAuthenticationButton
-          buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
-          cornerRadius={28}
-          style={{ height: 54, width: "100%" }}
-          onPress={() => run(() => oauth.login({ provider: "apple" }))}
-        />
+        // Drawn by us so all three buttons share one face; keeps Apple's rules: their logo, their exact wording, white or black.
+        <Button tone="white" left={<SymbolView name="apple.logo" size={20} tintColor="#000" style={{ width: 20, height: 22 }} />} onPress={() => run(() => oauth.login({ provider: "apple" }))} disabled={busy}>
+          Sign in with Apple
+        </Button>
       )}
       <Button tone="white" left={<GoogleG />} onPress={() => run(() => oauth.login({ provider: "google" }))} disabled={busy}>
         Sign in with Google
