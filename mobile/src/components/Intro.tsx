@@ -1,7 +1,7 @@
 /** The three intro slides behind the sign-in tray: the brand, how Pools work, how Targets work.
  *  Drawn in the Sticker Ledger voice: bills, crooked stickers, one green. */
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
+import { Animated, Easing, ScrollView, StyleSheet, Text, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Chip } from "@/components/ui";
 import { LogoMark } from "@/components/Logo";
@@ -85,6 +85,104 @@ function PoolsSlide() {
   );
 }
 
+
+/** "+$" that rises and fades, the web's animate-cash-up. */
+function Pop({ xPct }: { xPct: number }) {
+  const v = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(v, { toValue: 1, duration: 900, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+  }, [v]);
+  return (
+    <Animated.Text
+      style={[
+        s.pop,
+        { left: `${xPct}%`, opacity: v.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0, 1, 0] }), transform: [{ translateX: -10 }, { translateY: v.interpolate({ inputRange: [0, 1], outputRange: [0, -34] }) }] },
+      ]}
+    >
+      +$
+    </Animated.Text>
+  );
+}
+
+/** A price that wanders. Inside your band, trades pay you; outside, it waits. Same curve as the web demo. */
+function EarnSlide() {
+  const [t, setT] = useState(0);
+  const [pops, setPops] = useState<Array<{ id: number; x: number }>>([]);
+  const lastPop = useRef(0);
+  useEffect(() => {
+    let raf = 0;
+    const start = Date.now();
+    const loop = () => {
+      const now = Date.now();
+      const sec = (now - start) / 1000;
+      setT(sec);
+      const x = 50 + 38 * Math.sin(sec * 0.55) + 8 * Math.sin(sec * 1.9);
+      if (x >= 30 && x <= 70 && now - lastPop.current > 650) {
+        lastPop.current = now;
+        setPops((p) => [...p.slice(-5), { id: now, x }]);
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const x = 50 + 38 * Math.sin(t * 0.55) + 8 * Math.sin(t * 1.9);
+  const inRange = x >= 30 && x <= 70;
+  const price = 2400 + (x - 50) * 12;
+  const tone = inRange ? colors.accent : colors.negative;
+  return (
+    <View style={s.slide}>
+      <SlideHead tag="How you earn" title="In your range, every trade pays you." sub="The white dot is the market price. While it sits inside your band, each swap drops a slice of the pool fee on your position. Wander out and it waits; come back and it earns again." />
+      <View style={[s.board, { alignItems: "stretch", gap: 0, paddingTop: 22 }]}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom: 46 }}>
+          <Text style={s.rangeTitle}>ETH / USDC · $2,160 – $2,640</Text>
+          <Chip tone={inRange ? "accent" : "negative"} rotate={2}>{inRange ? "Earning" : "Paused"}</Chip>
+        </View>
+        <View>
+          <View style={s.popLane} pointerEvents="none">
+            {pops.map((p) => <Pop key={p.id} xPct={p.x} />)}
+          </View>
+          <View style={s.track}>
+            <View style={[s.band, { backgroundColor: inRange ? "rgba(124,212,74,0.4)" : "rgba(255,92,92,0.3)" }]} />
+            <View style={[s.edge, { left: "30%", backgroundColor: tone }]} />
+            <View style={[s.edge, { left: "70%", backgroundColor: tone }]} />
+            <View style={[s.marker, { left: `${x}%` }]} />
+          </View>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8 }}>
+            <Text style={s.axis}>$2,160</Text>
+            <Text style={s.nowPrice}>now ${price.toFixed(0)}</Text>
+            <Text style={s.axis}>$2,640</Text>
+          </View>
+        </View>
+        <Text style={[s.foot, { marginTop: 14 }]}>Fees stack on your position. Collect any time, or take them along when you withdraw.</Text>
+      </View>
+    </View>
+  );
+}
+
+/** Ticket → two halves → the chain's dollar back in your wallet, fee on the converted half only. */
+function WithdrawSlide() {
+  return (
+    <View style={s.slide}>
+      <SlideHead tag="When you withdraw" title="Take it out whenever." sub="The position is burned, both halves come back with the fees they earned, and the ETH half is swapped back to dollars. From there, send it anywhere." />
+      <View style={s.board}>
+        <View style={[s.ticket, { borderColor: "rgba(139,147,139,0.6)" }]}>
+          <Text style={[s.ticketTitle, { textDecorationLine: "line-through", textDecorationColor: colors.negative }]}>Position #3084756</Text>
+          <Text style={s.ticketSub}>closed, fees collected</Text>
+        </View>
+        <DownArrow />
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <Bill amount="$51.20" label="ETH → USDC" tone="eth" rotate={-1.5} />
+          <Bill amount="$51.20" label="USDC" tone="usdc" rotate={1} />
+        </View>
+        <DownArrow />
+        <Bill amount="$102.09" label="BACK IN YOUR WALLET" tone="in" rotate={-2} />
+        <Text style={s.foot}>0.6% on the converted half only: 31¢ here, nothing on the USDC that was already USDC</Text>
+      </View>
+    </View>
+  );
+}
+
 const RUNGS = [
   { price: "$5,200", pct: "25%", done: false },
   { price: "$4,800", pct: "25%", done: false },
@@ -124,7 +222,7 @@ function TargetsSlide() {
   );
 }
 
-const SLIDES = [BrandSlide, PoolsSlide, TargetsSlide];
+const SLIDES = [BrandSlide, PoolsSlide, EarnSlide, WithdrawSlide, TargetsSlide];
 
 export function Intro() {
   const { width } = useWindowDimensions();
@@ -196,6 +294,15 @@ const s = StyleSheet.create({
   now: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 2 },
   nowLine: { flex: 1, height: 1, backgroundColor: "rgba(124,212,74,0.5)" },
   nowText: { fontFamily: fonts.monoMedium, fontSize: 12, color: colors.accent },
+  rangeTitle: { fontFamily: fonts.display, fontSize: 15, color: colors.foreground, flexShrink: 1 },
+  popLane: { position: "absolute", left: 0, right: 0, top: -44, height: 44 },
+  pop: { position: "absolute", bottom: 0, fontFamily: fonts.display, fontSize: 18, color: colors.accent },
+  track: { height: 16, borderRadius: 8, backgroundColor: colors.surfaceRaised },
+  band: { position: "absolute", top: 0, bottom: 0, left: "30%", width: "40%", borderRadius: 8 },
+  edge: { position: "absolute", top: 0, bottom: 0, width: 4 },
+  marker: { position: "absolute", top: -4, width: 24, height: 24, marginLeft: -12, borderRadius: 12, backgroundColor: colors.foreground, borderWidth: 3, borderColor: colors.background, ...stickerShadow },
+  axis: { fontFamily: fonts.mono, fontSize: 12, color: colors.muted },
+  nowPrice: { fontFamily: fonts.display, fontSize: 14, color: colors.foreground },
   dots: { flexDirection: "row", justifyContent: "center", gap: 7, paddingVertical: 12 },
   dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.border },
   dotOn: { backgroundColor: colors.foreground, width: 20 },
