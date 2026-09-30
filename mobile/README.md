@@ -46,3 +46,9 @@ login on iOS uses the bundle id as the Apple client id on that app client.
 Apple's crypto rule (3.1.5) requires the developer account to be enrolled as
 an organization. Enroll Prosperity Labs LLC (needs a D-U-N-S number) before
 the first TestFlight build.
+
+## Fonts
+`assets/fonts/` holds a static Bricolage Grotesque ExtraBold (instanced from the web's
+variable TTF with `fonttools varLib.instancer` at wght 800 / opsz 96) and the Geist and
+Geist Mono statics copied from the `geist` package. `src/theme.ts` maps them to the
+`fonts` tokens; the root layout holds the splash until they load.

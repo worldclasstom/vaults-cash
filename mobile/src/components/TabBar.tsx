@@ -3,7 +3,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Path } from "react-native-svg";
-import { colors } from "@/theme";
+import { colors, fonts } from "@/theme";
 
 type IconProps = { active: boolean; color: string };
 const sw = (a: boolean) => (a ? 2.4 : 1.8);
@@ -104,5 +104,5 @@ const s = StyleSheet.create({
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 2 },
   },
-  label: { fontSize: 10, fontWeight: "600", color: colors.muted },
+  label: { fontSize: 10, fontFamily: fonts.semibold, color: colors.muted },
 });
