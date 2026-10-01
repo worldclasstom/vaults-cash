@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { usePrivy } from "@privy-io/expo";
-import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
@@ -9,6 +8,8 @@ import { CHAINS, CHAIN_IDS, VENUE_LABEL, type ChainId } from "@web/lib/chain";
 import type { Market } from "@web/lib/markets";
 import { useCash, useMarketQuotes, useStats } from "@/lib/data";
 import { useActiveAddress } from "@/lib/wallet";
+import { AddFundsSheet } from "@/components/AddFundsSheet";
+import { SendSheet } from "@/components/SendSheet";
 import { Button, Card, Chip, Loading, Muted, Screen } from "@/components/ui";
 import { colors, radius, space } from "@/theme";
 
@@ -45,7 +46,7 @@ function TokenLogo({ uri, symbol, color, style }: { uri?: string; symbol: string
 function CashHeader() {
   const address = useActiveAddress();
   const { data: cash, isLoading } = useCash(address);
-  const [copied, setCopied] = useState(false);
+  const [sheet, setSheet] = useState<"none" | "fund" | "send">("none");
   return (
     <View style={{ paddingVertical: space.md, gap: 6 }}>
       <Muted>Cash available</Muted>
@@ -61,19 +62,16 @@ function CashHeader() {
         ))}
       </View>
       <View style={{ flexDirection: "row", gap: 10, paddingTop: 6 }}>
-        <Button
-          onPress={async () => {
-            if (!address) return;
-            await Clipboard.setStringAsync(address);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-          }}
-          style={{ paddingVertical: 10, paddingHorizontal: 20 }}
-        >
-          {copied ? "Address copied" : "Add funds"}
+        <Button onPress={() => setSheet("fund")} style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
+          Add funds
+        </Button>
+        <Button tone="ghost" onPress={() => setSheet("send")} style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
+          Send
         </Button>
       </View>
-      <Muted>Send USDC on Base or USDG on Robinhood Chain to your address. Copy it with the button.</Muted>
+      <Muted>Apple Pay, card, or a transfer from an exchange. Your dollars stay in your own wallet.</Muted>
+      <AddFundsSheet open={sheet === "fund"} onClose={() => setSheet("none")} address={address} />
+      <SendSheet open={sheet === "send"} onClose={() => setSheet("none")} address={address} />
     </View>
   );
 }

@@ -54,3 +54,20 @@ export function useCash(address: `0x${string}` | undefined) {
     },
   });
 }
+
+/** One token's balance for the wallet; the zero address means native ETH. */
+export function useTokenBalance(address: `0x${string}` | undefined, chainId: number, token: `0x${string}`, decimals: number) {
+  return useQuery({
+    queryKey: ["token-balance", chainId, token, address],
+    enabled: !!address,
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const client = publicClientFor(chainId);
+      const raw =
+        token === "0x0000000000000000000000000000000000000000"
+          ? await client.getBalance({ address: address! })
+          : await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [address!] });
+      return { raw, formatted: Number(formatUnits(raw, decimals)) };
+    },
+  });
+}

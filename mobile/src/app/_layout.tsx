@@ -1,5 +1,6 @@
 import { PrivyProvider, usePrivy } from "@privy-io/expo";
 import { SmartWalletsProvider } from "@privy-io/expo/smart-wallets";
+import { PrivyElements } from "@privy-io/expo/ui";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { DarkTheme, Stack, ThemeProvider } from "expo-router";
@@ -53,6 +54,7 @@ export default function RootLayout() {
           <ThemeProvider value={theme}>
             <StatusBar style="light" />
             <Gate />
+            <PrivyElements config={{ appearance: { colorScheme: "dark", accentColor: colors.accent } }} />
           </ThemeProvider>
         </QueryClientProvider>
       </SmartWalletsProvider>
