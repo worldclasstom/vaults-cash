@@ -83,6 +83,14 @@ const SPECS: Record<string, ChainSpec> = {
     candidates: {
       USDG: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       WETH: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      // No crypto besides ETH is listed here on purpose (checked 2026-10-01). Everything
+      // GeckoTerminal shows on this chain with big "TVL" is counterfeit: "BTC"/"USDB"
+      // (9- and 8-decimal tokens with invented supply), three "USDC"s, "LINK", "XRP
+      // Robinhood", and a "cbBTC"/"cbXRP" pair that copy Coinbase's names but sit at
+      // random addresses (Coinbase deploys its wrappers at the same vanity address on
+      // every chain; see CANONICAL below) and price 15–25% off spot. Only WETH here is
+      // a canonical bridged token (it answers l1Address()). Add a crypto token only
+      // after it passes the CANONICAL check or proves it came through the bridge.
       TSLA: "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
       AAPL: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
       AMD: "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
@@ -110,6 +118,13 @@ const SPECS: Record<string, ChainSpec> = {
       USO: "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344",
     },
   },
+};
+
+/** Wrappers that live at one fixed address on every EVM chain. A candidate with
+ *  one of these symbols at any other address is an imitation and fails the run. */
+const CANONICAL: Record<string, string> = {
+  cbBTC: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+  cbXRP: "0xcb585250f852C6c6bf90434AB21A00f02833a4af",
 };
 
 const argChain = process.argv[process.argv.indexOf("--chain") + 1];
@@ -225,7 +240,35 @@ async function main() {
 
   console.log("\n— 3. Tokens —");
   const tokens: Record<string, NonNullable<Awaited<ReturnType<typeof checkToken>>>> = {};
-  for (const [label, addr] of Object.entries(spec.candidates)) {
+  // Robinhood keeps adding stock tokens (194 on chain vs the 25 the docs page listed
+  // when this file was written), so take the full list from Robinhood's Stock Token
+  // API and let the pool probes decide which have liquidity worth listing.
+  const candidates: Record<string, string> = { ...spec.candidates };
+  if (spec.chainId === 4663) {
+    try {
+      const res = await fetch("https://api.robinhood.com/rhj/assets", { headers: { accept: "application/json" } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const body = (await res.json()) as { assets: Array<{ tokenSymbol: string; deployments: Array<{ contractAddress: string; chainId: number }> }> };
+      let added = 0;
+      for (const a of body.assets ?? []) {
+        for (const d of a.deployments ?? []) {
+          if (d.chainId === 4663 && a.tokenSymbol && !candidates[a.tokenSymbol]) {
+            candidates[a.tokenSymbol] = getAddress(d.contractAddress);
+            added++;
+          }
+        }
+      }
+      ok(`Robinhood Stock Token API: ${added} more stock tokens to probe`);
+    } catch (e) {
+      fail("Robinhood Stock Token API", (e as Error).message);
+    }
+  }
+  for (const [label, addr] of Object.entries(candidates)) {
+    if (CANONICAL[label] && CANONICAL[label].toLowerCase() !== addr.toLowerCase()) {
+      fail(`${label} at ${addr} is not Coinbase's ${label} (${CANONICAL[label]}) — imitation, skipped`);
+      delete candidates[label];
+      continue;
+    }
     try {
       const t = await checkToken(label, addr);
       if (t) tokens[label] = t;

@@ -206,7 +206,10 @@ function buildMarkets(chainId: ChainId, registry: Registry): Market[] {
       symbol: sym,
       name: known?.name ?? (reg ? cleanName(reg.name) : sym),
       decimals: isEth ? 18 : reg.decimals,
-      kind: known?.kind ?? "crypto",
+      // Robinhood stock tokens are ERC-8056 (they expose uiMultiplier); anything
+      // unknown that carries one is a stock, so the 190-odd tickers the registry
+      // learns from Robinhood's API never land in the crypto tab.
+      kind: known?.kind ?? (reg?.uiMultiplier ? "stock" : "crypto"),
       correlates: known?.correlates ?? null,
       uiMultiplier: reg?.uiMultiplier ? Number(BigInt(reg.uiMultiplier)) / 1e18 : 1,
       color: known?.color ?? hashColor(sym),

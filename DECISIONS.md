@@ -30,3 +30,27 @@ with no fee; Tom applied 2026-10-01). Until one lands, USDG arrives by transfer 
 Test note: the office network resets connections to moonpay.com, pay.coinbase.com and mainnet.base.org,
 so the MoonPay page can't be exercised from the simulator there; the Privy hand-off itself was verified
 (it opened buy.moonpay.com).
+
+## 2026-10-01 — Robinhood Chain has one real crypto pool, and that is the honest answer
+The phone showed ETH/USDG alone under "crypto" on Robinhood Chain, so we went looking for what
+discovery had missed. The candidate list was the official contracts page (USDG, WETH, 25 stock
+tokens), so the probes never asked about anything else. Discovery now pulls every stock token on
+chain from Robinhood's Stock Token API (194 at the time) and probes them all; the liquidity floor
+decides what lists (75 tickers made it, up from 25). Unknown tokens that expose an ERC-8056
+uiMultiplier are classified "stock", so new tickers land in the stock tab. Robinhood markets
+went 65 → 147.
+
+Crypto did NOT grow, on purpose. Everything GeckoTerminal shows on this chain with big "TVL" is
+counterfeit: "BTC"/"USDB" (9- and 8-decimal tokens with invented supply), three different "USDC"s,
+a "LINK", an "XRP Robinhood", and a "cbBTC"/"cbXRP" pair that copy Coinbase's names, decimals and
+supply but sit at random addresses (Coinbase deploys its wrappers at one vanity address on every
+chain) and price 15–25% off spot, which arbitrage would never allow for the real thing. Only WETH
+is a canonical bridged token (it answers l1Address()). The scanner now fails any candidate whose
+symbol is a known Coinbase wrapper at the wrong address. Robinhood Chain has no bridged USDC,
+USDT or BTC today; USDG is the only real dollar and ETH the only real crypto asset. More crypto
+pools there wait on Robinhood or a canonical bridge bringing real assets over.
+
+Known gaps: the deepest ETH/USDG v4 pool ($28M) is a hooked dynamic-fee pool, out of scope until
+contract v2's hook allowlist. The phone also silently lost every v3 pool on both chains until
+today: Metro's dev-only lazy bundling resolved the shared lib's `import("./v3core")` against the
+phone project root (mobile/metro.config.js now redirects it).
